@@ -22,6 +22,16 @@ read at build time; the admin panel is the only client-rendered route.
 - Values still to be replaced with real ones are marked `PLACEHOLDER`.
 - Deliberate simplifications are marked `ponytail:` with the upgrade path.
 
+## Tickets
+
+Work is tracked as GitHub Issues: milestones are epics (E0–E8), `epic:*` labels mirror them,
+and blockers are written into the body as `**Blocked by** #N`. Two repo skills own the
+mechanics — `ticket` creates and refines issues, `ticket-implement` picks one up, reads it
+with all its comments, builds it and opens the pull request. Use them rather than improvising
+`gh` calls, and start Claude from this directory so they load.
+
+`.claude/tickets/INDEX.md` is the short decision log and pointer, not a second ticket system.
+
 ## Commands
 
     npm run dev      # dev server
