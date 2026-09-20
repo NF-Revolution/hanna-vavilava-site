@@ -1,0 +1,101 @@
+---
+/*
+ * The drawer the hamburger opens. <dialog>.showModal() gives the focus trap,
+ * the Escape key and background inertness for free, so none of that is
+ * hand-rolled here. With JavaScript off the hamburger stays what it is in the
+ * markup — a link to /menu, which renders the same list as a page.
+ */
+import MenuNav from './MenuNav.astro';
+import Close from './icons/Close.astro';
+import { t, type Locale } from '../i18n';
+import type { RouteKey } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+  slug?: string;
+}
+const { locale, routeKey, slug } = Astro.props;
+const dict = t(locale);
+---
+
+<dialog id="hv-menu" class="drawer" aria-label={dict.a11y.openMenu}>
+  <div class="drawer-panel">
+    <div class="drawer-head">
+      <form method="dialog">
+        <button type="submit" class="drawer-close" aria-label={dict.a11y.closeMenu}>
+          <Close />
+        </button>
+      </form>
+    </div>
+    <MenuNav locale={locale} routeKey={routeKey} slug={slug} />
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('hv-menu') as HTMLDialogElement | null;
+
+  if (dialog?.showModal) {
+    for (const trigger of document.querySelectorAll<HTMLAnchorElement>('.menu-trigger')) {
+      trigger.addEventListener('click', (event) => {
+        // Let modified clicks still open /menu in a new tab.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        dialog.showModal();
+        document.body.style.setProperty('overflow', 'hidden');
+      });
+    }
+
+    // ponytail: overflow alone is enough on every browser except iOS Safari,
+    // which keeps rubber-banding the page behind. Swap in the position:fixed
+    // scroll-offset dance only if that turns out to matter on real hardware.
+    dialog.addEventListener('close', () => {
+      document.body.style.removeProperty('overflow');
+    });
+  }
+</script>
+
+<style>
+  .drawer {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: var(--ink-inv);
+  }
+
+  .drawer::backdrop {
+    background: rgba(14, 14, 13, 0.7);
+  }
+
+  .drawer-panel {
+    width: min(470px, 100%);
+    height: 100%;
+    background: rgba(14, 14, 13, 0.96);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-bottom: 1px solid var(--rule-inv);
+    height: 76px;
+    flex-shrink: 0;
+    padding-right: 24px;
+  }
+
+  .drawer-close {
+    width: var(--tap);
+    height: var(--tap);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-inv);
+  }
+</style>

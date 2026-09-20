@@ -1,0 +1,158 @@
+---
+/*
+ * The menu's one list. Rendered twice from the same source: inside the drawer
+ * on every page, and as the whole of /menu, which is where the hamburger goes
+ * when JavaScript is not available.
+ */
+import { t, type Locale } from '../i18n';
+import { path, type RouteKey } from '../i18n/routes';
+import { site, whatsappHref, telegramHref, emailHref } from '../site';
+import { fill } from '../i18n/format';
+
+interface Props {
+  locale: Locale;
+  /* So the language switch lands on this page's twin, not on the homepage. */
+  routeKey: RouteKey;
+  slug?: string;
+}
+const { locale, routeKey, slug } = Astro.props;
+const dict = t(locale);
+const other = locale === 'pl' ? 'en' : 'pl';
+
+const primary = [
+  {
+    href: path(locale, 'horses'),
+    label: dict.nav.horses,
+    meta: fill(dict.menu.horsesMeta, { count: String(site.horsesAvailable).padStart(2, '0') }),
+  },
+  { href: path(locale, 'about'), label: dict.nav.about, meta: dict.menu.aboutMeta },
+  { href: path(locale, 'faq'), label: dict.nav.faq, meta: dict.menu.faqMeta },
+  { href: path(locale, 'enquiry'), label: dict.nav.enquiry, meta: dict.menu.enquiryMeta },
+];
+
+const contact = [
+  { href: whatsappHref(), label: dict.menu.whatsapp, meta: site.phone },
+  { href: telegramHref, label: dict.menu.telegram, meta: `@${site.telegram}` },
+  { href: emailHref, label: dict.menu.email, meta: site.email, lower: true },
+];
+---
+
+<nav class="menu-nav">
+  <ul class="menu-primary">
+    {primary.map((item) => (
+      <li>
+        <a class="top" href={item.href}>
+          <span>{item.label}</span>
+          <span class="meta menu-meta">{item.meta}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <ul class="menu-contact">
+    {contact.map((item) => (
+      <li>
+        <a class="nav" href={item.href}>
+          <span>{item.label}</span>
+          <span class:list={['meta', 'menu-meta', item.lower && 'menu-meta-lower']}>
+            {item.meta}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<div class="menu-foot">
+  <!--
+    ponytail: posts to the same endpoint as the enquiry form, with its own
+    unbundled consent box (ticket 5.9). Until that endpoint exists the field is
+    inert, so it is not rendered yet rather than rendered broken.
+  -->
+  <p class="lbl menu-langs">
+    <span class="menu-lang-current">{dict.lang.current}</span>
+    <a class="menu-lang-other" href={path(other, routeKey, slug)}>
+      {dict.lang.switchTo}
+    </a>
+  </p>
+</div>
+
+<style>
+  .menu-nav {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 26px 28px 0;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-contact {
+    margin-top: 26px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule-inv);
+  }
+
+  .top,
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    text-transform: uppercase;
+  }
+
+  .top {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--ink-inv);
+    min-height: 56px;
+  }
+
+  .nav {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--ink-inv-muted);
+    min-height: var(--tap);
+  }
+
+  .nav:hover,
+  .top:hover {
+    color: var(--ink-inv);
+  }
+
+  .menu-meta {
+    color: var(--ink-inv-faint);
+  }
+
+  .menu-meta-lower {
+    text-transform: none;
+    letter-spacing: 0.1em;
+  }
+
+  .menu-foot {
+    padding: 0 28px 34px;
+    flex-shrink: 0;
+  }
+
+  .menu-langs {
+    display: flex;
+    gap: 16px;
+    margin: 24px 0 0;
+  }
+
+  .menu-lang-current {
+    border-bottom: 1px solid var(--ink-inv);
+    padding-bottom: 4px;
+  }
+
+  .menu-lang-other {
+    color: var(--ink-inv-muted);
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+/*
+ * The menu as a page. This is where the hamburger goes when JavaScript is off,
+ * and it renders the same list the drawer does.
+ */
+import Base from '../layouts/Base.astro';
+import MenuNav from './MenuNav.astro';
+import { t, type Locale } from '../i18n';
+import { path } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const page = dict.pages.menu;
+---
+
+<Base
+  locale={locale}
+  routeKey="menu"
+  title={page.title}
+  description={page.description}
+  ground="dark"
+>
+  <main id="main" class="menu-page">
+    <div class="menu-page-head">
+      <a class="wordmark" href={path(locale, 'home')}>
+        <span class="wordmark-name">{dict.brand.name}</span>
+        <span class="lbl wordmark-tagline">{dict.brand.tagline}</span>
+      </a>
+    </div>
+    <MenuNav locale={locale} routeKey="menu" />
+  </main>
+</Base>
+
+<style>
+  .menu-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    display: flex;
+    flex-direction: column;
+    max-width: 470px;
+  }
+
+  .menu-page-head {
+    border-bottom: 1px solid var(--rule-inv);
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    padding: 16px 28px;
+  }
+
+  .wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .wordmark-name {
+    font-size: 15px;
+    letter-spacing: 0.44em;
+    text-transform: uppercase;
+    padding-left: 0.44em;
+  }
+
+  .wordmark-tagline {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--ink-inv-muted);
+  }
+</style>

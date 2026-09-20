@@ -1,0 +1,24 @@
+---
+import Page from '../../layouts/Page.astro';
+import SubBar from '../../components/SubBar.astro';
+import { t } from '../../i18n';
+
+const locale = 'en' as const;
+const dict = t(locale);
+const page = dict.pages.privacy;
+---
+
+<Page locale={locale} routeKey="privacy" title={page.title} description={page.description}>
+  <SubBar label={page.label} />
+  <section class="stub">
+    <!-- Ticket 7.3 — RODO Art. 13 notice. -->
+    <p class="copy">7.3 — RODO Art. 13 notice</p>
+  </section>
+</Page>
+
+<style>
+  .stub {
+    padding: 80px var(--gutter);
+    color: var(--ink-muted);
+  }
+</style>

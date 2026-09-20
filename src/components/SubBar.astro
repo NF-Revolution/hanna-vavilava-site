@@ -1,0 +1,42 @@
+---
+/* The 56px band under the header: what this page is, on the left. */
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<div class="subbar">
+  <p class="lbl subbar-label">{label}</p>
+  <div class="subbar-right">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .subbar {
+    min-height: var(--subbar-h);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 8px var(--gutter);
+  }
+
+  .subbar-label {
+    margin: 0;
+  }
+
+  .subbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  @media (max-width: 720px) {
+    .subbar {
+      padding-inline: var(--gutter-mobile);
+    }
+  }
+</style>

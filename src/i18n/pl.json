@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "name": "Hanna Vavilava",
+    "tagline": "Show Jumping Horses · Poland"
+  },
+  "a11y": {
+    "skipToContent": "Przejdź do treści",
+    "openMenu": "Menu — konie, jak przebiega zakup, o mnie, zapytanie",
+    "closeMenu": "Zamknij menu",
+    "home": "Strona główna",
+    "whatsapp": "WhatsApp — napisz do Hanny"
+  },
+  "nav": {
+    "horses": "Konie",
+    "about": "O mnie",
+    "faq": "Pytania",
+    "enquiry": "Zapytanie",
+    "privacy": "Prywatność"
+  },
+  "menu": {
+    "horsesMeta": "{count} dostępne",
+    "aboutMeta": "i jak przebiega zakup",
+    "faqMeta": "06",
+    "enquiryMeta": "odpowiedź w 1 h",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "email": "E-mail"
+  },
+  "notify": {
+    "label": "Powiadom mnie o nowych koniach",
+    "placeholder": "adres e-mail",
+    "submit": "Zapisz",
+    "note": "Jedna wiadomość, kiedy dochodzi nowy koń. Zwykle raz w miesiącu.",
+    "consent": "Zgadzam się na otrzymywanie wiadomości o nowych koniach. Mogę wypisać się w każdej chwili."
+  },
+  "status": {
+    "city": "Warszawa, Polska",
+    "horsesAvailable": {
+      "one": "{count} koń dostępny",
+      "few": "{count} konie dostępne",
+      "many": "{count} koni dostępnych",
+      "other": "{count} konia dostępne"
+    },
+    "updated": "zaktualizowano {date}"
+  },
+  "footer": {
+    "stable": "Stajnia [PLACEHOLDER]",
+    "location": "40 km od Warszawy, Polska",
+    "languages": "Polski · English",
+    "vetting": "Badanie przedzakupowe — weterynarza wybiera kupujący",
+    "footage": "Pełne nagranie bez cięć na życzenie",
+    "phone": "Telefon"
+  },
+  "lang": {
+    "switchTo": "English",
+    "current": "Polski"
+  },
+  "pages": {
+    "home": {
+      "title": "Hanna Vavilava — konie skokowe na sprzedaż, Polska",
+      "description": "Konie skokowe na sprzedaż pod Warszawą. Każdego konia jeżdżę osobiście przez co najmniej cztery miesiące, zanim trafi na tę stronę. Odpowiadam sama, w ciągu godziny.",
+      "h1": "Hanna Vavilava — konie skokowe na sprzedaż pod Warszawą"
+    },
+    "horses": {
+      "title": "Konie na sprzedaż — Hanna Vavilava",
+      "description": "Aktualny stan stajni: konie skokowe od 110 do 130 cm, z pełną dokumentacją, nagraniami bez cięć i zdjęciami RTG udostępnianymi przed wizytą.",
+      "label": "Wszystkie konie"
+    },
+    "horsesGrid": {
+      "title": "Konie na sprzedaż, siatka — Hanna Vavilava",
+      "description": "Aktualny stan stajni w widoku siatki — cztery konie skokowe, cena, poziom i wzrost na jednym ekranie.",
+      "label": "Wszystkie konie"
+    },
+    "about": {
+      "title": "O mnie i jak przebiega zakup — Hanna Vavilava",
+      "description": "Sprzedaję konie od 2016 roku, od 2021 wyłącznie konie skokowe. Pięć kroków zakupu: zapytanie, rozmowa wideo, oglądanie, badanie przedzakupowe, umowa.",
+      "label": "O mnie"
+    },
+    "faq": {
+      "title": "Pytania — Hanna Vavilava",
+      "description": "Negocjacje ceny, badanie przedzakupowe, zakup bez przyjazdu do Polski, okres próbny i termin oglądania — sześć pytań, na które odpowiadam najczęściej.",
+      "label": "Pytania · 06"
+    },
+    "enquiry": {
+      "title": "Zapytanie — Hanna Vavilava",
+      "description": "Zapytanie trafia bezpośrednio do Hanny. Odpowiedź w ciągu godziny, 8:00–21:00 CET.",
+      "label": "Zapytanie"
+    },
+    "enquirySent": {
+      "title": "Zapytanie wysłane — Hanna Vavilava",
+      "description": "Zapytanie wysłane.",
+      "label": "Zapytanie wysłane"
+    },
+    "menu": {
+      "title": "Menu — Hanna Vavilava",
+      "description": "Konie, o mnie, pytania i zapytanie.",
+      "label": "Menu"
+    },
+    "privacy": {
+      "title": "Prywatność — Hanna Vavilava",
+      "description": "Informacja o przetwarzaniu danych osobowych.",
+      "label": "Prywatność"
+    }
+  },
+  "home": {
+    "enter": {
+      "one": "Wejdź — {count} koń",
+      "few": "Wejdź — {count} konie",
+      "many": "Wejdź — {count} koni",
+      "other": "Wejdź — {count} konia"
+    },
+    "sound": "Włącz dźwięk",
+    "soundHint": "Tętent, oddech, drąg",
+    "videoSpec": "Wideo · 100vh · pętla 8 s · wyciszone · bez napisów na kadrze",
+    "videoSpecDetail": "Poster < 120 kb · plik < 2,5 MB · obraz statyczny przy prefers-reduced-motion",
+    "videoAlt": "ALT: klacz Cascada skacze oxer 125 cm, ujęcie z boku na krytej ujeżdżalni — kliknięcie kadru prowadzi do koni"
+  }
+}

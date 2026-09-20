@@ -1,0 +1,24 @@
+---
+import Page from '../../layouts/Page.astro';
+import SubBar from '../../components/SubBar.astro';
+import { t } from '../../i18n';
+
+const locale = 'en' as const;
+const dict = t(locale);
+const page = dict.pages.faq;
+---
+
+<Page locale={locale} routeKey="faq" title={page.title} description={page.description}>
+  <SubBar label={page.label} />
+  <section class="stub">
+    <!-- Ticket 4.7 — six questions as disclosure elements. -->
+    <p class="copy">4.7 — six questions as disclosure elements</p>
+  </section>
+</Page>
+
+<style>
+  .stub {
+    padding: 80px var(--gutter);
+    color: var(--ink-muted);
+  }
+</style>

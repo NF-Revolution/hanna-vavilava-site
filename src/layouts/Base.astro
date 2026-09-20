@@ -1,0 +1,67 @@
+---
+import '../styles/fonts.css';
+import '../styles/base.css';
+import { locales, htmlLang, t, type Locale } from '../i18n';
+import { path, type RouteKey } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+  slug?: string;
+  title: string;
+  description: string;
+  /* Dark is the video screens; light is every page behind the menu. */
+  ground?: 'light' | 'dark';
+}
+
+const { locale, routeKey, slug, title, description, ground = 'light' } = Astro.props;
+const dict = t(locale);
+
+const canonical = new URL(path(locale, routeKey, slug), Astro.site);
+const alternates = locales.map((l) => ({
+  locale: l,
+  href: new URL(path(l, routeKey, slug), Astro.site).href,
+}));
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    {alternates.map((alt) => (
+      <link rel="alternate" hreflang={htmlLang[alt.locale]} href={alt.href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={dict.brand.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:locale" content={locale === 'pl' ? 'pl_PL' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content={ground === 'dark' ? '#0E0E0D' : '#F6F5F2'} />
+
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+    {locale === 'pl' && (
+      <link
+        rel="preload"
+        href="/fonts/archivo-latin-ext.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin
+      />
+    )}
+    <slot name="head" />
+  </head>
+  <body data-ground={ground}>
+    <a class="skip-link" href="#main">
+      {dict.a11y.skipToContent}
+    </a>
+    <slot />
+  </body>
+</html>

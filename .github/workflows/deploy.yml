@@ -1,0 +1,49 @@
+name: deploy
+
+# Runs on a push to main, and on the repository_dispatch the admin panel's
+# Publish button sends (ticket 2.6) after Hanna changes a horse in Firestore.
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [publish]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # Astro keeps optimised images here; without the cache every build
+      # re-downloads and re-encodes every photo from Firebase Storage.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-assets-${{ github.sha }}
+          restore-keys: astro-assets-
+
+      - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          # Service account with Firestore read access, used by the build-time
+          # content loader (ticket 2.2).
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - run: npm run links
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live

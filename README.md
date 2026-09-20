@@ -1,0 +1,47 @@
+# hanna-vavilava-site
+
+Sales site for Hanna Vavilava — show jumping horses near Warsaw.
+
+## Run it
+
+    npm install
+    npm run dev       # http://localhost:4321
+    npm run ci        # format check, types, build, internal link check
+
+## Routes
+
+Polish is the default locale and sits at the root; English sits under `/en`.
+Paths are localised (`/konie`, `/en/horses`) and defined once in
+`src/i18n/routes.ts`.
+
+| Page                  | PL                   | EN                  |
+| --------------------- | -------------------- | ------------------- |
+| Home                  | `/`                  | `/en`               |
+| Menu (no-JS fallback) | `/menu`              | `/en/menu`          |
+| Horses                | `/konie`             | `/en/horses`        |
+| Horses, grid          | `/konie/siatka`      | `/en/horses/grid`   |
+| Horse                 | `/konie/<slug>`      | `/en/horses/<slug>` |
+| About                 | `/o-mnie`            | `/en/about`         |
+| Questions             | `/pytania`           | `/en/questions`     |
+| Enquiry               | `/zapytanie`         | `/en/enquiry`       |
+| Enquiry sent          | `/zapytanie/wyslane` | `/en/enquiry/sent`  |
+| Privacy               | `/prywatnosc`        | `/en/privacy`       |
+
+## Deployment
+
+GitHub Actions builds the site and deploys it to Firebase Hosting, on a push to
+`main` and on the `repository_dispatch` the admin panel's Publish button sends.
+Pull requests get their own preview channel.
+
+Repository settings the workflows expect:
+
+| Kind     | Name                       | What it is                                            |
+| -------- | -------------------------- | ----------------------------------------------------- |
+| Variable | `FIREBASE_PROJECT_ID`      | The Firebase project                                  |
+| Variable | `SITE_URL`                 | Canonical origin, e.g. `https://hannavavilava.com`    |
+| Secret   | `FIREBASE_SERVICE_ACCOUNT` | Service account JSON: Hosting deploy + Firestore read |
+
+## Still placeholder
+
+Every contact detail, the stable name, the horse facts and the video assets are
+invented and marked `PLACEHOLDER` in the source. Grep for it before launch.

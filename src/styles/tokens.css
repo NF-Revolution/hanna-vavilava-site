@@ -1,0 +1,53 @@
+/*
+ * Design tokens — from the artboard canvas "Hanna Vavilava — sales site".
+ *
+ * Two grounds, one palette: the video screens are near-black, the pages
+ * behind the menu are off-white, and each page carries exactly one
+ * inverted band where the action is.
+ */
+:root {
+  /* Grounds */
+  --ground-dark: #0e0e0d;
+  --ground-light: #f6f5f2;
+
+  /* Ink on the light ground */
+  --ink: #0e0e0d;
+  --ink-muted: #6b6a64; /* 4.98:1 on --ground-light */
+
+  /* Ink on the dark ground */
+  --ink-inv: #f2f1ed;
+  --ink-inv-muted: #a3a29c; /* 7.56:1 on --ground-dark */
+  --ink-inv-faint: #7d7c75; /* 4.60:1 on --ground-dark */
+
+  /*
+   * Contrast corrections against the artboards. The design uses #8D8B83 on
+   * the light ground (3.13:1) and #6E6D68 on the dark ground (3.74:1) for
+   * tertiary text — both fail WCAG AA at the 10–11px sizes they are used at.
+   * They are folded into --ink-muted and --ink-inv-faint above. Everything
+   * else is the artboard value unchanged.
+   */
+
+  /* Rules */
+  --rule: #d8d6d0;
+  --rule-hair: #e4e2dc;
+  --rule-field: #c9c7c0;
+  --rule-inv: #262622;
+  --rule-inv-soft: #3a3a36;
+
+  /* Image placeholders, until real photography lands */
+  --placeholder: #e9e8e3;
+  --placeholder-inv: #171715;
+
+  /* Type */
+  --font-body: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-script: 'Italianno', cursive;
+
+  /* Spacing — the artboards use a 40px page gutter and 4px rhythm */
+  --gutter: 40px;
+  --gutter-mobile: 20px;
+
+  /* Chrome */
+  --header-h: 88px;
+  --subbar-h: 56px;
+  --tap: 44px;
+}

@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "name": "Hanna Vavilava",
+    "tagline": "Show Jumping Horses · Poland"
+  },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "openMenu": "Menu — horses, how buying works, about, enquiry",
+    "closeMenu": "Close menu",
+    "home": "Home",
+    "whatsapp": "WhatsApp — message Hanna"
+  },
+  "nav": {
+    "horses": "Horses",
+    "about": "About",
+    "faq": "Questions",
+    "enquiry": "Enquiry",
+    "privacy": "Privacy"
+  },
+  "menu": {
+    "horsesMeta": "{count} available",
+    "aboutMeta": "and how buying works",
+    "faqMeta": "06",
+    "enquiryMeta": "reply within 1 h",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "email": "Email"
+  },
+  "notify": {
+    "label": "Tell me when a new horse arrives",
+    "placeholder": "email address",
+    "submit": "Sign up",
+    "note": "One message when a new horse arrives. Usually once a month.",
+    "consent": "I agree to receive messages about new horses. I can unsubscribe at any time."
+  },
+  "status": {
+    "city": "Warsaw, Poland",
+    "horsesAvailable": {
+      "one": "{count} horse available",
+      "few": "{count} horses available",
+      "many": "{count} horses available",
+      "other": "{count} horses available"
+    },
+    "updated": "updated {date}"
+  },
+  "footer": {
+    "stable": "[PLACEHOLDER] stables",
+    "location": "40 km from Warsaw, Poland",
+    "languages": "Polski · English · Русский",
+    "vetting": "Pre-purchase exam — the buyer chooses the vet",
+    "footage": "Full uncut footage on request",
+    "phone": "Phone"
+  },
+  "lang": {
+    "switchTo": "Polski",
+    "current": "English"
+  },
+  "pages": {
+    "home": {
+      "title": "Hanna Vavilava — show jumping horses for sale, Poland",
+      "description": "Show jumping horses for sale near Warsaw. I ride every horse myself for at least four months before it reaches this page. I answer personally, within the hour.",
+      "h1": "Hanna Vavilava — show jumping horses for sale near Warsaw"
+    },
+    "horses": {
+      "title": "Horses for sale — Hanna Vavilava",
+      "description": "The current stable: show jumping horses from 110 to 130 cm, with full documentation, uncut footage and X-rays shared before the visit.",
+      "label": "All horses"
+    },
+    "horsesGrid": {
+      "title": "Horses for sale, grid — Hanna Vavilava",
+      "description": "The current stable in a grid view — four show jumping horses, price, level and height on one screen.",
+      "label": "All horses"
+    },
+    "about": {
+      "title": "About and how buying works — Hanna Vavilava",
+      "description": "I have sold horses since 2016, and only show jumpers since 2021. Five steps: enquiry, video call, viewing, pre-purchase exam, contract.",
+      "label": "About"
+    },
+    "faq": {
+      "title": "Questions — Hanna Vavilava",
+      "description": "Price negotiation, the pre-purchase exam, buying without travelling to Poland, trial periods and viewing lead times — the six questions I am asked most.",
+      "label": "Questions · 06"
+    },
+    "enquiry": {
+      "title": "Enquiry — Hanna Vavilava",
+      "description": "Your enquiry goes straight to Hanna. A reply within the hour, 08:00–21:00 CET.",
+      "label": "Enquiry"
+    },
+    "enquirySent": {
+      "title": "Enquiry sent — Hanna Vavilava",
+      "description": "Enquiry sent.",
+      "label": "Enquiry sent"
+    },
+    "menu": {
+      "title": "Menu — Hanna Vavilava",
+      "description": "Horses, about, questions and enquiry.",
+      "label": "Menu"
+    },
+    "privacy": {
+      "title": "Privacy — Hanna Vavilava",
+      "description": "How personal data is processed on this site.",
+      "label": "Privacy"
+    }
+  },
+  "home": {
+    "enter": {
+      "one": "Enter — {count} horse",
+      "few": "Enter — {count} horses",
+      "many": "Enter — {count} horses",
+      "other": "Enter — {count} horses"
+    },
+    "sound": "Turn sound on",
+    "soundHint": "Hoofbeat, breath, pole",
+    "videoSpec": "Video · 100vh · 8 s loop · muted · no captions over the frame",
+    "videoSpecDetail": "Poster < 120 kb · file < 2.5 MB · still image under prefers-reduced-motion",
+    "videoAlt": "ALT: the mare Cascada jumps a 125 cm oxer, side view in an indoor arena — clicking the frame leads to the horses"
+  }
+}

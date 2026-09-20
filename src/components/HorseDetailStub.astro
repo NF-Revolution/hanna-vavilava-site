@@ -1,0 +1,40 @@
+---
+/*
+ * Ticket 4.4/4.5 fill this page. It exists now so the homepage's bottom-edge
+ * horse line — one of the three ways off the homepage — is not a dead link.
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+  name: string;
+}
+const { locale, slug, name } = Astro.props;
+const dict = t(locale);
+---
+
+<Page
+  locale={locale}
+  routeKey="horse"
+  slug={slug}
+  title={`${name} — ${dict.brand.name}`}
+  description={dict.pages.horses.description}
+  headerLinks={['horses', 'enquiry']}
+>
+  <SubBar label={name} />
+  <section class="stub">
+    <!-- Ticket 4.4 — hero, fact table, suitability, health, viewing, other horses. -->
+    <!-- Ticket 4.5 — sales video, full round, gallery lightbox. -->
+    <p class="copy">4.4 / 4.5</p>
+  </section>
+</Page>
+
+<style>
+  .stub {
+    padding: 80px var(--gutter);
+    color: var(--ink-muted);
+  }
+</style>
