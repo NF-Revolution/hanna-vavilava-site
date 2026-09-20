@@ -35,11 +35,11 @@ Pull requests get their own preview channel.
 
 Repository settings the workflows expect:
 
-| Kind     | Name                       | What it is                                            |
-| -------- | -------------------------- | ----------------------------------------------------- |
-| Variable | `FIREBASE_PROJECT_ID`      | The Firebase project                                  |
-| Variable | `SITE_URL`                 | Canonical origin, e.g. `https://hannavavilava.com`    |
-| Secret   | `FIREBASE_SERVICE_ACCOUNT` | Service account JSON: Hosting deploy + Firestore read |
+| Kind     | Name                       | What it is                                           |
+| -------- | -------------------------- | ---------------------------------------------------- |
+| Variable | `FIREBASE_PROJECT_ID`      | The Firebase project                                 |
+| Variable | `SITE_URL`                 | Canonical origin, e.g. `https://hannavavilava.com`   |
+| Secret   | `FIREBASE_SERVICE_ACCOUNT` | Service account JSON: Hosting deploy + database read |
 
 ## Still placeholder
 

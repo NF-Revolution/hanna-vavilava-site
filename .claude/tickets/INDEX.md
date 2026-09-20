@@ -25,6 +25,10 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 ## Decisions made along the way
 
 - Astro 7.3.3, not 5 — that is what `npm create astro` installs now.
+- Realtime Database, not Firestore (owner's call). Content is read once at build
+  time, so Firestore's per-document read model bought nothing, and one JSON tree
+  priced on bandwidth is the predictable number. Paths: `/horses`, `/enquiries`,
+  `/subscribers`, `/site`.
 - Tertiary greys deviate from the artboards: `#8D8B83` (3.13:1) and `#6E6D68`
   (3.74:1) fail WCAG AA at 10–11px, so they are folded into `--ink-muted` and
   `--ink-inv-faint`. Needs the designer's sign-off (E1.10).

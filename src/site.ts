@@ -2,7 +2,7 @@
  * Standing site facts.
  *
  * Every value here is PLACEHOLDER until E8.6. This module is the single seam
- * the Firestore `site` document replaces in ticket 2.2 — nothing else in the
+ * the database's `/site` node replaces in ticket 2.2 — nothing else in the
  * codebase should hardcode a contact detail or a stock count.
  */
 export const site = {

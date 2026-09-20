@@ -1,7 +1,7 @@
 name: deploy
 
 # Runs on a push to main, and on the repository_dispatch the admin panel's
-# Publish button sends (ticket 2.6) after Hanna changes a horse in Firestore.
+# Publish button sends (ticket 2.6) after Hanna changes a horse.
 on:
   push:
     branches: [main]
@@ -35,8 +35,8 @@ jobs:
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL }}
-          # Service account with Firestore read access, used by the build-time
-          # content loader (ticket 2.2).
+          # Service account with Realtime Database read access, used by the
+          # build-time content loader (ticket 2.2).
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - run: npm run links
