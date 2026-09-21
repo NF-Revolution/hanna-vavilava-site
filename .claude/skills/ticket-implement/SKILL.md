@@ -55,6 +55,10 @@ cannot be finished and a pull request that cannot be merged.
 GitHub links the branch to the issue itself, so the issue shows the work and no naming
 convention has to be remembered.
 
+**A decision ticket opens no branch and no pull request** — an E0 ticket produces a
+comment and edits to other tickets, and there is nothing to merge. A canvas ticket does
+not either; `design` owns that case. Both still close through their own ritual.
+
 ## 5. Agree the approach, then record it
 
 Discuss, settle on an approach, and post **one** comment before writing code:
@@ -79,6 +83,8 @@ Follow `AGENTS.md`. The conventions that actually bite:
 - A deliberate shortcut gets a `ponytail:` comment naming its ceiling and the upgrade path.
 - Public pages stay free of framework JavaScript. If a change adds a hydrated island,
   it is the wrong change.
+- A change you can see on a page changes its artboard too, in the same pull request. Link
+  and read mechanics: `AGENTS.md`, `## Design`.
 
 ## 7. Verify
 
@@ -89,19 +95,17 @@ the issue body — that is what the checklist is for.
 
 ## 8. Pull request
 
-    gh pr create --repo NF-Revolution/hanna-vavilava-site --base main --title "..." --body-file -
-
-The body contains `Closes #<N>`. In the body, not in a commit message: it survives a squash
-merge, it lives in one place, and merging then closes the ticket so the milestone burndown
-stays honest without anyone remembering to close anything.
-
-The pull request also gets a Firebase Hosting preview channel, so there is a real URL to
-check against the artboards before merging.
+The `create-pr` skill — it owns the commit subject, the body, `Closes #<N>` and the exact
+`gh pr create` call, and it re-runs safely if a pull request already exists.
 
 ## 9. Outcome comment
 
 One comment when the work lands: the pull-request link, what actually shipped if it differs
 from the plan, and any trap the next person would otherwise hit.
+
+This step has never run. Every closed build ticket was closed against the one scaffold
+commit `e2c959f`, silently, with no comment at all, and the repo has no pull requests —
+so the closed set shows what this skill is for, not what it looks like when followed.
 
 ## Rules
 
@@ -109,5 +113,6 @@ from the plan, and any trap the next person would otherwise hit.
   `ticket` skill — never a bigger pull request.
 - **If the ticket is wrong, fix the ticket first.** Editing the body after the fact turns
   the history into fiction.
-- Two comments per ticket is the target: one decision, one outcome. Anything else belongs
-  in the pull request or in the code.
+- Two comments per build ticket is the target: one approach, one outcome. Anything else
+  belongs in the pull request or in the code. A decision ticket follows the three-comment
+  ritual in `ticket`; a canvas ticket follows `design`.

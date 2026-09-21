@@ -1,7 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// PLACEHOLDER domain — replaced once E0.5 (domain purchase) lands.
+// hannavavilava.com is the production origin, bought at launch (E8.1). Until then
+// SITE_URL carries the Firebase .web.app URL, so nothing here moves twice (E0.5).
 const SITE = process.env.SITE_URL ?? 'https://hannavavilava.com';
 
 export default defineConfig({

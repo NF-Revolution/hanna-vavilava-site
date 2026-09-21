@@ -22,6 +22,25 @@ read at build time; the admin panel is the only client-rendered route.
 - Values still to be replaced with real ones are marked `PLACEHOLDER`.
 - Deliberate simplifications are marked `ponytail:` with the upgrade path.
 
+## Design
+
+Artboards: <https://claude.ai/artifact/F7qeoBwkyu2Dau5p1iLg2n> — the canvas named above.
+Read it with the Artifact tool's `read` action, not WebFetch: `project/canvas.json` indexes
+the boards (one per screen and breakpoint), `project/<Board>.dc.html` is one board's source.
+The read returns the mechanics for writing back.
+
+The canvas is the current design, not a record of the old one. **A change to public UI
+changes its artboard too, in the same pull request** — new screen, new state, moved element,
+changed component copy. Code that deliberately deviates gets a line under "Decisions made
+along the way" in `.claude/tickets/INDEX.md`, as the tertiary greys and the homepage scrim
+already have.
+
+A decision that changes public UI but opens no pull request — an E0 ticket, an owner's
+answer in a comment — files a design ticket instead, because the rule above only bites on
+pull requests and the canvas is what everyone reads before building. The `artboards` skill
+owns both halves: when a design ticket is owed, and how a board is actually changed.
+Canvas work has no branch, no pull request and no `npm run ci`.
+
 ## Tickets
 
 Work is tracked as GitHub Issues: milestones are epics (E0–E8), `epic:*` labels mirror them,

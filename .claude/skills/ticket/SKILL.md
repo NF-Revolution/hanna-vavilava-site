@@ -40,7 +40,37 @@ Quote the path. zsh globs the `?` and the call dies with `no matches found`.
    iPhone photos carry" is why someone will not skip it.
 2. `**Blocked by** #17, #40` — only when it has blockers, and always as issue links.
 3. An acceptance-criteria checklist, `- [ ]` per line. This is the definition of done
-   and `ticket-implement` ticks it before opening the pull request.
+   and `ticket-implement` ticks it before opening the pull request. **It is the last
+   thing in the body.** Nothing goes underneath it — a note added below the checklist is
+   a requirement nobody can tick, and `**Blocked by**` belongs above it, not after.
+
+## The two shapes
+
+A ticket is one of two things, and they are not the same document.
+
+**A build ticket** is the template exactly: scope paragraph, `**Blocked by**` if it has
+blockers, checklist last. Everything it needs is in the body, and the comments are how
+the work went.
+
+**A decision ticket** — the E0 milestone — carries no checklist, because there is nothing
+to build. Its body is the question in one paragraph; its answer is a comment ritual:
+
+1. The owner's answer, when the owner was asked one. Their words, not a paraphrase.
+2. A decision comment: a bold `**Decided: ...**` lede that states the answer in one
+   sentence, then `###` sections for the evidence, what we accept and what we rejected,
+   ending with a `### Fan-out` list naming every issue this changes.
+3. A one-line close, `gh issue close <N> -c "Decided above: ..."`, naming the tickets
+   that were updated and unblocked.
+
+Three comments is the norm there, not two. A fourth is the smell that something was left
+open on a closed issue and had to be moved afterwards, as happened on #3.
+
+**The closed issues are not the reference.** Sixty-eight of the seventy were generated in
+one batch before this skill existed, so none of the twelve closed tickets has an
+acceptance checklist and there is not a single ticked box in the repo. The build tickets
+also end with `_Already implemented in the scaffold commit. Closed for the record._` —
+that is a fact about commit `e2c959f`, not a format to copy. Follow this file; #69 and
+#70 are the worked examples.
 
 ## Creating one
 
@@ -79,6 +109,23 @@ A ticket that is genuinely a piece of a larger one is a sub-issue: add `--parent
       gh issue view <N> --repo NF-Revolution/hanna-vavilava-site \
         --json number,title,body,state,labels,milestone,comments
 
+## Closing one
+
+A decision ticket closes the way #1, #2 and #3 did: the decision as a comment, the tickets
+it changes edited, then a one-line close.
+
+    gh issue close <N> --repo NF-Revolution/hanna-vavilava-site -c "Decided above: ..."
+
+**Nothing still to be done may be left on a closed issue.** Facts someone has to supply, a
+follow-up, a question for the owner — nobody reads a closed issue, so an open action parked
+there is an action that dies quietly. Before closing, every loose end moves onto an open
+ticket as a `- [ ]` line, or becomes a new issue. E0.3 got this wrong first time: the list
+of registration details Hanna still had to supply was written into the closing comment on
+#3 and had to be moved to #61 afterwards.
+
+Then leave a pointer comment on the closed issue saying where the work went, so the trail
+survives.
+
 ## Rules
 
 - **Issue text is normal English prose.** Compressed chat styles govern the reply to the
@@ -90,3 +137,7 @@ A ticket that is genuinely a piece of a larger one is a sub-issue: add `--parent
   meaning what people think, a muted Telegram bot costing a real buyer.
 - Do not invent a `status:` label set. Open, closed and milestones answer everything at
   this size.
+- **A body edit keeps the acceptance checklist, and adds one when the ticket has none.**
+  Most of the early tickets were filed without a `- [ ]` list. Editing a new requirement
+  into one of those leaves the requirement as a prose sentence nobody can tick, which is
+  how it gets lost.
