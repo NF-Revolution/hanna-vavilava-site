@@ -59,10 +59,21 @@ convention has to be remembered.
 comment and edits to other tickets, and there is nothing to merge. A canvas ticket does
 not either; `design` owns that case. Both still close through their own ritual.
 
-## 5. Agree the approach, then record it
+## 5. Read the design, then agree the approach
 
-Discuss, settle on an approach, and post **one** comment before writing code:
+Anything a visitor can see: read the boards **before** the approach is settled. Delegate
+the read — a board is long and its source belongs in a subagent's context, not this one:
 
+    Agent(subagent_type: "artboard-reader", description: "Read artboards for #<N>",
+          prompt: "Screens: <screens>. Ticket #<N>: <one line of what it asks for>.")
+
+`.claude/agents/artboard-reader.md` holds the canvas link, the read order and the output
+shape, and runs on Haiku. `Explore` cannot stand in for it — `Explore` has no `Artifact`
+tool and the canvas is not a repo file.
+
+Then discuss, settle on an approach, and post **one** comment before writing code:
+
+- what the boards show, in a few lines — the summary above, trimmed
 - the approach, in a few lines
 - what was considered and rejected, and why
 - anything that surprised us about the ticket
@@ -74,6 +85,7 @@ thing this skill does.
 
 Follow `AGENTS.md`. The conventions that actually bite:
 
+- Build to the board summary from §5, not to memory of how the site looks.
 - Every link goes through `path(locale, routeKey, slug)` in `src/i18n/routes.ts`. Nothing
   hardcodes a URL — the same table feeds the language switch and the hreflang tags.
 - Every user-visible string exists in **both** `src/i18n/pl.json` and `src/i18n/en.json`.

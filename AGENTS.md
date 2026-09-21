@@ -29,6 +29,11 @@ Read it with the Artifact tool's `read` action, not WebFetch: `project/canvas.js
 the boards (one per screen and breakpoint), `project/<Board>.dc.html` is one board's source.
 The read returns the mechanics for writing back.
 
+**Read the boards before building anything a visitor can see**, and build to them — the
+canvas is the spec, and a ticket rarely repeats what a board already draws. Delegate that
+read to the `artboard-reader` agent — read-only, Haiku, summary out, board source never in
+this context — and keep its summary. `Explore` cannot stand in: it has no `Artifact` tool.
+
 The canvas is the current design, not a record of the old one. **A change to public UI
 changes its artboard too, in the same pull request** — new screen, new state, moved element,
 changed component copy. Code that deliberately deviates gets a line under "Decisions made
