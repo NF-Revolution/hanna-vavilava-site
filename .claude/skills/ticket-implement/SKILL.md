@@ -24,8 +24,14 @@ The issue — body plus comments — is the source of truth, not memory and not 
 - A ticket code → `gh issue list --repo NF-Revolution/hanna-vavilava-site --search "E2.1 in:title" --json number,title`
 - On a branch already → `gh issue list --state all --json number,title` and match, or read
   the branch name, which `gh issue develop` derives from the issue.
-- **"The next ticket"** → the lowest-numbered open issue in the earliest milestone whose
-  blockers are all closed. Say which one you picked and why before starting.
+- **"The next ticket"** → one `issue-reader` call. The answer is the lowest-numbered open
+  issue in the earliest milestone whose blockers are all closed, and finding it means
+  reading most of the open tickets for a one-line result:
+
+      Agent(subagent_type: "issue-reader", description: "Pick the next ticket",
+            prompt: "Next ticket. No number given.")
+
+  Say which one it picked and why before starting.
 
 ## 2. Read it whole, in one call
 
@@ -39,11 +45,19 @@ the newest decision wins and the body is stale — say so, and fix the body befo
 Use `--json` with a field list. A bare `gh issue view` on a long thread floods the context
 window with rendered chrome for no gain.
 
+**This read stays in this window.** It is the one place delegation is wrong: you build from
+the ticket's own wording, and a digest is how an acceptance criterion goes quietly missing.
+`issue-reader` is for the questions around the ticket, never for the ticket itself.
+
 ## 3. Check the blockers
 
-Parse `**Blocked by** #N` out of the body and check each one:
+Delegate this one — it is a status question over however many blockers there are, and the
+answer is one line each:
 
-    gh issue view <N> --repo NF-Revolution/hanna-vavilava-site --json number,state,title
+    Agent(subagent_type: "issue-reader", description: "Check blockers for #<N>",
+          prompt: "Blockers for #<N>.")
+
+It parses `**Blocked by** #N` out of the body itself and reads those tickets one level down.
 
 If any blocker is open, **stop** and name it. Starting blocked work produces a branch that
 cannot be finished and a pull request that cannot be merged.
@@ -55,10 +69,25 @@ cannot be finished and a pull request that cannot be merged.
 GitHub links the branch to the issue itself, so the issue shows the work and no naming
 convention has to be remembered.
 
-## 5. Agree the approach, then record it
+**A decision ticket opens no branch and no pull request** — an E0 ticket produces a
+comment and edits to other tickets, and there is nothing to merge. A canvas ticket does
+not either; `artboards` owns that case. Both still close through their own ritual.
 
-Discuss, settle on an approach, and post **one** comment before writing code:
+## 5. Read the design, then agree the approach
 
+Anything a visitor can see: read the boards **before** the approach is settled. Delegate
+the read — a board is long and its source belongs in a subagent's context, not this one:
+
+    Agent(subagent_type: "artboard-reader", description: "Read artboards for #<N>",
+          prompt: "Screens: <screens>. Ticket #<N>: <one line of what it asks for>.")
+
+`.claude/agents/artboard-reader.md` holds the canvas link, the read order and the output
+shape, and runs on Haiku. `Explore` cannot stand in for it — `Explore` has no `Artifact`
+tool and the canvas is not a repo file.
+
+Then discuss, settle on an approach, and post **one** comment before writing code:
+
+- what the boards show, in a few lines — the summary above, trimmed
 - the approach, in a few lines
 - what was considered and rejected, and why
 - anything that surprised us about the ticket
@@ -70,6 +99,7 @@ thing this skill does.
 
 Follow `AGENTS.md`. The conventions that actually bite:
 
+- Build to the board summary from §5, not to memory of how the site looks.
 - Every link goes through `path(locale, routeKey, slug)` in `src/i18n/routes.ts`. Nothing
   hardcodes a URL — the same table feeds the language switch and the hreflang tags.
 - Every user-visible string exists in **both** `src/i18n/pl.json` and `src/i18n/en.json`.
@@ -79,6 +109,8 @@ Follow `AGENTS.md`. The conventions that actually bite:
 - A deliberate shortcut gets a `ponytail:` comment naming its ceiling and the upgrade path.
 - Public pages stay free of framework JavaScript. If a change adds a hydrated island,
   it is the wrong change.
+- A change you can see on a page changes its artboard too, in the same pull request. Link
+  and read mechanics: `AGENTS.md`, `## Design`.
 
 ## 7. Verify
 
@@ -89,19 +121,17 @@ the issue body — that is what the checklist is for.
 
 ## 8. Pull request
 
-    gh pr create --repo NF-Revolution/hanna-vavilava-site --base main --title "..." --body-file -
-
-The body contains `Closes #<N>`. In the body, not in a commit message: it survives a squash
-merge, it lives in one place, and merging then closes the ticket so the milestone burndown
-stays honest without anyone remembering to close anything.
-
-The pull request also gets a Firebase Hosting preview channel, so there is a real URL to
-check against the artboards before merging.
+The `create-pr` skill — it owns the commit subject, the body, `Closes #<N>` and the exact
+`gh pr create` call, and it re-runs safely if a pull request already exists.
 
 ## 9. Outcome comment
 
 One comment when the work lands: the pull-request link, what actually shipped if it differs
 from the plan, and any trap the next person would otherwise hit.
+
+This step has never run. Every closed build ticket was closed against the one scaffold
+commit `e2c959f`, silently, with no comment at all, and the repo has no pull requests —
+so the closed set shows what this skill is for, not what it looks like when followed.
 
 ## Rules
 
@@ -109,5 +139,6 @@ from the plan, and any trap the next person would otherwise hit.
   `ticket` skill — never a bigger pull request.
 - **If the ticket is wrong, fix the ticket first.** Editing the body after the fact turns
   the history into fiction.
-- Two comments per ticket is the target: one decision, one outcome. Anything else belongs
-  in the pull request or in the code.
+- Two comments per build ticket is the target: one approach, one outcome. Anything else
+  belongs in the pull request or in the code. A decision ticket follows the three-comment
+  ritual in `ticket`; a canvas ticket follows `artboards`.

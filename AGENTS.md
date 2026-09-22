@@ -22,13 +22,39 @@ read at build time; the admin panel is the only client-rendered route.
 - Values still to be replaced with real ones are marked `PLACEHOLDER`.
 - Deliberate simplifications are marked `ponytail:` with the upgrade path.
 
+## Design
+
+Artboards: <https://claude.ai/artifact/F7qeoBwkyu2Dau5p1iLg2n> — the canvas named above.
+Read it with the Artifact tool's `read` action, not WebFetch: `project/canvas.json` indexes
+the boards (one per screen and breakpoint), `project/<Board>.dc.html` is one board's source.
+The read returns the mechanics for writing back.
+
+**Read the boards before building anything a visitor can see**, and build to them — the
+canvas is the spec, and a ticket rarely repeats what a board already draws. Delegate that
+read to the `artboard-reader` agent — read-only, Haiku, summary out, board source never in
+this context — and keep its summary. `Explore` cannot stand in: it has no `Artifact` tool.
+
+The canvas is the current design, not a record of the old one. **A change to public UI
+changes its artboard too, in the same pull request** — new screen, new state, moved element,
+changed component copy. Code that deliberately deviates gets a line under "Decisions made
+along the way" in `.claude/tickets/INDEX.md`, as the tertiary greys and the homepage scrim
+already have.
+
+A decision that changes public UI but opens no pull request — an E0 ticket, an owner's
+answer in a comment — files a design ticket instead, because the rule above only bites on
+pull requests and the canvas is what everyone reads before building. The `artboards` skill
+owns both halves: when a design ticket is owed, and how a board is actually changed.
+Canvas work has no branch, no pull request and no `npm run ci`.
+
 ## Tickets
 
 Work is tracked as GitHub Issues: milestones are epics (E0–E8), `epic:*` labels mirror them,
 and blockers are written into the body as `**Blocked by** #N`. Two repo skills own the
 mechanics — `ticket` creates and refines issues, `ticket-implement` picks one up, reads it
 with all its comments, builds it and opens the pull request. Use them rather than improvising
-`gh` calls, and start Claude from this directory so they load.
+`gh` calls, and start Claude from this directory so they load. The `issue-reader` agent
+answers the wide questions those skills ask — which ticket is next, whether a ticket's
+blockers are clear — on Haiku, so a hundred issue bodies never reach the main context.
 
 `.claude/tickets/INDEX.md` is the short decision log and pointer, not a second ticket system.
 
