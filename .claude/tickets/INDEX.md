@@ -17,8 +17,9 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.8 shared footer           | #13                | done                                                      |
 | E1.9 menu drawer             | #14                | done                                                      |
 | E7.1 localised routing       | #57                | done                                                      |
-| E1.3 Actions deploy          | #8                 | written, unverified — needs the Firebase project          |
-| E1.4 preview channel         | #9                 | written, unverified — needs the Firebase project          |
+| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
+| E1.3 Actions deploy          | #8                 | written, unverified — needs the service account secret    |
+| E1.4 preview channel         | #9                 | written, unverified — follows #8                          |
 | E1.10 accessibility baseline | #15                | partial                                                   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
@@ -85,3 +86,16 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   re-encodes — so #69's subdomain is `media.` rather than `video.`. The horse owner is
   redacted from page 1 before upload and the examining vet is not (#3), and the objects
   are deleted when the horse sells (#23). Upload is #70.
+- The Firebase project is `hanna-vavilava-site` on Blaze (E1.2). Realtime Database in
+  `europe-west1` at `https://hanna-vavilava-site-default-rtdb.europe-west1.firebasedatabase.app`;
+  Storage and Functions in `europe-central2`, which is Warsaw itself. The database sits in a
+  different region from everything else because Realtime Database has no Warsaw location
+  and content is read once at build time, so the hop is paid by CI and never by a visitor.
+  The project carries two Hosting sites and the default is `hanna-vavilava-site-4baa3`,
+  which Firebase does not allow deleting — so `SITE_URL` is
+  `https://hanna-vavilava-site-4baa3.web.app` and `firebase.json` names no site at all.
+  Pinning deploys to the prettier `hanna-vavilava-site` site would have bought a nicer
+  hostname that #63 throws away anyway, at the cost of a config line that also has to be
+  thrown away. No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
+  repository variable and both workflows pass it explicitly. It arrives with #16, where
+  the emulator needs a local CLI call.
