@@ -56,7 +56,20 @@ with all its comments, builds it and opens the pull request. Use them rather tha
 answers the wide questions those skills ask — which ticket is next, whether a ticket's
 blockers are clear — on Haiku, so a hundred issue bodies never reach the main context.
 
-`.claude/tickets/INDEX.md` is the short decision log and pointer, not a second ticket system.
+Two different things live under `.claude/tickets/`, and they are not the same file twice:
+
+- `.claude/tickets/INDEX.md` — the cross-ticket decision log and pointer. Which tickets are
+  done, and the decisions taken along the way that no single ticket owns. It is not a second
+  ticket system; GitHub Issues is the ticket system.
+- `.claude/tickets/<E-code>/` — one folder per ticket, `E1.10` and not `15`, owned by the
+  `ticket-notes` skill. While the ticket is open it holds `INDEX.md`, that ticket's plan map,
+  `plans/NN-<slug>.md`, one plan per concern, and `followup.md`, the running log newest-first.
+  Read the folder before planning and copy the approved plan into it before writing code.
+  **When the pull request opens, finalize it**: the plans merge into `followup.md` as
+  `## What was built`, the outcome goes below that, and `INDEX.md` and `plans/` are deleted in
+  the same commit. A shipped ticket is one file — the scaffolding answered "which plan covers
+  what" while we were building and answers nothing afterwards, and git history keeps it.
+  `.claude/tickets/E1.10/` is the worked example, in its finished shape.
 
 ## Commands
 
