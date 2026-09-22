@@ -47,6 +47,15 @@ decision, not here. This skill draws what has been decided.
 
 ## Filing one
 
+First find out what the boards already draw — filing needs the board file names, and
+"no board draws it yet" is a claim worth checking before a ticket asserts it:
+
+    Agent(subagent_type: "artboard-reader", description: "Check boards for <screen>",
+          prompt: "Screens: <screens>. Does any board draw <the change>?")
+
+Its `Not drawn` line is the ticket. Filing is the half of this skill that delegates;
+carrying one out cannot, see below.
+
 The `ticket` skill's conventions, unchanged: `E<epic>.<n> · <Short title>`, the milestone
 of the screen the board draws, the matching `epic:*` label. Plus:
 
@@ -58,7 +67,9 @@ of the screen the board draws, the matching `epic:*` label. Plus:
 ## Carrying one out
 
 1. `read` `project/canvas.json` — it has the board paths and each board's frame.
-2. `read` only the boards that change, in one message.
+2. `read` only the boards that change, in one message. `artboard-reader` is no use here —
+   step 3 edits this source, so it has to be in this window. ponytail: the read is as
+   narrow as it gets instead.
 3. Copy each to its canvas path under **one** scratch root and edit it there. Never edit
    the file the read saved; never edit through a shell one-liner you cannot re-read.
 4. **One** publish call: `url` the canvas, `root` that folder, `file_path` the full path

@@ -24,8 +24,14 @@ The issue — body plus comments — is the source of truth, not memory and not 
 - A ticket code → `gh issue list --repo NF-Revolution/hanna-vavilava-site --search "E2.1 in:title" --json number,title`
 - On a branch already → `gh issue list --state all --json number,title` and match, or read
   the branch name, which `gh issue develop` derives from the issue.
-- **"The next ticket"** → the lowest-numbered open issue in the earliest milestone whose
-  blockers are all closed. Say which one you picked and why before starting.
+- **"The next ticket"** → one `issue-reader` call. The answer is the lowest-numbered open
+  issue in the earliest milestone whose blockers are all closed, and finding it means
+  reading most of the open tickets for a one-line result:
+
+      Agent(subagent_type: "issue-reader", description: "Pick the next ticket",
+            prompt: "Next ticket. No number given.")
+
+  Say which one it picked and why before starting.
 
 ## 2. Read it whole, in one call
 
@@ -39,11 +45,19 @@ the newest decision wins and the body is stale — say so, and fix the body befo
 Use `--json` with a field list. A bare `gh issue view` on a long thread floods the context
 window with rendered chrome for no gain.
 
+**This read stays in this window.** It is the one place delegation is wrong: you build from
+the ticket's own wording, and a digest is how an acceptance criterion goes quietly missing.
+`issue-reader` is for the questions around the ticket, never for the ticket itself.
+
 ## 3. Check the blockers
 
-Parse `**Blocked by** #N` out of the body and check each one:
+Delegate this one — it is a status question over however many blockers there are, and the
+answer is one line each:
 
-    gh issue view <N> --repo NF-Revolution/hanna-vavilava-site --json number,state,title
+    Agent(subagent_type: "issue-reader", description: "Check blockers for #<N>",
+          prompt: "Blockers for #<N>.")
+
+It parses `**Blocked by** #N` out of the body itself and reads those tickets one level down.
 
 If any blocker is open, **stop** and name it. Starting blocked work produces a branch that
 cannot be finished and a pull request that cannot be merged.
@@ -57,7 +71,7 @@ convention has to be remembered.
 
 **A decision ticket opens no branch and no pull request** — an E0 ticket produces a
 comment and edits to other tickets, and there is nothing to merge. A canvas ticket does
-not either; `design` owns that case. Both still close through their own ritual.
+not either; `artboards` owns that case. Both still close through their own ritual.
 
 ## 5. Read the design, then agree the approach
 
@@ -127,4 +141,4 @@ so the closed set shows what this skill is for, not what it looks like when foll
   the history into fiction.
 - Two comments per build ticket is the target: one approach, one outcome. Anything else
   belongs in the pull request or in the code. A decision ticket follows the three-comment
-  ritual in `ticket`; a canvas ticket follows `design`.
+  ritual in `ticket`; a canvas ticket follows `artboards`.

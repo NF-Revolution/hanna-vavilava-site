@@ -52,7 +52,9 @@ Work is tracked as GitHub Issues: milestones are epics (E0–E8), `epic:*` label
 and blockers are written into the body as `**Blocked by** #N`. Two repo skills own the
 mechanics — `ticket` creates and refines issues, `ticket-implement` picks one up, reads it
 with all its comments, builds it and opens the pull request. Use them rather than improvising
-`gh` calls, and start Claude from this directory so they load.
+`gh` calls, and start Claude from this directory so they load. The `issue-reader` agent
+answers the wide questions those skills ask — which ticket is next, whether a ticket's
+blockers are clear — on Haiku, so a hundred issue bodies never reach the main context.
 
 `.claude/tickets/INDEX.md` is the short decision log and pointer, not a second ticket system.
 

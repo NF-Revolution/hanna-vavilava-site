@@ -108,14 +108,23 @@ larger for the same text.
 
     jq -r 'select(.project|test("hanna-vavilava-site")) | .display' ~/.claude/history.jsonl
 
+**Do not run that here.** Every prompt ever typed for this project would land in this
+window and the useful part of it is a dozen lines. Hand the agent the command, not its
+output, so the dump lands in a cheap context instead:
+
+    Agent(subagent_type: "general-purpose", model: "haiku",
+          description: "Cluster the prompt history",
+          prompt: "Run the jq line above. Return semantic clusters, not exact
+                   duplicates — 'debugging the same scanner', 'reviewing vet documents' —
+                   with a count and one representative prompt each. Exact-match counting
+                   finds only re-runs of `continue` and `go`. 15 lines at most, and never
+                   paste the prompt list back.")
+
 Drop the `select(...)` to scan every project. Say so plainly when a cluster is
 cross-project: a skill in this repo only loads in this repo, so a cross-project habit
 either gets a repo skill that solves it here, or nothing.
 
-Hand the output to a subagent and ask for **semantic clusters, not exact duplicates** —
-"debugging the same scanner", "reviewing vet documents" — with a count and one
-representative prompt each. Exact-match counting finds only re-runs of `continue` and
-`go`. Bring back the clusters worth a skill, propose them, write nothing yet.
+Bring back the clusters worth a skill, propose them, write nothing yet.
 
 ## Rules
 
@@ -129,3 +138,12 @@ representative prompt each. Exact-match counting finds only re-runs of `continue
   the user objected to. Paraphrase loses the thing that makes it recognisable.
 - If no existing skill owns the lesson and it is a one-off, memory is the answer. Do
   not create a skill for a lesson that has happened once.
+
+## Learned
+
+- 2026-09-22 — The four routes above have no row for behaviour that should hold in every
+  project, not just this one. That goes in `~/.claude/CLAUDE.md`, which the scope guard
+  at the top of this file does not cover: it rules out `~/.claude/skills/` and
+  `~/.claude/plugins/` because plugin updates overwrite them, and the user's own global
+  instructions file is neither. Take it only when the lesson would be wrong to repeat in
+  every repo's `AGENTS.md`; memory is still the narrower route and wins a tie.

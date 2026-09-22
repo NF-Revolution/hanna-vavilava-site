@@ -40,10 +40,14 @@ Uncommitted changes carry over either way.
 
 ## 4. Verify before pushing
 
-    npm run ci
+    npm run ci 2>&1 | tail -30
 
 Format check, types, build, link check — the same job CI runs on the pull request. It fails →
 fix it or report the failure verbatim. Never open a pull request on a red tree.
+
+`tail -30` because a green run is 40 lines of build chatter and a red one puts the error at
+the end. Need more, write the whole log to a file in the scratchpad directory and grep that
+— never pour a build log into this window.
 
 Two things `npm run ci` cannot check, so check them by eye:
 
