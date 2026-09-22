@@ -18,8 +18,8 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.9 menu drawer             | #14                | done                                                      |
 | E7.1 localised routing       | #57                | done                                                      |
 | E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
-| E1.3 Actions deploy          | #8                 | written, unverified — needs the service account secret    |
-| E1.4 preview channel         | #9                 | written, unverified — follows #8                          |
+| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`              |
+| E1.4 preview channel         | #9                 | verified by #8's pull request — a channel per PR, 14d     |
 | E1.10 accessibility baseline | #15                | partial                                                   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
@@ -91,11 +91,16 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   Storage and Functions in `europe-central2`, which is Warsaw itself. The database sits in a
   different region from everything else because Realtime Database has no Warsaw location
   and content is read once at build time, so the hop is paid by CI and never by a visitor.
-  The project carries two Hosting sites and the default is `hanna-vavilava-site-4baa3`,
-  which Firebase does not allow deleting — so `SITE_URL` is
-  `https://hanna-vavilava-site-4baa3.web.app` and `firebase.json` names no site at all.
-  Pinning deploys to the prettier `hanna-vavilava-site` site would have bought a nicer
-  hostname that #63 throws away anyway, at the cost of a config line that also has to be
-  thrown away. No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
+  The project carries two Hosting sites and the default is `hanna-vavilava-site` — the
+  project's `resources.hostingSite`, which is the field `firebase deploy` resolves. The
+  console's `hanna-vavilava-site-4baa3` is a different field, the web app's linked site,
+  and it only feeds that app's `/__/firebase/init.js`. So `SITE_URL` is
+  `https://hanna-vavilava-site.web.app` and `firebase.json` pins
+  `"site": "hanna-vavilava-site"`. The pin is one line and permanent — a custom domain
+  attaches to a site rather than renaming one, so #63 does not throw it away — and it keeps
+  the deploy target readable in the repo instead of inferred from an API call, which is how
+  the earlier `-4baa3` reading survived unchallenged until the first real deploy (E1.3).
+  `hanna-vavilava-site-4baa3` stays a 404 and Firebase does not allow deleting it.
+  No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
   repository variable and both workflows pass it explicitly. It arrives with #16, where
   the emulator needs a local CLI call.

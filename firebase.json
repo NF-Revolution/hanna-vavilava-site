@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "hanna-vavilava-site",
     "public": "dist",
     "cleanUrls": true,
     "trailingSlash": false,
