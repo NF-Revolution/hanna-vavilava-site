@@ -5,11 +5,22 @@ name: preview
 on:
   pull_request:
 
+# One channel per pull request, so two pushes must not race it. Without this,
+# the second build can finish first and the comment advertises the older commit.
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   preview:
-    # Without a Firebase project there is nothing to deploy to, so skip rather
-    # than fail. Setting the variable turns this job back on, no edit needed.
-    if: ${{ vars.FIREBASE_PROJECT_ID != '' }}
+    # Without a Firebase project there is nothing to deploy to, and a fork
+    # pull request gets no secrets — the repo is public, so an empty
+    # FIREBASE_SERVICE_ACCOUNT would fail the deploy step on every outside
+    # contribution. Skip rather than fail in both cases. Setting the variable
+    # turns the first half back on, no edit needed.
+    if: >-
+      ${{ vars.FIREBASE_PROJECT_ID != '' &&
+      github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
       checks: write

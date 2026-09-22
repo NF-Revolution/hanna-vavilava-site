@@ -19,7 +19,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.1 localised routing       | #57                | done                                                      |
 | E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
 | E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`              |
-| E1.4 preview channel         | #9                 | verified by #8's pull request — a channel per PR, 14d     |
+| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76             |
 | E1.10 accessibility baseline | #15                | partial                                                   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
@@ -104,3 +104,12 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
   repository variable and both workflows pass it explicitly. It arrives with #16, where
   the emulator needs a local CLI call.
+- The preview workflow skips a fork's pull request rather than failing it. The repo is public
+  and a `pull_request` from a fork gets no secrets, so `FIREBASE_SERVICE_ACCOUNT` arrives empty
+  and the deploy step fails every time; `vars.FIREBASE_PROJECT_ID != ''` does not catch it,
+  because repository variables _are_ readable from fork pull requests and only secrets are
+  withheld. The trigger stays `pull_request`, never `pull_request_target` — fork code must not
+  run with secrets. Preview channel URLs are public and reachable from the bot's pull-request
+  comment, and what keeps them out of the index is the absolute `<link rel="canonical">` in
+  `Base.astro`, which points at production. `robots.txt` still has to be `Disallow: /` on a
+  preview build when E6.4 writes one (#9, #53).
