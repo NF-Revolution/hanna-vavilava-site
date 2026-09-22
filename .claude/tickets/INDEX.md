@@ -19,7 +19,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.1 localised routing       | #57                | done                                                      |
 | E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
 | E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`              |
-| E1.4 preview channel         | #9                 | written, unverified — follows #8                          |
+| E1.4 preview channel         | #9                 | verified by #8's pull request — a channel per PR, 14d     |
 | E1.10 accessibility baseline | #15                | partial                                                   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
