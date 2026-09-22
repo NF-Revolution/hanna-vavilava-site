@@ -7,6 +7,9 @@ on:
 
 jobs:
   preview:
+    # Without a Firebase project there is nothing to deploy to, so skip rather
+    # than fail. Setting the variable turns this job back on, no edit needed.
+    if: ${{ vars.FIREBASE_PROJECT_ID != '' }}
     runs-on: ubuntu-latest
     permissions:
       checks: write
