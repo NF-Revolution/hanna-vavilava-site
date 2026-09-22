@@ -13,8 +13,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "links": "node scripts/check-links.mjs",
+    "a11y": "node scripts/check-a11y.mjs",
     "fonts": "node scripts/fonts.mjs",
-    "ci": "npm run format:check && npm run check && npm run build && npm run links",
+    "ci": "npm run format:check && npm run check && npm run build && npm run links && npm run a11y",
     "astro": "astro"
   },
   "dependencies": {

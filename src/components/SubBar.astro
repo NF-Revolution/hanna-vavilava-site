@@ -7,7 +7,8 @@ const { label } = Astro.props;
 ---
 
 <div class="subbar">
-  <p class="lbl subbar-label">{label}</p>
+  <!-- The sub-bar label is the page title, so it is the page's one h1. -->
+  <h1 class="lbl subbar-label">{label}</h1>
   <div class="subbar-right">
     <slot />
   </div>
@@ -26,6 +27,7 @@ const { label } = Astro.props;
 
   .subbar-label {
     margin: 0;
+    font-weight: inherit;
   }
 
   .subbar-right {

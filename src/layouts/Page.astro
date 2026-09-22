@@ -28,7 +28,7 @@ const { locale, routeKey, slug, title, description, headerLinks } = Astro.props;
   ground="light"
 >
   <Header locale={locale} variant="page" links={headerLinks} />
-  <main id="main">
+  <main id="main" tabindex="-1">
     <slot />
   </main>
   <Footer locale={locale} routeKey={routeKey} slug={slug} />

@@ -4,7 +4,7 @@
  * on every page, and as the whole of /menu, which is where the hamburger goes
  * when JavaScript is not available.
  */
-import { t, type Locale } from '../i18n';
+import { t, htmlLang, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
 import { site, whatsappHref, telegramHref, emailHref } from '../site';
 import { fill } from '../i18n/format';
@@ -37,7 +37,7 @@ const contact = [
 ];
 ---
 
-<nav class="menu-nav">
+<nav class="menu-nav" aria-label={dict.a11y.navMenu}>
   <ul class="menu-primary">
     {primary.map((item) => (
       <li>
@@ -71,7 +71,12 @@ const contact = [
   -->
   <p class="lbl menu-langs">
     <span class="menu-lang-current">{dict.lang.current}</span>
-    <a class="menu-lang-other" href={path(other, routeKey, slug)}>
+    <a
+      class="menu-lang-other"
+      href={path(other, routeKey, slug)}
+      lang={htmlLang[other]}
+      hreflang={htmlLang[other]}
+    >
       {dict.lang.switchTo}
     </a>
   </p>
@@ -143,6 +148,7 @@ const contact = [
 
   .menu-langs {
     display: flex;
+    align-items: center;
     gap: 16px;
     margin: 24px 0 0;
   }
@@ -153,6 +159,9 @@ const contact = [
   }
 
   .menu-lang-other {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
     color: var(--ink-inv-muted);
   }
 </style>

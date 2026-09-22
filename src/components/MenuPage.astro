@@ -23,7 +23,8 @@ const page = dict.pages.menu;
   description={page.description}
   ground="dark"
 >
-  <main id="main" class="menu-page">
+  <main id="main" tabindex="-1" class="menu-page">
+    <h1 class="visually-hidden">{page.h1}</h1>
     <div class="menu-page-head">
       <a class="wordmark" href={path(locale, 'home')}>
         <span class="wordmark-name">{dict.brand.name}</span>

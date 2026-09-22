@@ -20,7 +20,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
 | E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`              |
 | E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76             |
-| E1.10 accessibility baseline | #15                | partial                                                   |
+| E1.10 accessibility baseline | #15                | done                                                      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61           |
@@ -35,13 +35,32 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   time, so Firestore's per-document read model bought nothing, and one JSON tree
   priced on bandwidth is the predictable number. Paths: `/horses`, `/enquiries`,
   `/subscribers`, `/site`.
-- Tertiary greys deviate from the artboards: `#8D8B83` (3.13:1) and `#6E6D68`
-  (3.74:1) fail WCAG AA at 10–11px, so they are folded into `--ink-muted` and
-  `--ink-inv-faint`. Needs the designer's sign-off (E1.10).
+- Three colours deviate from the artboards, and E1.10 repainted the boards to
+  match rather than the other way round. The tertiary greys `#8D8B83` (3.13:1)
+  and `#6E6D68` (3.73:1) fail WCAG AA at the 10–11px sizes they are drawn at,
+  so they are folded into `--ink-muted` and `--ink-inv-faint`; `--rule-field`
+  `#C9C7C0` is 1.55:1 on the light ground, and a form-input border is a UI
+  component under SC 1.4.11, so it became `#8F8D87` (3.01:1) before E5.1 could
+  build to it. The canvas note that claims "text runs at 4.5:1 or better on
+  both grounds" was false while those greys were on the boards; making it true
+  is the designer's sign-off the ticket asked for.
 - The grid view is a second static route, not a JS toggle — shareable,
   crawlable, and less code (E4.3).
-- The homepage scrim behind the entry cue and bottom edge is an addition: text
-  over moving video has no guaranteed contrast.
+- The homepage scrim is an addition — the boards draw none — because text over
+  moving video has no guaranteed contrast, and the worst case is a white frame,
+  not `--ground-dark`. Two strengths, both computed against white: `--scrim`
+  `rgba(14,14,13,0.62)` carries `--ink-inv` at 4.79:1, `--scrim-strong`
+  `rgba(14,14,13,0.84)` carries `--ink-inv-muted` at 4.71:1, and
+  `--ink-inv-faint` never goes over video at all — no alpha short of opaque
+  carries it. It covers the overlay header as well as the entry cue and the
+  bottom edge; the header had no scrim before E1.10 and its status line is
+  muted ink.
+- The sub-bar label is each page's `<h1>`. One element, no visual change, and
+  every page E4.x adds gets its heading for free (E1.10).
+- `scripts/check-a11y.mjs` runs in `npm run ci` after the link check: token
+  contrast, the scrim floors, one `<h1>` per page, named `<nav>` landmarks,
+  `alt` on images, `aria-label` on icon-only controls. Regex and arithmetic, no
+  dependency — axe-core behind a headless browser is the named upgrade.
 - The artboards have no sold-horse state. Raised in E2.8.
 - Video lives on Cloudflare R2, played by a native `<video>` behind the facade —
   not YouTube, not Firebase (E0.1). The homepage hero has to be a local element
