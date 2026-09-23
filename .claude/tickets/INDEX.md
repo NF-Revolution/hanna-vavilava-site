@@ -8,25 +8,26 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 
 ## State
 
-| Ticket                       | Issue              | State                                                     |
-| ---------------------------- | ------------------ | --------------------------------------------------------- |
-| E1.1 repo, Astro, TS, CI     | #6                 | done                                                      |
-| E1.5 design tokens           | #10                | done                                                      |
-| E1.6 self-hosted fonts       | #11                | done                                                      |
-| E1.7 base layout             | #12                | done                                                      |
-| E1.8 shared footer           | #13                | done                                                      |
-| E1.9 menu drawer             | #14                | done                                                      |
-| E7.1 localised routing       | #57                | done                                                      |
-| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                     |
-| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`              |
-| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76             |
-| E1.10 accessibility baseline | #15                | done                                                      |
-| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                     |
-| E0.2 price display           | #2                 | decided — price per horse, `null` = on request            |
-| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61           |
-| E0.4 X-rays                  | #4                 | decided — PDF study, public download                      |
-| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1 |
-| everything else              | see the milestones | not started                                               |
+| Ticket                       | Issue              | State                                                        |
+| ---------------------------- | ------------------ | ------------------------------------------------------------ |
+| E1.1 repo, Astro, TS, CI     | #6                 | done                                                         |
+| E1.5 design tokens           | #10                | done                                                         |
+| E1.6 self-hosted fonts       | #11                | done                                                         |
+| E1.7 base layout             | #12                | done                                                         |
+| E1.8 shared footer           | #13                | done                                                         |
+| E1.9 menu drawer             | #14                | done                                                         |
+| E7.1 localised routing       | #57                | done                                                         |
+| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                        |
+| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`                 |
+| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                |
+| E1.10 accessibility baseline | #15                | done                                                         |
+| E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com` |
+| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                        |
+| E0.2 price display           | #2                 | decided — price per horse, `null` = on request               |
+| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61              |
+| E0.4 X-rays                  | #4                 | decided — PDF study, public download                         |
+| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1    |
+| everything else              | see the milestones | not started                                                  |
 
 ## Decisions made along the way
 
@@ -132,3 +133,11 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   comment, and what keeps them out of the index is the absolute `<link rel="canonical">` in
   `Base.astro`, which points at production. `robots.txt` still has to be `Disallow: /` on a
   preview build when E6.4 writes one (#9, #53).
+- The media bucket is `hanna-vavilava-media`, location hint `eeur`, served only through the
+  custom domain `hv-media.nfrevolution.com` with minimum TLS 1.2 — the `.r2.dev` URL stays
+  disabled (E1.11). No EU jurisdiction: the assets are public and hold no personal data, and
+  `-J eu` would have to ride on every later command. `Cache-Control: public, max-age=31536000,
+immutable` is object metadata set at upload rather than an edge rule, because the zone is
+  shared with another brand and the encode script is the only uploader; the value, the bucket
+  and the base live once in `site.media`, which Node imports straight from `src/site.ts`.
+  `wrangler` runs as `npx wrangler@4`, not a devDependency — CI never touches R2.

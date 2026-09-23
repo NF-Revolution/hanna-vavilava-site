@@ -35,6 +35,20 @@ export const site = {
     levelCm: 125,
     priceEur: 32000,
   },
+
+  /*
+   * Cloudflare R2 (#69) — video, posters and X-ray PDFs. The site stores object
+   * keys, never URLs, so #63 changes `base` to https://media.hannavavilava.com
+   * and nothing else. Keys are content-addressed (`<slug>/<name>-<sha8>.<ext>`)
+   * and never overwritten, which is what makes `cacheControl` safe; every upload
+   * sets it. Node 22.18+ strips types, so the encode script (#26) imports this
+   * file directly.
+   */
+  media: {
+    base: 'https://hv-media.nfrevolution.com',
+    bucket: 'hanna-vavilava-media',
+    cacheControl: 'public, max-age=31536000, immutable',
+  },
 } as const;
 
 export const whatsappHref = (text?: string): string =>

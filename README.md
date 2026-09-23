@@ -41,6 +41,16 @@ Repository settings the workflows expect:
 | Variable | `SITE_URL`                 | Canonical origin: the Firebase `.web.app` URL until E8.1, then `https://hannavavilava.com` |
 | Secret   | `FIREBASE_SERVICE_ACCOUNT` | Service account JSON: Hosting deploy + database read                                       |
 
+## Media
+
+Video, posters and X-ray PDFs live in the Cloudflare R2 bucket `hanna-vavilava-media`,
+served from `https://hv-media.nfrevolution.com` until E8.1. The values sit in
+`site.media` in `src/site.ts`. Uploads need `npx wrangler@4 login` once, and every
+object carries the long immutable `Cache-Control`, so a key is never overwritten:
+
+    npx wrangler@4 r2 object put hanna-vavilava-media/<key> --file <file> --remote \
+      --cache-control "public, max-age=31536000, immutable"
+
 ## Still placeholder
 
 Every contact detail, the stable name, the horse facts and the video assets are
