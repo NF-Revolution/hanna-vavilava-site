@@ -1,6 +1,7 @@
 {
   "database": { "rules": "database.rules.json" },
   "storage": [{ "target": "photos", "rules": "storage.rules" }],
+  "functions": { "source": "functions" },
   "hosting": {
     "site": "hanna-vavilava-site",
     "public": "dist",
