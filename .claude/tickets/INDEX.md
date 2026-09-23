@@ -24,6 +24,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com`  |
 | E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`           |
 | E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded |
+| E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -170,3 +171,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
 - The homepage's bottom-edge horse line is omitted when the stable is empty, and its price
   segment when the price is `null` — two states no board draws. The "on request" label
   comes with E4.x's boards; the empty stable is E2.8's sold-state question (E2.2).
+- The admin panel has no artboard and needs none: it is not public UI, one person uses it,
+  so it is built plain on the existing tokens (E2.3). `/admin` is a standalone page rather
+  than `Base.astro` — no canonical, hreflang or og tags — and stays out of `routes.ts`, so
+  it has no `/en` twin. The Firebase web SDK is imported only by its bundled `<script>`;
+  every other page still ships no `_astro` JS. The web config sits in `src/firebase.ts` as
+  constants, because the API key is an identifier and the rules are the lock. The `admin`
+  claim is set by `npm run admin:grant -- <email>` with application-default credentials, and
+  the panel force-refreshes the ID token so a new claim needs no sign-out. The `-4baa3`
+  authorized-domain warning on #18 was stale; `hanna-vavilava-site.web.app` was already on
+  the list. Email and password sign-in is not checked against that list anyway; it works on
+  preview channels too. The list matters only for OAuth or email-link sign-in.

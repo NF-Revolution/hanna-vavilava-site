@@ -118,5 +118,21 @@
     "videoSpec": "Wideo · 100vh · pętla 8 s · wyciszone · bez napisów na kadrze",
     "videoSpecDetail": "Poster < 120 kb · plik < 2,5 MB · obraz statyczny przy prefers-reduced-motion",
     "videoAlt": "ALT: klacz Cascada skacze oxer 125 cm, ujęcie z boku na krytej ujeżdżalni — kliknięcie kadru prowadzi do koni"
+  },
+  "admin": {
+    "title": "Panel — Hanna Vavilava",
+    "h1": "Panel",
+    "email": "E-mail",
+    "password": "Hasło",
+    "signIn": "Zaloguj",
+    "signOut": "Wyloguj",
+    "signedInAs": "Zalogowano jako {email}",
+    "noAccess": "To konto nie ma dostępu do panelu.",
+    "horsesSoon": "Lista koni pojawi się tutaj.",
+    "errors": {
+      "credentials": "Nieprawidłowy e-mail lub hasło.",
+      "throttled": "Zbyt wiele prób. Spróbuj ponownie za kilka minut.",
+      "generic": "Nie udało się zalogować. Spróbuj ponownie."
+    }
   }
 }

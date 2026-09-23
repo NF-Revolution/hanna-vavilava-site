@@ -118,5 +118,21 @@
     "videoSpec": "Video · 100vh · 8 s loop · muted · no captions over the frame",
     "videoSpecDetail": "Poster < 120 kb · file < 2.5 MB · still image under prefers-reduced-motion",
     "videoAlt": "ALT: the mare Cascada jumps a 125 cm oxer, side view in an indoor arena — clicking the frame leads to the horses"
+  },
+  "admin": {
+    "title": "Admin — Hanna Vavilava",
+    "h1": "Admin",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {email}",
+    "noAccess": "This account has no access to the panel.",
+    "horsesSoon": "The horse list will appear here.",
+    "errors": {
+      "credentials": "Wrong email or password.",
+      "throttled": "Too many attempts. Try again in a few minutes.",
+      "generic": "Sign-in failed. Try again."
+    }
   }
 }
