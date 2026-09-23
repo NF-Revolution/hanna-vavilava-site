@@ -54,7 +54,9 @@ mechanics — `ticket` creates and refines issues, `ticket-implement` picks one 
 with all its comments, builds it and opens the pull request. Use them rather than improvising
 `gh` calls, and start Claude from this directory so they load. The `issue-reader` agent
 answers the wide questions those skills ask — which ticket is next, whether a ticket's
-blockers are clear — on Haiku, so a hundred issue bodies never reach the main context.
+blockers are clear — on Haiku, so a hundred issue bodies never reach the main context. The `ticket-reviewer`
+agent reads a finished diff with none of the build's context and reports only blocker,
+critical and high findings, before the pull request opens.
 
 Two different things live under `.claude/tickets/`, and they are not the same file twice:
 
