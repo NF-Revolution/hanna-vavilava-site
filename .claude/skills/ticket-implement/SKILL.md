@@ -3,7 +3,8 @@ name: ticket-implement
 description: >
   Pick up a GitHub issue in this repo and build it: read the description and every
   comment, check its blockers, open a linked branch, agree an approach and record it
-  on the issue, implement, verify, and open a pull request that closes the ticket.
+  on the issue, implement, verify, have a fresh agent review it, and open a pull
+  request that closes the ticket.
   Use whenever the user asks to implement, start, work on, pick up, continue or finish
   a ticket or issue — "implement #16", "let's do E2.1", "pick up the next ticket",
   "continue #17", "work on the database rules ticket", "start the horses page ticket",
@@ -119,12 +120,32 @@ Follow `AGENTS.md`. The conventions that actually bite:
 Format check, types, build, internal link check. Then tick the acceptance-criteria boxes in
 the issue body — that is what the checklist is for.
 
-## 8. Pull request
+## 8. Independent review
+
+Once `npm run ci` is green, before the pull request, one reviewer with fresh eyes:
+
+    Agent(subagent_type: "ticket-reviewer", description: "Review #<N>",
+          prompt: "#<N>. Diff: working tree vs main.")
+
+The prompt carries nothing else — no approach, no plan, no summary of what was built. The
+reviewer is useful because it has not seen how we got here; a briefing gives that away.
+It reports only blocker, critical and high findings, and `Verdict: clear` is a normal answer.
+
+For each finding, check it yourself — the reviewer can be wrong too:
+
+- Real → fix it, re-run `npm run ci`.
+- Wrong → a one-line rebuttal naming why.
+- Real but outside the ticket → a new linked issue via the `ticket` skill.
+
+A fix bigger than a few lines → review once more. Two rounds at most; a finding still in
+dispute after that goes to the user. The verdict goes into the pull-request body.
+
+## 9. Pull request
 
 The `create-pr` skill — it owns the commit subject, the body, `Closes #<N>` and the exact
 `gh pr create` call, and it re-runs safely if a pull request already exists.
 
-## 9. Outcome comment
+## 10. Outcome comment
 
 One comment when the work lands: the pull-request link, what actually shipped if it differs
 from the plan, and any trap the next person would otherwise hit.

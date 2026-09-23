@@ -79,6 +79,7 @@ End the commit message with the attribution line the session's instructions give
 
     - `npm run ci` passes locally
     - <artboard note: which board changed, or why none needed to>
+    - independent review: clear | <n> fixed | <n> disputed — <one line each>
 
     Closes #<N>
     EOF
