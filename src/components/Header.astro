@@ -40,7 +40,7 @@ const status = [
     {variant === 'overlay' && <p class="meta status">{status.join('  |  ')}</p>}
   </div>
 
-  <nav class="head-nav">
+  <nav class="head-nav" aria-label={dict.a11y.navPrimary}>
     {links.map((key) => (
       <a class="lbl" href={path(locale, key)}>
         {dict.nav[key as 'horses']}
@@ -77,17 +77,41 @@ const status = [
     color: var(--ink-inv);
   }
 
+  /*
+   * The scrim. This band sits on the video, and the wordmark tagline and the
+   * status line are --ink-inv-muted, which needs --scrim-strong to clear
+   * 4.5:1 against a white frame. The gradient is solid for the full height of
+   * the text and only fades below it — a gradient behind the text itself
+   * would put the last line on less alpha than the floor.
+   */
+  .overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 190px;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      var(--scrim-strong) 0%,
+      var(--scrim-strong) 60%,
+      transparent 100%
+    );
+  }
+
+  /* 26px of bars inside a 44px box, which is what the board draws. */
   .menu-trigger {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    width: 26px;
+    width: var(--tap);
     min-height: var(--tap);
   }
 
   .menu-trigger span {
     display: block;
+    width: 26px;
     height: 1px;
     background: currentColor;
   }
@@ -103,7 +127,9 @@ const status = [
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    min-height: var(--tap);
   }
 
   .wordmark-name {
@@ -138,6 +164,12 @@ const status = [
     align-items: center;
     justify-content: flex-end;
     gap: 26px;
+  }
+
+  .head-nav .lbl {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
   }
 
   .overlay .head-nav {

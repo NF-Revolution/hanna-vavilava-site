@@ -20,17 +20,36 @@
   --ink-inv-faint: #7d7c75; /* 4.60:1 on --ground-dark */
 
   /*
-   * Contrast corrections against the artboards. The design uses #8D8B83 on
-   * the light ground (3.13:1) and #6E6D68 on the dark ground (3.74:1) for
-   * tertiary text — both fail WCAG AA at the 10–11px sizes they are used at.
-   * They are folded into --ink-muted and --ink-inv-faint above. Everything
-   * else is the artboard value unchanged.
+   * Scrims, for text over the moving video. The homepage is a video, so the
+   * worst case is a white frame and contrast has to be computed against white
+   * rather than against --ground-dark. Compositing over #FFFFFF:
+   *
+   *   alpha   --ink-inv   --ink-inv-muted   --ink-inv-faint
+   *   0.62      4.79            2.11              1.29
+   *   0.84     10.9             4.71              2.9
+   *
+   * So --ink-inv sits on --scrim, --ink-inv-muted needs --scrim-strong, and
+   * --ink-inv-faint never goes over video at all — no usable alpha carries it.
+   */
+  --scrim: rgba(14, 14, 13, 0.62);
+  --scrim-strong: rgba(14, 14, 13, 0.84);
+
+  /*
+   * Contrast corrections against the artboards (E1.10). The design uses
+   * #8D8B83 on the light ground (3.13:1) and #6E6D68 on the dark ground
+   * (3.73:1) for tertiary text — both fail WCAG AA at the 10–11px sizes they
+   * are used at. They are folded into --ink-muted and --ink-inv-faint above.
+   * --rule-field is the third: #C9C7C0 is 1.55:1 on the light ground, and a
+   * form-input border is a UI component under SC 1.4.11, which wants 3:1.
+   * The other rules stay as drawn — a decorative separator is exempt.
+   * Everything else is the artboard value unchanged, and
+   * scripts/check-a11y.mjs fails the build if any of it drifts.
    */
 
   /* Rules */
   --rule: #d8d6d0;
   --rule-hair: #e4e2dc;
-  --rule-field: #c9c7c0;
+  --rule-field: #8f8d87; /* was #c9c7c0, 1.55:1 — see below */
   --rule-inv: #262622;
   --rule-inv-soft: #3a3a36;
 

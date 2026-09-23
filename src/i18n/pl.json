@@ -8,7 +8,10 @@
     "openMenu": "Menu — konie, jak przebiega zakup, o mnie, zapytanie",
     "closeMenu": "Zamknij menu",
     "home": "Strona główna",
-    "whatsapp": "WhatsApp — napisz do Hanny"
+    "whatsapp": "WhatsApp — napisz do Hanny",
+    "navPrimary": "Nawigacja główna",
+    "navFooter": "Nawigacja w stopce",
+    "navMenu": "Menu strony"
   },
   "nav": {
     "horses": "Konie",
@@ -94,7 +97,8 @@
     "menu": {
       "title": "Menu — Hanna Vavilava",
       "description": "Konie, o mnie, pytania i zapytanie.",
-      "label": "Menu"
+      "label": "Menu",
+      "h1": "Menu"
     },
     "privacy": {
       "title": "Prywatność — Hanna Vavilava",

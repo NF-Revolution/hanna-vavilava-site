@@ -60,6 +60,11 @@ button {
 input::placeholder {
   color: var(--ink-muted);
 }
+/* --ink-muted is a light-ground value; on the dark ground it is 2.4:1. */
+[data-ground='dark'] input::placeholder,
+.dk input::placeholder {
+  color: var(--ink-inv-faint);
+}
 select {
   -webkit-appearance: none;
   appearance: none;
@@ -122,6 +127,9 @@ video {
   top: 0;
   left: 0;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
   padding: 12px 20px;
   background: var(--ground-light);
   color: var(--ink);

@@ -44,10 +44,19 @@ const horseFacts = [
   -->
   <Header locale={locale} variant="overlay" links={['horses']} />
 
-  <main id="main" class="screen">
+  <main id="main" tabindex="-1" class="screen">
     <h1 class="visually-hidden">{page.h1}</h1>
 
-    <a class="frame" href={path(locale, 'horses')} data-event="home_frame">
+    <!--
+      Named explicitly: without this the link takes its accessible name from
+      everything inside the figure, including the ALT: placeholder caption.
+    -->
+    <a
+      class="frame"
+      href={path(locale, 'horses')}
+      aria-label={dict.nav.horses}
+      data-event="home_frame"
+    >
       <figure class="poster">
         <!-- PLACEHOLDER: poster frame and video asset, ticket 3.2. -->
         <div class="poster-spec">
@@ -164,7 +173,7 @@ const horseFacts = [
     padding: 15px 30px;
     min-height: var(--tap);
     /* A scrim: text over moving video has no guaranteed contrast. */
-    background: rgba(14, 14, 13, 0.45);
+    background: var(--scrim);
     backdrop-filter: blur(2px);
   }
 
@@ -178,7 +187,8 @@ const horseFacts = [
     right: 0;
     bottom: 0;
     border-top: 1px solid rgba(242, 241, 237, 0.22);
-    background: rgba(14, 14, 13, 0.55);
+    /* --scrim-strong, not --scrim: this bar carries --ink-inv-muted facts. */
+    background: var(--scrim-strong);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -202,7 +212,8 @@ const horseFacts = [
 
   .sound-hint {
     font-size: 9px;
-    color: var(--ink-inv-faint);
+    /* --ink-inv-faint clears no scrim over video; muted is the floor here. */
+    color: var(--ink-inv-muted);
   }
 
   .horse {

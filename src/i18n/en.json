@@ -8,7 +8,10 @@
     "openMenu": "Menu — horses, how buying works, about, enquiry",
     "closeMenu": "Close menu",
     "home": "Home",
-    "whatsapp": "WhatsApp — message Hanna"
+    "whatsapp": "WhatsApp — message Hanna",
+    "navPrimary": "Primary navigation",
+    "navFooter": "Footer navigation",
+    "navMenu": "Site menu"
   },
   "nav": {
     "horses": "Horses",
@@ -94,7 +97,8 @@
     "menu": {
       "title": "Menu — Hanna Vavilava",
       "description": "Horses, about, questions and enquiry.",
-      "label": "Menu"
+      "label": "Menu",
+      "h1": "Menu"
     },
     "privacy": {
       "title": "Privacy — Hanna Vavilava",
