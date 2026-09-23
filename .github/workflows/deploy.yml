@@ -28,7 +28,7 @@ jobs:
       - run: npm ci
 
       # Astro keeps optimised images here; without the cache every build
-      # re-downloads and re-encodes every photo from the R2 media host.
+      # re-downloads and re-encodes every photo from Storage.
       - uses: actions/cache@v4
         with:
           path: node_modules/.astro

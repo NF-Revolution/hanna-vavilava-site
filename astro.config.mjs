@@ -10,8 +10,9 @@ const SITE = process.env.SITE_URL || 'https://hannavavilava.com';
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
-  // Photos and posters are R2 object keys under `media.base` (#69).
-  image: { domains: [new URL(media.base).hostname] },
+  // Posters are R2 object keys under `media.base` (#69); photos are Storage
+  // objects, read anonymously through the Firebase host (#20).
+  image: { domains: [new URL(media.base).hostname, 'firebasestorage.googleapis.com'] },
   i18n: {
     locales: ['pl', 'en'],
     defaultLocale: 'pl',

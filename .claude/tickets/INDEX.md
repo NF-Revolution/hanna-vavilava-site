@@ -26,6 +26,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded |
 | E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
 | E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN               |
+| E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required          |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -112,7 +113,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   are deleted when the horse sells (#23). Upload is #70.
 - The Firebase project is `hanna-vavilava-site` on Blaze (E1.2). Realtime Database in
   `europe-west1` at `https://hanna-vavilava-site-default-rtdb.europe-west1.firebasedatabase.app`;
-  Storage and Functions in `europe-central2`, which is Warsaw itself. The database sits in a
+  Functions in `europe-central2`, which is Warsaw itself (Storage moved to US-EAST1 in E2.5). The database sits in a
   different region from everything else because Realtime Database has no Warsaw location
   and content is read once at build time, so the hop is paid by CI and never by a visitor.
   The project carries two Hosting sites and the default is `hanna-vavilava-site` — the
@@ -125,7 +126,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   the deploy target readable in the repo instead of inferred from an API call, which is how
   the earlier `-4baa3` reading survived unchallenged until the first real deploy (E1.3).
   `hanna-vavilava-site-4baa3` stays a 404 and Firebase does not allow deleting it.
-  No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
+  No default project in `.firebaserc` (it holds storage targets only, E2.5): the project id already lives in the `FIREBASE_PROJECT_ID`
   repository variable and both workflows pass it explicitly. #16 did not need one either —
   the emulator runs on `--project demo-hv`, which cannot reach production by construction.
 - The preview workflow skips a fork's pull request rather than failing it. The repo is public
@@ -190,3 +191,24 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   parse the build runs, so the panel cannot write a horse that fails `astro build`. The
   rules still say who and never what. Videos, photos and X-ray files are JSON textareas
   until #20 and #70 replace them.
+- Photos live in Firebase Storage, not R2 (E2.5). A photo is a build input Astro re-encodes
+  onto Hosting, so R2's free egress buys nothing, and Storage takes a browser upload gated by
+  the `admin` claim in `storage.rules` where R2 would need a presigning Function (#70's). Keys
+  are `photos/<slug>/<sha8>.jpg`, public read, admin create/update, JPEG under 10 MB, no
+  delete. The panel downscales to a 2400 px long edge on an `OffscreenCanvas` and re-encodes
+  JPEG, which is what drops EXIF and the GPS of the yard. A photo is `{ key, alt, caption }`:
+  the boards draw the first photo as the hero and the grid card with no text, and the gallery
+  photos with a short visible caption, so `alt` is required in both locales and `caption` may
+  be empty. `astro.config.mjs`, `deploy.yml` and `horse.ts` had assumed R2 and were corrected.
+- The photo bucket is `hanna-vavilava-site` in US-EAST1, not the Warsaw default (E2.5). The
+  default `.firebasestorage.app` bucket in `europe-central2` has no free tier; a bucket in
+  `us-central1`, `us-east1` or `us-west1` sits in Cloud Storage's Always Free tier, and the
+  owner created one and linked it to Firebase. The Warsaw bucket is gone. Upload latency is the
+  only cost, and visitors never read the bucket. The legal reading: the photos are horses with
+  EXIF stripped, Google is DPF-certified with SCCs in its terms, and Firebase Auth already
+  stores the admin email in the US. Consent for a recognisable rider (art. 81 of the copyright
+  act) is owed wherever the bucket sits. With no default bucket, `firebase deploy --only storage`
+  cannot resolve one, so `firebase.json` names the target `photos` and `.firebaserc` maps it for
+  `hanna-vavilava-site` and for the emulator's `demo-hv`. `.firebaserc` holds targets only, never
+  a default project. The rules deploy by hand, like the database rules:
+  `npx firebase-tools@15 deploy --only storage --project hanna-vavilava-site`.

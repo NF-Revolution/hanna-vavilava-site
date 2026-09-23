@@ -143,6 +143,16 @@
     "lineHint": "Jedna pozycja w wierszu, ta sama kolejność po polsku i po angielsku.",
     "priceHint": "Puste = cena na zapytanie.",
     "xraysHint": "Pusta liczba = brak badania.",
+    "photoDrop": "Upuść zdjęcia tutaj albo wybierz pliki",
+    "photoHint": "Pierwsze zdjęcie to okładka. Zmniejszane do 2400 px, bez danych EXIF i lokalizacji GPS.",
+    "photoNeedSlug": "Najpierw wpisz adres konia.",
+    "photoUploading": "Wysyłanie: {name}…",
+    "photoFailed": "Nie udało się wysłać: {name}",
+    "photoDone": "Wysłano zdjęcia: {count}",
+    "photo": "Zdjęcie {n}",
+    "photoAlt": "Opis dla niewidomych (wymagany)",
+    "photoCaption": "Podpis w galerii",
+    "remove": "Usuń: {name}",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {
       "basics": "Podstawy",
@@ -152,7 +162,7 @@
       "health": "Zdrowie",
       "xrays": "RTG",
       "viewing": "Oglądanie",
-      "media": "Media (JSON)"
+      "media": "Media"
     },
     "fields": {
       "slug": "Adres (slug)",

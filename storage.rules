@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Horse photos (E2.5). Public read: every photo is on a public page once the
+// horse is published, and the build fetches them without credentials. Only the
+// admin claim writes, only JPEG — the panel re-encodes everything, which is
+// what strips EXIF and GPS, so anything else did not come through it. No
+// delete: a saved horse may still reference the object.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /photos/{slug}/{file} {
+      allow read;
+      allow create, update: if request.auth != null
+        && request.auth.token.get('admin', false) == true
+        && request.resource.contentType == 'image/jpeg'
+        && request.resource.size < 10 * 1024 * 1024;
+    }
+  }
+}
