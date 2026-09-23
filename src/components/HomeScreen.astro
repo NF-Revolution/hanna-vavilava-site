@@ -23,12 +23,17 @@ const page = dict.pages.home;
 const horse = site.featuredHorse;
 
 const enterLabel = plural(locale, dict.home.enter, site.horsesAvailable);
-const horseFacts = [
-  horse.born,
-  `${horse.heightCm} cm`,
-  `${horse.levelCm} cm`,
-  formatPrice(locale, horse.priceEur),
-].join(' · ');
+// ponytail: a `null` price ("on request", #2) drops the segment until E4.x draws its label.
+const horseFacts =
+  horse &&
+  [
+    horse.born,
+    `${horse.heightCm} cm`,
+    `${horse.levelCm} cm`,
+    horse.price === null ? null : formatPrice(locale, horse.price),
+  ]
+    .filter((part) => part !== null)
+    .join(' · ');
 ---
 
 <Base
@@ -94,17 +99,19 @@ const horseFacts = [
         <span class="lbl sound-hint">{dict.home.soundHint}</span>
       </button>
 
-      <a
-        class="horse fade-late"
-        href={path(locale, 'horse', horse.slug)}
-        data-event="home_horse_line"
-      >
-        <span class="meta">{horse.name}</span>
-        <span class="meta horse-facts num">{horseFacts}</span>
-        <span aria-hidden="true" class="horse-arrow">
-          &#8594;
-        </span>
-      </a>
+      {horse && (
+        <a
+          class="horse fade-late"
+          href={path(locale, 'horse', horse.slug)}
+          data-event="home_horse_line"
+        >
+          <span class="meta">{horse.name}</span>
+          <span class="meta horse-facts num">{horseFacts}</span>
+          <span aria-hidden="true" class="horse-arrow">
+            &#8594;
+          </span>
+        </a>
+      )}
     </div>
   </main>
 

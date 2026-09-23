@@ -58,6 +58,14 @@ test('price on request is null, never zero', () => {
   assert.equal(horseSchema.safeParse({ ...cascada, price: 0 }).success, false);
 });
 
+test('a horse read back from the database, nulls and empty lists dropped, still parses', () => {
+  const { price, xrays, suits, notFor, videos, photos, ...stored } = cascada;
+  const horse = horseSchema.parse(stored);
+  assert.equal(horse.price, null);
+  assert.equal(horse.xrays, null);
+  assert.deepEqual([horse.suits, horse.notFor, horse.videos, horse.photos], [[], [], [], []]);
+});
+
 test('an owner field fails the parse', () => {
   assert.equal(horseSchema.safeParse({ ...cascada, owner: 'Jan Kowalski' }).success, false);
 });

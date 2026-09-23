@@ -15,12 +15,16 @@ const text = z.object({ pl: z.string(), en: z.string() });
 const key = z.string().regex(/^[a-z0-9][\w./-]*$/i);
 
 /*
+ * The Realtime Database stores neither `null` nor an empty array, so every
+ * nullable or list field defaults: a horse read back without `xrays`, `price`
+ * or `photos` is the same horse (E2.2).
+ *
  * Strict, so a field nobody designed — the owner of a brokered horse above all
  * (#3) — fails the parse instead of riding through to a page.
  *
  * ponytail: `headline` serves both the detail-page hook and the list-card blurb;
  * split it when E4.x needs two lengths. `status` arrives with the sold state
- * (E2.8), and the `/site` schema with the loader that reads it (E2.2).
+ * (E2.8). The `/site` schema lives with the loader, in `content.config.ts`.
  */
 export const horseSchema = z.strictObject({
   name: z.string(),
@@ -34,7 +38,7 @@ export const horseSchema = z.strictObject({
 
   levelCm: z.number().int().positive(),
   /* Whole EUR, the total the buyer pays. `null` is "on request" (#2). */
-  price: z.number().int().positive().nullable(),
+  price: z.number().int().positive().nullable().default(null),
   /* Decides the VAT invoice, the price label and the sale-kind line (#3). */
   seller: z.enum(['company', 'private']),
   headline: text,
@@ -53,8 +57,8 @@ export const horseSchema = z.strictObject({
     documents: text,
   }),
 
-  suits: z.array(text),
-  notFor: z.array(text),
+  suits: z.array(text).default([]),
+  notFor: z.array(text).default([]),
 
   health: z.object({
     vaccinations: text,
@@ -77,7 +81,8 @@ export const horseSchema = z.strictObject({
         )
         .default([]),
     })
-    .nullable(),
+    .nullable()
+    .default(null),
 
   viewing: z.object({
     lead: text,
@@ -85,16 +90,18 @@ export const horseSchema = z.strictObject({
     visitDay: text,
   }),
 
-  videos: z.array(
-    z.object({
-      key,
-      kind: z.enum(['sales', 'round']),
-      posterKey: key,
-      durationS: z.number().int().positive(),
-      transcript: text,
-    }),
-  ),
-  photos: z.array(z.object({ key, caption: text })),
+  videos: z
+    .array(
+      z.object({
+        key,
+        kind: z.enum(['sales', 'round']),
+        posterKey: key,
+        durationS: z.number().int().positive(),
+        transcript: text,
+      }),
+    )
+    .default([]),
+  photos: z.array(z.object({ key, caption: text })).default([]),
 });
 
 export type Horse = z.infer<typeof horseSchema>;

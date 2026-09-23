@@ -8,27 +8,28 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 
 ## State
 
-| Ticket                       | Issue              | State                                                        |
-| ---------------------------- | ------------------ | ------------------------------------------------------------ |
-| E1.1 repo, Astro, TS, CI     | #6                 | done                                                         |
-| E1.5 design tokens           | #10                | done                                                         |
-| E1.6 self-hosted fonts       | #11                | done                                                         |
-| E1.7 base layout             | #12                | done                                                         |
-| E1.8 shared footer           | #13                | done                                                         |
-| E1.9 menu drawer             | #14                | done                                                         |
-| E7.1 localised routing       | #57                | done                                                         |
-| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                        |
-| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`                 |
-| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                |
-| E1.10 accessibility baseline | #15                | done                                                         |
-| E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com` |
-| E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`          |
-| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                        |
-| E0.2 price display           | #2                 | decided — price per horse, `null` = on request               |
-| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61              |
-| E0.4 X-rays                  | #4                 | decided — PDF study, public download                         |
-| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1    |
-| everything else              | see the milestones | not started                                                  |
+| Ticket                       | Issue              | State                                                         |
+| ---------------------------- | ------------------ | ------------------------------------------------------------- |
+| E1.1 repo, Astro, TS, CI     | #6                 | done                                                          |
+| E1.5 design tokens           | #10                | done                                                          |
+| E1.6 self-hosted fonts       | #11                | done                                                          |
+| E1.7 base layout             | #12                | done                                                          |
+| E1.8 shared footer           | #13                | done                                                          |
+| E1.9 menu drawer             | #14                | done                                                          |
+| E7.1 localised routing       | #57                | done                                                          |
+| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                         |
+| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`                  |
+| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                 |
+| E1.10 accessibility baseline | #15                | done                                                          |
+| E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com`  |
+| E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`           |
+| E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded |
+| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
+| E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
+| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
+| E0.4 X-rays                  | #4                 | decided — PDF study, public download                          |
+| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1     |
+| everything else              | see the milestones | not started                                                   |
 
 ## Decisions made along the way
 
@@ -153,3 +154,19 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   plus `fetch` against the emulator's REST API with unsigned tokens — no
   `@firebase/rules-unit-testing` — and run as `npm test` through `npx firebase-tools@15`,
   in its own CI step with Java, so `npm run ci` stays Java-free.
+- Content is read at build time, not fetched in the browser, even though the owner asked
+  for live edits (E2.2). A horse edit still needs no hand redeploy: the Publish button
+  (E2.6) sends `repository_dispatch` and `deploy.yml` rebuilds in a minute or two. A
+  browser read would have cost crawlable horse pages, WhatsApp link previews, the 1 KB
+  JavaScript budget and the admin-only read rules. `src/content.config.ts` reads `/horses`
+  and `/site` — never the root, which holds enquiries — through `firebase-admin`, and
+  deletes the app afterwards, because the open socket keeps `astro build` from exiting.
+  Without `FIREBASE_SERVICE_ACCOUNT` the build reads `src/fixture.json`; that covers
+  `npm run ci`, forks and local dev, and it can never reach live, because the hosting
+  deploy needs the same secret. `/site` holds the contact details, `responseWindow` and
+  `updated`; the stock count and the featured horse are derived from `/horses`, never
+  stored. `site.media` moved to `src/media.ts`, because `site.ts` now imports
+  `astro:content` and neither `astro.config.mjs` nor a plain Node script can.
+- The homepage's bottom-edge horse line is omitted when the stable is empty, and its price
+  segment when the price is `null` — two states no board draws. The "on request" label
+  comes with E4.x's boards; the empty stable is E2.8's sold-state question (E2.2).

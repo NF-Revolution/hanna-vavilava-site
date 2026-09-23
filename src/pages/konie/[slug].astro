@@ -1,11 +1,10 @@
 ---
 import HorseDetailStub from '../../components/HorseDetailStub.astro';
-import { site } from '../../site';
+import { getCollection } from 'astro:content';
 
-export function getStaticPaths() {
-  // PLACEHOLDER source — the content collection replaces this in ticket 2.2.
-  const horse = site.featuredHorse;
-  return [{ params: { slug: horse.slug }, props: { name: horse.name } }];
+export async function getStaticPaths() {
+  const horses = await getCollection('horses');
+  return horses.map((horse) => ({ params: { slug: horse.id }, props: { name: horse.data.name } }));
 }
 
 const { slug } = Astro.params;
