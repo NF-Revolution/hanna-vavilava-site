@@ -1,0 +1,158 @@
+---
+/*
+ * The admin panel (E2.3) — the only client-rendered route. Standalone rather
+ * than Base.astro: Base emits canonical, hreflang and og tags for a public
+ * route, and this page must be none of those. It is not in routes.ts either,
+ * so it has no /en twin and nothing links to it.
+ *
+ * ponytail: Polish only — one user. The strings exist in en.json too, so an
+ * English panel is swapping the locale below if Hanna ever wants one.
+ */
+import '../styles/fonts.css';
+import '../styles/base.css';
+import { htmlLang, t } from '../i18n';
+
+const locale = 'pl';
+const dict = t(locale);
+const a = dict.admin;
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{a.title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {dict.a11y.skipToContent}
+    </a>
+    <main id="main">
+      <h1>{a.h1}</h1>
+
+      <form id="sign-in" hidden>
+        <label>
+          {a.email}
+          <input name="email" type="email" autocomplete="username" required />
+        </label>
+        <label>
+          {a.password}
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit">{a.signIn}</button>
+        <p id="error" role="alert"></p>
+      </form>
+
+      <section id="no-access" hidden>
+        <p>{a.noAccess}</p>
+        <button type="button" data-sign-out>
+          {a.signOut}
+        </button>
+      </section>
+
+      <section id="shell" hidden>
+        <p id="who"></p>
+        <button type="button" data-sign-out>
+          {a.signOut}
+        </button>
+        <!-- ponytail: placeholder until the horse list ticket fills the panel. -->
+        <p>{a.horsesSoon}</p>
+      </section>
+    </main>
+  </body>
+</html>
+
+<script>
+  import { initializeApp } from 'firebase/app';
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signOut,
+    type AuthError,
+  } from 'firebase/auth';
+  import { firebaseConfig } from '../firebase';
+  import { admin } from '../i18n/pl.json';
+
+  const auth = getAuth(initializeApp(firebaseConfig));
+  const form = document.getElementById('sign-in') as HTMLFormElement;
+  const error = document.getElementById('error')!;
+  const noAccess = document.getElementById('no-access')!;
+  const shell = document.getElementById('shell')!;
+  const who = document.getElementById('who')!;
+
+  const show = (view: HTMLElement | null) => {
+    for (const el of [form, noAccess, shell]) el.hidden = el !== view;
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return show(form);
+    // Forced refresh: a claim granted after sign-in shows up on the next load.
+    const { claims } = await user.getIdTokenResult(true);
+    if (claims.admin !== true) return show(noAccess);
+    who.textContent = admin.signedInAs.replace('{email}', user.email ?? '');
+    show(shell);
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const button = form.querySelector('button')!;
+    button.disabled = true;
+    error.textContent = '';
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        String(data.get('email')),
+        String(data.get('password')),
+      );
+      form.reset();
+    } catch (e) {
+      const code = (e as AuthError).code;
+      error.textContent =
+        code === 'auth/invalid-credential'
+          ? admin.errors.credentials
+          : code === 'auth/too-many-requests'
+            ? admin.errors.throttled
+            : admin.errors.generic;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  for (const button of document.querySelectorAll('[data-sign-out]')) {
+    button.addEventListener('click', () => signOut(auth));
+  }
+</script>
+
+<style>
+  main {
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: var(--gutter-mobile);
+  }
+  /* :not([hidden]) — a display rule would otherwise beat the hidden attribute. */
+  form:not([hidden]),
+  section:not([hidden]) {
+    display: grid;
+    gap: 1rem;
+  }
+  label {
+    display: grid;
+    gap: 0.25rem;
+  }
+  input {
+    min-height: var(--tap);
+    border-bottom: 1px solid var(--rule-field);
+  }
+  button {
+    min-height: var(--tap);
+    justify-self: start;
+    text-decoration: underline;
+  }
+  button:disabled {
+    color: var(--ink-muted);
+  }
+</style>
