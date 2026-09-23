@@ -1,55 +1,28 @@
 /*
- * Standing site facts.
- *
- * Every value here is PLACEHOLDER until E8.6. This module is the single seam
- * the database's `/site` node replaces in ticket 2.2 — nothing else in the
- * codebase should hardcode a contact detail or a stock count.
+ * Standing site facts — the single seam. Contact details come from the
+ * database's `/site` node and the stock counts from `/horses`, both read at
+ * build time by `content.config.ts`. Nothing else in the codebase should
+ * hardcode a contact detail or a stock count.
  */
+import { getCollection, getEntry } from 'astro:content';
+
+const horses = await getCollection('horses');
+const facts = await getEntry('site', 'site');
+if (!facts) throw new Error('`/site` is missing from the Realtime Database');
+
+const first = horses[0];
+
 export const site = {
-  /* PLACEHOLDER — digits only, no + and no spaces, which is what wa.me needs. */
-  whatsapp: '48000000000',
-  /* PLACEHOLDER */
-  telegram: 'placeholder',
-  /* PLACEHOLDER */
-  phone: '+48 000 000 000',
-  /* PLACEHOLDER */
-  email: 'kontakt@przyklad.pl',
-  /* PLACEHOLDER */
-  instagram: 'https://instagram.com/placeholder',
-
-  horsesAvailable: 4,
-  /* PLACEHOLDER — the "stan stajni" date shown in the header and sub-bars. */
-  updated: '2026-09-19',
-  responseWindow: '8:00–21:00 CET',
-
+  ...facts.data,
+  /* ponytail: every horse counts as available until the sold state (E2.8) adds a status. */
+  horsesAvailable: horses.length,
   /*
-   * PLACEHOLDER — the horse named on the bottom edge of the homepage, one of
-   * its three ways in. Replaced by the first `available` horse from the
-   * content collection in ticket 2.2.
+   * The horse named on the bottom edge of the homepage, one of its three ways
+   * in. ponytail: the first by slug; E2.8's status or a featured flag picks
+   * properly. `undefined` when the stable is empty, and the line is omitted.
    */
-  featuredHorse: {
-    slug: 'cascada',
-    name: 'Cascada',
-    born: 2017,
-    heightCm: 168,
-    levelCm: 125,
-    priceEur: 32000,
-  },
-
-  /*
-   * Cloudflare R2 (#69) — video, posters and X-ray PDFs. The site stores object
-   * keys, never URLs, so #63 changes `base` to https://media.hannavavilava.com
-   * and nothing else. Keys are content-addressed (`<slug>/<name>-<sha8>.<ext>`)
-   * and never overwritten, which is what makes `cacheControl` safe; every upload
-   * sets it. Node 22.18+ strips types, so the encode script (#26) imports this
-   * file directly.
-   */
-  media: {
-    base: 'https://hv-media.nfrevolution.com',
-    bucket: 'hanna-vavilava-media',
-    cacheControl: 'public, max-age=31536000, immutable',
-  },
-} as const;
+  featuredHorse: first && { slug: first.id, ...first.data },
+};
 
 export const whatsappHref = (text?: string): string =>
   `https://wa.me/${site.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
