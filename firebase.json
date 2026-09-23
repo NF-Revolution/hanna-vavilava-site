@@ -1,4 +1,5 @@
 {
+  "database": { "rules": "database.rules.json" },
   "hosting": {
     "site": "hanna-vavilava-site",
     "public": "dist",
