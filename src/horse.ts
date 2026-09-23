@@ -23,10 +23,15 @@ const key = z.string().regex(/^[a-z0-9][\w./-]*$/i);
  * (#3) — fails the parse instead of riding through to a page.
  *
  * ponytail: `headline` serves both the detail-page hook and the list-card blurb;
- * split it when E4.x needs two lengths. `status` arrives with the sold state
- * (E2.8). The `/site` schema lives with the loader, in `content.config.ts`.
+ * split it when E4.x needs two lengths. The `/site` schema lives with the
+ * loader, in `content.config.ts`.
  */
 export const horseSchema = z.strictObject({
+  /* Set in the admin editor (E2.4). Defaulted, so a horse seeded before it parses. */
+  status: z.enum(['available', 'reserved', 'sold']).default('available'),
+  /* List position, ascending. The editor rewrites it 0..n-1 on every move. */
+  order: z.number().int().nonnegative().default(0),
+
   name: z.string(),
   sex: z.enum(['mare', 'gelding']),
   born: z.number().int(),

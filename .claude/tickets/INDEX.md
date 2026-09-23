@@ -25,6 +25,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`           |
 | E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded |
 | E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
+| E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN               |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -182,3 +183,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   authorized-domain warning on #18 was stale; `hanna-vavilava-site.web.app` was already on
   the list. Email and password sign-in is not checked against that list anyway; it works on
   preview channels too. The list matters only for OAuth or email-link sign-in.
+- The horse gains `status` (`available | reserved | sold`) and `order`, both defaulted, so
+  the seeded horse needed no migration (E2.4). The stock count and the featured horse read
+  only `available`, in `order`. Reserved and sold horses keep their pages, and #23 owns how
+  a sold one looks. The editor validates with `horseSchema` before every write, the same
+  parse the build runs, so the panel cannot write a horse that fails `astro build`. The
+  rules still say who and never what. Videos, photos and X-ray files are JSON textareas
+  until #20 and #70 replace them.

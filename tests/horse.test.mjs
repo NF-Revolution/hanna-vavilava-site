@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { horseSchema } from '../src/horse.ts';
+import { fromFields, toFields } from '../src/horse-form.ts';
 
 const t = (pl) => ({ pl, en: pl });
 const cascada = {
@@ -73,4 +74,31 @@ test('an owner field fails the parse', () => {
 test('media is an object key, never a URL', () => {
   const videos = [{ ...cascada.videos[0], key: 'https://hv-media.nfrevolution.com/cascada/a.mp4' }];
   assert.equal(horseSchema.safeParse({ ...cascada, videos }).success, false);
+});
+
+test('the admin form round-trips a horse, status and order included', () => {
+  const horse = horseSchema.parse({ ...cascada, status: 'reserved', order: 2 });
+  assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
+});
+
+test('a blank price and a blank X-ray block are null, as the form leaves them', () => {
+  const fields = {
+    ...toFields(horseSchema.parse(cascada)),
+    price: undefined,
+    'xrays.count': undefined,
+    'xrays.takenOn': '',
+    'xrays.scope.pl': '',
+    'xrays.scope.en': '',
+    'xrays.files': '',
+  };
+  const horse = horseSchema.parse(fromFields(fields));
+  assert.equal(horse.price, null);
+  assert.equal(horse.xrays, null);
+});
+
+test('a PL list longer than its EN twin, or broken JSON, fails the parse', () => {
+  const fields = toFields(horseSchema.parse(cascada));
+  const uneven = { ...fields, 'suits.pl': 'jeden\ndwa', 'suits.en': 'one' };
+  assert.equal(horseSchema.safeParse(fromFields(uneven)).success, false);
+  assert.equal(horseSchema.safeParse(fromFields({ ...fields, videos: '[{' })).success, false);
 });
