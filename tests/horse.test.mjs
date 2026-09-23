@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { horseSchema } from '../src/horse.ts';
 import { fromFields, toFields } from '../src/horse-form.ts';
+import { fit } from '../src/photo.ts';
 
 const t = (pl) => ({ pl, en: pl });
 const cascada = {
@@ -47,7 +48,10 @@ const cascada = {
       transcript: t('…'),
     },
   ],
-  photos: [],
+  photos: [
+    { key: 'photos/cascada/1a2b3c4d.jpg', alt: t('Cascada nad oxerem 125 cm'), caption: t('') },
+    { key: 'photos/cascada/5e6f7a8b.jpg', alt: t('Głowa, z profilu'), caption: t('głowa') },
+  ],
 };
 
 test('a full horse parses, and a study starts with no files', () => {
@@ -76,7 +80,7 @@ test('media is an object key, never a URL', () => {
   assert.equal(horseSchema.safeParse({ ...cascada, videos }).success, false);
 });
 
-test('the admin form round-trips a horse, status and order included', () => {
+test('the admin form round-trips a horse, status, order and photos included', () => {
   const horse = horseSchema.parse({ ...cascada, status: 'reserved', order: 2 });
   assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
 });
@@ -101,4 +105,15 @@ test('a PL list longer than its EN twin, or broken JSON, fails the parse', () =>
   const uneven = { ...fields, 'suits.pl': 'jeden\ndwa', 'suits.en': 'one' };
   assert.equal(horseSchema.safeParse(fromFields(uneven)).success, false);
   assert.equal(horseSchema.safeParse(fromFields({ ...fields, videos: '[{' })).success, false);
+});
+
+test('a photo without alt text in both languages fails the parse', () => {
+  const photos = [{ ...cascada.photos[0], alt: { pl: 'Cascada', en: '  ' } }];
+  assert.equal(horseSchema.safeParse({ ...cascada, photos }).success, false);
+});
+
+test('a photo is scaled to a 2400 px long edge and never up', () => {
+  assert.deepEqual(fit(4032, 3024), [2400, 1800]);
+  assert.deepEqual(fit(3024, 4032), [1800, 2400]);
+  assert.deepEqual(fit(800, 600), [800, 600]);
 });

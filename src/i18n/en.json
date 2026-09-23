@@ -143,6 +143,16 @@
     "lineHint": "One item per line, in the same order in Polish and English.",
     "priceHint": "Empty = price on request.",
     "xraysHint": "Empty count = no study.",
+    "photoDrop": "Drop photos here or choose files",
+    "photoHint": "The first photo is the cover. Downscaled to 2400 px, EXIF and GPS location removed.",
+    "photoNeedSlug": "Enter the horse's address first.",
+    "photoUploading": "Uploading: {name}…",
+    "photoFailed": "Upload failed: {name}",
+    "photoDone": "Photos uploaded: {count}",
+    "photo": "Photo {n}",
+    "photoAlt": "Alt text (required)",
+    "photoCaption": "Gallery caption",
+    "remove": "Remove: {name}",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
       "basics": "Basics",
@@ -152,7 +162,7 @@
       "health": "Health",
       "xrays": "X-rays",
       "viewing": "Viewing",
-      "media": "Media (JSON)"
+      "media": "Media"
     },
     "fields": {
       "slug": "Address (slug)",

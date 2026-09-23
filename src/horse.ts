@@ -11,7 +11,11 @@ import { z } from 'astro/zod';
 
 const text = z.object({ pl: z.string(), en: z.string() });
 
-/* An object key under `site.media.base`. No `:`, so an absolute URL cannot pass. */
+/*
+ * An object key, never a URL — no `:`, so an absolute URL cannot pass. Video,
+ * posters and X-rays are R2 keys under `media.base`; photos are Storage paths,
+ * `photos/<slug>/<sha8>.jpg` (E2.5).
+ */
 const key = z.string().regex(/^[a-z0-9][\w./-]*$/i);
 
 /*
@@ -106,7 +110,19 @@ export const horseSchema = z.strictObject({
       }),
     )
     .default([]),
-  photos: z.array(z.object({ key, caption: text })).default([]),
+  /*
+   * The first is the cover — the detail hero and the grid card. `caption` is the
+   * short visible gallery label and may be empty; `alt` never may.
+   */
+  photos: z
+    .array(
+      z.object({
+        key,
+        alt: z.object({ pl: z.string().trim().min(1), en: z.string().trim().min(1) }),
+        caption: text,
+      }),
+    )
+    .default([]),
 });
 
 export type Horse = z.infer<typeof horseSchema>;

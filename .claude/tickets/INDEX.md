@@ -26,6 +26,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded |
 | E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
 | E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN               |
+| E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required          |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -190,3 +191,12 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   parse the build runs, so the panel cannot write a horse that fails `astro build`. The
   rules still say who and never what. Videos, photos and X-ray files are JSON textareas
   until #20 and #70 replace them.
+- Photos live in Firebase Storage, not R2 (E2.5). A photo is a build input Astro re-encodes
+  onto Hosting, so R2's free egress buys nothing, and Storage takes a browser upload gated by
+  the `admin` claim in `storage.rules` where R2 would need a presigning Function (#70's). Keys
+  are `photos/<slug>/<sha8>.jpg`, public read, admin create/update, JPEG under 10 MB, no
+  delete. The panel downscales to a 2400 px long edge on an `OffscreenCanvas` and re-encodes
+  JPEG, which is what drops EXIF and the GPS of the yard. A photo is `{ key, alt, caption }`:
+  the boards draw the first photo as the hero and the grid card with no text, and the gallery
+  photos with a short visible caption, so `alt` is required in both locales and `caption` may
+  be empty. `astro.config.mjs`, `deploy.yml` and `horse.ts` had assumed R2 and were corrected.

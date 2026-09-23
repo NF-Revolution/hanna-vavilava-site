@@ -8,6 +8,8 @@
  * The horse editor (E2.4) lives here too: a live list to reorder and open,
  * and one form whose field names are dotted paths into the horse. The
  * mapping is `horse-form.ts`; the check before any write is `horseSchema`.
+ * Photos (E2.5) upload to Storage as they are dropped, downscaled and
+ * stripped of EXIF by `photo.ts`, and join the form as rows of fields.
  *
  * ponytail: Polish only — one user. The strings exist in en.json too, so an
  * English panel is swapping the locale below if Hanna ever wants one.
@@ -23,8 +25,8 @@ const a = dict.admin;
 const f = a.fields as Record<string, string>;
 const o = a.options as Record<string, string>;
 
-/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, or a select. */
-type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | string[];
+/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, or a select. */
+type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
 const sections: [legend: string, fields: Field[]][] = [
@@ -86,7 +88,7 @@ const sections: [legend: string, fields: Field[]][] = [
     a.sections.media,
     [
       ['videos', 'json'],
-      ['photos', 'json'],
+      ['photos', 'photos'],
     ],
   ],
 ];
@@ -178,6 +180,18 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
                       ></textarea>
                     </label>
                   </fieldset>
+                ) : kind === 'photos' ? (
+                  <fieldset class="photos">
+                    <legend>
+                      {f[path]} <small>{a.photoHint}</small>
+                    </legend>
+                    <label id="drop" class="drop">
+                      {a.photoDrop}
+                      <input id="photo-input" type="file" accept="image/*" multiple />
+                    </label>
+                    <p id="photo-status" role="status"></p>
+                    <ol id="photos"></ol>
+                  </fieldset>
                 ) : kind === 'json' ? (
                   <label>
                     {f[path]}
@@ -234,6 +248,41 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             </button>
           </li>
         </template>
+
+        <template id="photo-row">
+          <li>
+            <img alt="" width="160" height="120" />
+            <input type="hidden" data-field="key" />
+            <fieldset class="pair">
+              <legend data-legend></legend>
+              <label>
+                {a.photoAlt} · PL
+                <input type="text" data-field="alt.pl" required />
+              </label>
+              <label>
+                {a.photoAlt} · EN
+                <input type="text" data-field="alt.en" lang="en" required />
+              </label>
+              <label>
+                {a.photoCaption} · PL
+                <input type="text" data-field="caption.pl" />
+              </label>
+              <label>
+                {a.photoCaption} · EN
+                <input type="text" data-field="caption.en" lang="en" />
+              </label>
+            </fieldset>
+            <button type="button" data-up>
+              ↑
+            </button>
+            <button type="button" data-down>
+              ↓
+            </button>
+            <button type="button" data-remove>
+              {a.remove.replace(': {name}', '')}
+            </button>
+          </li>
+        </template>
       </section>
     </main>
   </body>
@@ -249,14 +298,18 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     type AuthError,
   } from 'firebase/auth';
   import { getDatabase, onValue, ref, set, update } from 'firebase/database';
-  import { firebaseConfig } from '../firebase';
+  import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+  import { firebaseConfig, photoUrl } from '../firebase';
   import { horseSchema } from '../horse';
   import { fromFields, toFields } from '../horse-form';
   import { admin } from '../i18n/pl.json';
+  import { media } from '../media';
+  import { downscale, photoKey } from '../photo';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
+  const storage = getStorage(app);
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
   const form = $<HTMLFormElement>('sign-in');
@@ -274,6 +327,10 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   const slugInput = $<HTMLInputElement>('slug');
   const errors = $('errors');
   const save = $<HTMLButtonElement>('save');
+  const photoList = $('photos');
+  const photoRow = $<HTMLTemplateElement>('photo-row');
+  const photoStatus = $('photo-status');
+  const photoInput = $<HTMLInputElement>('photo-input');
 
   const show = (view: HTMLElement | null) => {
     for (const el of [form, noAccess, shell]) el.hidden = el !== view;
@@ -335,10 +392,99 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
         'name' in el && el.name !== '' && 'value' in el,
     );
 
+  /* Names every row's inputs `photos.<i>.…` in display order, the shape `fromFields` reads. */
+  function numberPhotos() {
+    const rows = [...photoList.children];
+    rows.forEach((li, i) => {
+      const name = admin.photo.replace('{n}', String(i + 1));
+      const button = (key: string) => li.querySelector<HTMLButtonElement>(`[data-${key}]`)!;
+      li.querySelector('[data-legend]')!.textContent = name;
+      for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+        el.name = `photos.${i}.${el.dataset.field}`;
+      }
+      button('up').setAttribute('aria-label', admin.up.replace('{name}', name));
+      button('down').setAttribute('aria-label', admin.down.replace('{name}', name));
+      button('remove').setAttribute('aria-label', admin.remove.replace('{name}', name));
+      button('up').disabled = i === 0;
+      button('down').disabled = i === rows.length - 1;
+    });
+  }
+
+  function addPhoto(photo: { key: string }) {
+    const li = photoRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+    const button = (key: string) => li.querySelector<HTMLButtonElement>(`[data-${key}]`)!;
+    li.querySelector('img')!.src = photoUrl(photo.key);
+    for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+      el.value = el.dataset.field!.split('.').reduce((v: any, k) => v?.[k], photo) ?? '';
+    }
+    // Moving the row drops focus, so it goes back to the pressed button, or its twin at an end.
+    const move = (key: 'up' | 'down') => {
+      if (key === 'up') li.previousElementSibling?.before(li);
+      else li.nextElementSibling?.after(li);
+      numberPhotos();
+      (button(key).disabled ? button(key === 'up' ? 'down' : 'up') : button(key)).focus();
+    };
+    button('up').onclick = () => move('up');
+    button('down').onclick = () => move('down');
+    // ponytail: the Storage object stays — a saved horse may still use it. #23 cleans up on sale.
+    button('remove').onclick = () => {
+      li.remove();
+      numberPhotos();
+      photoInput.focus();
+    };
+    photoList.append(li);
+    numberPhotos();
+  }
+
+  /* One file at a time: downscale, which drops the EXIF, then upload under a content hash. */
+  async function upload(files: FileList | null | undefined) {
+    if (!files?.length) return;
+    if (!slugInput.value || !slugInput.checkValidity()) {
+      photoStatus.textContent = admin.photoNeedSlug;
+      slugInput.focus();
+      return;
+    }
+    const slug = slugInput.value;
+    const done: string[] = [];
+    const failed: string[] = [];
+    for (const file of files) {
+      photoStatus.textContent = admin.photoUploading.replace('{name}', file.name);
+      try {
+        const blob = await downscale(file);
+        const key = await photoKey(slug, blob);
+        await uploadBytes(storageRef(storage, key), blob, {
+          contentType: 'image/jpeg',
+          cacheControl: media.cacheControl,
+        });
+        addPhoto({ key });
+        done.push(file.name);
+      } catch {
+        failed.push(file.name);
+      }
+    }
+    photoStatus.textContent = [
+      done.length ? admin.photoDone.replace('{count}', String(done.length)) : '',
+      ...failed.map((name) => admin.photoFailed.replace('{name}', name)),
+    ]
+      .filter(Boolean)
+      .join(' ');
+    photoInput.value = '';
+  }
+
+  photoInput.addEventListener('change', () => upload(photoInput.files));
+  $('drop').addEventListener('dragover', (event) => event.preventDefault());
+  $('drop').addEventListener('drop', (event) => {
+    event.preventDefault();
+    upload(event.dataTransfer?.files);
+  });
+
   function open(slug: string | null) {
     editing = slug;
     editor.reset();
     errors.replaceChildren();
+    photoStatus.textContent = '';
+    photoList.replaceChildren();
+    for (const photo of (slug && horses[slug].photos) || []) addPhoto(photo);
     slugInput.value = slug ?? '';
     slugInput.readOnly = slug !== null;
     editorTitle.textContent = slug ? (horses[slug].name ?? slug) : admin.newHorse;
@@ -518,6 +664,22 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     border: 1px solid var(--rule-field);
     padding: 0.5rem;
     resize: vertical;
+  }
+  .drop {
+    padding: 1.5rem;
+    border: 1px dashed var(--rule-field);
+  }
+  #photos li {
+    align-items: start;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+  #photos img {
+    object-fit: cover;
+    background: var(--rule);
+  }
+  #photos .pair {
+    flex: 1 1 20rem;
   }
   .code {
     font-family: ui-monospace, monospace;
