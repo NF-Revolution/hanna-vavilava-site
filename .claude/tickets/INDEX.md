@@ -22,6 +22,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                |
 | E1.10 accessibility baseline | #15                | done                                                         |
 | E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com` |
+| E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`          |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                        |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request               |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61              |
@@ -122,8 +123,8 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   the earlier `-4baa3` reading survived unchallenged until the first real deploy (E1.3).
   `hanna-vavilava-site-4baa3` stays a 404 and Firebase does not allow deleting it.
   No `.firebaserc`: the project id already lives in the `FIREBASE_PROJECT_ID`
-  repository variable and both workflows pass it explicitly. It arrives with #16, where
-  the emulator needs a local CLI call.
+  repository variable and both workflows pass it explicitly. #16 did not need one either —
+  the emulator runs on `--project demo-hv`, which cannot reach production by construction.
 - The preview workflow skips a fork's pull request rather than failing it. The repo is public
   and a `pull_request` from a fork gets no secrets, so `FIREBASE_SERVICE_ACCOUNT` arrives empty
   and the deploy step fails every time; `vars.FIREBASE_PROJECT_ID != ''` does not catch it,
@@ -141,3 +142,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   shared with another brand and the encode script is the only uploader; the value, the bucket
   and the base live once in `site.media`, which Node imports straight from `src/site.ts`.
   `wrangler` runs as `npx wrangler@4`, not a devDependency — CI never touches R2.
+- No client writes to the database at all — every path is `auth.token.admin === true` (E2.1).
+  #16 first had `/enquiries` and `/subscribers` open for anonymous create-only pushes, but
+  #42 writes enquiries from a Cloud Function behind Turnstile, a honeypot and a per-IP rate
+  limit, and #48 needs double opt-in; the Admin SDK skips the rules, so an open write was
+  only a door around those. The admin is a custom claim, not a uid or an email in the rules:
+  E2.3 sets it once with `setCustomUserClaims(uid, { admin: true })`, and until then every
+  read from the panel is denied. The horse schema is `src/horse.ts`, on Astro's own zod, and
+  it is a `strictObject` so an `owner` field fails the parse. The rules tests are `node:test`
+  plus `fetch` against the emulator's REST API with unsigned tokens — no
+  `@firebase/rules-unit-testing` — and run as `npm test` through `npx firebase-tools@15`,
+  in its own CI step with Java, so `npm run ci` stays Java-free.

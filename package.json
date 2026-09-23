@@ -16,7 +16,8 @@
     "a11y": "node scripts/check-a11y.mjs",
     "fonts": "node scripts/fonts.mjs",
     "ci": "npm run format:check && npm run check && npm run build && npm run links && npm run a11y",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "npx -y firebase-tools@15 emulators:exec --only database --project demo-hv 'node --test tests/*.test.mjs'"
   },
   "dependencies": {
     "astro": "^7.3.3"
