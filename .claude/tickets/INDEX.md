@@ -180,4 +180,5 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   claim is set by `npm run admin:grant -- <email>` with application-default credentials, and
   the panel force-refreshes the ID token so a new claim needs no sign-out. The `-4baa3`
   authorized-domain warning on #18 was stale; `hanna-vavilava-site.web.app` was already on
-  the list. Preview-channel domains are not on it, so preview sign-in is expected to fail.
+  the list. Email and password sign-in is not checked against that list anyway; it works on
+  preview channels too. The list matters only for OAuth or email-link sign-in.

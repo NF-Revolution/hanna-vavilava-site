@@ -9,6 +9,7 @@ Shipped 2026-09-23.
 - Only `dist/admin/index.html` references an `_astro` chunk (103 KB). Public pages are unchanged.
 - The Email/Password provider is on. A bogus sign-in returns `INVALID_LOGIN_CREDENTIALS`, not `OPERATION_NOT_ALLOWED`.
 - ticket-reviewer: clear.
+- The owner verified the flow on the preview channel: sign-in, the claim and the shell all work.
 
 ## What was built — 2026-09-23
 
@@ -103,7 +104,8 @@ Approach comment on #18 → `gh issue develop 18 --base main --checkout` → bui
 - Traps for next time:
   - A scoped `display: grid` beats the `hidden` attribute, so the rule targets `:not([hidden])`.
   - zsh drops `grep --include=*.html` with a glob error. Quote the pattern.
-  - Preview-channel domains are not authorized, so sign-in fails on a PR preview. Test on
-    localhost or production.
+  - Email and password sign-in is not checked against the authorized-domain list. The owner
+    signed in on the #84 preview channel, whose domain is not on the list. The list gates
+    OAuth redirects and popups and email links, so it matters only if one of those is added.
   - The account shows "no access" until `npm run admin:grant -- <email>` has run. That needs
     `gcloud auth application-default login` first, because this machine has no key.
