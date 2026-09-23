@@ -6,20 +6,24 @@
  */
 import { getCollection, getEntry } from 'astro:content';
 
-const horses = await getCollection('horses');
+const horses = (await getCollection('horses')).sort(
+  (a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id),
+);
+const available = horses.filter((h) => h.data.status === 'available');
 const facts = await getEntry('site', 'site');
 if (!facts) throw new Error('`/site` is missing from the Realtime Database');
 
-const first = horses[0];
+const first = available[0];
 
 export const site = {
   ...facts.data,
-  /* ponytail: every horse counts as available until the sold state (E2.8) adds a status. */
-  horsesAvailable: horses.length,
+  /* Reserved and sold horses keep their pages but leave the count. */
+  horsesAvailable: available.length,
   /*
    * The horse named on the bottom edge of the homepage, one of its three ways
-   * in. ponytail: the first by slug; E2.8's status or a featured flag picks
-   * properly. `undefined` when the stable is empty, and the line is omitted.
+   * in. ponytail: the first available horse in the editor's order; a featured
+   * flag if Hanna ever wants a different one. `undefined` when none is
+   * available, and the line is omitted.
    */
   featuredHorse: first && { slug: first.id, ...first.data },
 };

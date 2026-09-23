@@ -5,16 +5,93 @@
  * route, and this page must be none of those. It is not in routes.ts either,
  * so it has no /en twin and nothing links to it.
  *
+ * The horse editor (E2.4) lives here too: a live list to reorder and open,
+ * and one form whose field names are dotted paths into the horse. The
+ * mapping is `horse-form.ts`; the check before any write is `horseSchema`.
+ *
  * ponytail: Polish only — one user. The strings exist in en.json too, so an
  * English panel is swapping the locale below if Hanna ever wants one.
  */
 import '../styles/fonts.css';
 import '../styles/base.css';
 import { htmlLang, t } from '../i18n';
+import { horseSchema } from '../horse';
 
 const locale = 'pl';
 const dict = t(locale);
 const a = dict.admin;
+const f = a.fields as Record<string, string>;
+const o = a.options as Record<string, string>;
+
+/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, or a select. */
+type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | string[];
+type Field = [path: string, kind: Kind, required?: boolean];
+
+const sections: [legend: string, fields: Field[]][] = [
+  [
+    a.sections.basics,
+    [
+      ['name', 'text', true],
+      ['sex', ['mare', 'gelding']],
+      ['born', 'number', true],
+      ['heightCm', 'number', true],
+      ['breed', 'text'],
+      ['pedigree', 'text'],
+      ['headline', 'pair'],
+    ],
+  ],
+  [
+    a.sections.sale,
+    [
+      ['status', ['available', 'reserved', 'sold']],
+      ['seller', ['company', 'private']],
+      ['levelCm', 'number', true],
+      ['price', 'number'],
+    ],
+  ],
+  [a.sections.facts, Object.keys(horseSchema.shape.facts.shape).map((k) => [`facts.${k}`, 'pair'])],
+  [
+    a.sections.fit,
+    [
+      ['suits', 'lines'],
+      ['notFor', 'lines'],
+    ],
+  ],
+  [
+    a.sections.health,
+    [
+      ['health.vaccinations', 'pair'],
+      ['health.dewormedOn', 'date'],
+      ['health.knownIssues', 'pair'],
+    ],
+  ],
+  [
+    a.sections.xrays,
+    [
+      ['xrays.count', 'number'],
+      ['xrays.takenOn', 'date'],
+      ['xrays.scope', 'pair'],
+      ['xrays.files', 'json'],
+    ],
+  ],
+  [
+    a.sections.viewing,
+    [
+      ['viewing.lead', 'pair'],
+      ['viewing.airport', 'pair'],
+      ['viewing.visitDay', 'pair'],
+    ],
+  ],
+  [
+    a.sections.media,
+    [
+      ['videos', 'json'],
+      ['photos', 'json'],
+    ],
+  ],
+];
+
+const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xraysHint };
 ---
 
 <!doctype html>
@@ -57,8 +134,106 @@ const a = dict.admin;
         <button type="button" data-sign-out>
           {a.signOut}
         </button>
-        <!-- ponytail: placeholder until the horse list ticket fills the panel. -->
-        <p>{a.horsesSoon}</p>
+
+        <section id="list-view">
+          <h2 id="list-title" tabindex="-1">
+            {a.horses}
+          </h2>
+          <button type="button" id="add">
+            {a.add}
+          </button>
+          <ol id="list"></ol>
+          <p id="empty" hidden>
+            {a.empty}
+          </p>
+          <p id="list-error" role="alert"></p>
+        </section>
+
+        <form id="editor" hidden>
+          <h2 id="editor-title" tabindex="-1"></h2>
+          <label>
+            {f.slug} <small>{a.slugHint}</small>
+            <input id="slug" type="text" required pattern="[a-z0-9]+(-[a-z0-9]+)*" />
+          </label>
+
+          {sections.map(([legend, fields]) => (
+            <fieldset>
+              <legend>{legend}</legend>
+              {fields.map(([path, kind, required]) =>
+                kind === 'pair' || kind === 'lines' ? (
+                  <fieldset class="pair">
+                    <legend>
+                      {f[path]} {kind === 'lines' && <small>{a.lineHint}</small>}
+                    </legend>
+                    <label>
+                      PL
+                      <textarea name={`${path}.pl`} rows={kind === 'lines' ? 4 : 2}></textarea>
+                    </label>
+                    <label>
+                      EN
+                      <textarea
+                        name={`${path}.en`}
+                        lang="en"
+                        rows={kind === 'lines' ? 4 : 2}
+                      ></textarea>
+                    </label>
+                  </fieldset>
+                ) : kind === 'json' ? (
+                  <label>
+                    {f[path]}
+                    <textarea name={path} rows={6} spellcheck="false" class="code"></textarea>
+                  </label>
+                ) : Array.isArray(kind) ? (
+                  <label>
+                    {f[path]}
+                    <select name={path}>
+                      {kind.map((value) => (
+                        <option value={value}>{o[value]}</option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <label>
+                    {f[path]} {hints[path] && <small>{hints[path]}</small>}
+                    <input
+                      name={path}
+                      type={kind}
+                      required={required}
+                      step={kind === 'number' ? 1 : undefined}
+                      min={kind === 'number' && path !== 'born' ? 1 : undefined}
+                    />
+                  </label>
+                ),
+              )}
+            </fieldset>
+          ))}
+
+          <ul id="errors" role="alert"></ul>
+          <div class="actions">
+            <button type="submit" id="save">
+              {a.save}
+            </button>
+            <button type="button" id="cancel">
+              {a.cancel}
+            </button>
+          </div>
+        </form>
+
+        <template id="row">
+          <li>
+            <span data-name></span>
+            <span data-status></span>
+            <button type="button" data-edit>
+              {a.edit}
+            </button>
+            <button type="button" data-up>
+              ↑
+            </button>
+            <button type="button" data-down>
+              ↓
+            </button>
+          </li>
+        </template>
       </section>
     </main>
   </body>
@@ -73,26 +248,187 @@ const a = dict.admin;
     signOut,
     type AuthError,
   } from 'firebase/auth';
+  import { getDatabase, onValue, ref, set, update } from 'firebase/database';
   import { firebaseConfig } from '../firebase';
+  import { horseSchema } from '../horse';
+  import { fromFields, toFields } from '../horse-form';
   import { admin } from '../i18n/pl.json';
 
-  const auth = getAuth(initializeApp(firebaseConfig));
-  const form = document.getElementById('sign-in') as HTMLFormElement;
-  const error = document.getElementById('error')!;
-  const noAccess = document.getElementById('no-access')!;
-  const shell = document.getElementById('shell')!;
-  const who = document.getElementById('who')!;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const form = $<HTMLFormElement>('sign-in');
+  const error = $('error');
+  const noAccess = $('no-access');
+  const shell = $('shell');
+  const who = $('who');
+  const listView = $('list-view');
+  const list = $('list');
+  const empty = $('empty');
+  const listError = $('list-error');
+  const row = $<HTMLTemplateElement>('row');
+  const editor = $<HTMLFormElement>('editor');
+  const editorTitle = $('editor-title');
+  const slugInput = $<HTMLInputElement>('slug');
+  const errors = $('errors');
+  const save = $<HTMLButtonElement>('save');
 
   const show = (view: HTMLElement | null) => {
     for (const el of [form, noAccess, shell]) el.hidden = el !== view;
   };
 
+  /* The raw records under `/horses`, keyed by slug. Parsed only on save. */
+  type Stored = Record<string, any>;
+  let horses: Record<string, Stored> = {};
+  /* The slug being edited; `null` while creating one. */
+  let editing: string | null = null;
+  let unsubscribe: (() => void) | undefined;
+
+  const sorted = () =>
+    Object.keys(horses).sort(
+      (x, y) => (horses[x].order ?? 0) - (horses[y].order ?? 0) || x.localeCompare(y),
+    );
+
+  function render() {
+    const slugs = sorted();
+    list.replaceChildren(
+      ...slugs.map((slug, i) => {
+        const li = row.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+        const name = horses[slug].name ?? slug;
+        const status = horses[slug].status ?? 'available';
+        const button = (key: string) => li.querySelector<HTMLButtonElement>(`[data-${key}]`)!;
+        li.querySelector('[data-name]')!.textContent = name;
+        li.querySelector('[data-status]')!.textContent =
+          admin.options[status as keyof typeof admin.options] ?? status;
+        button('edit').setAttribute('aria-label', `${admin.edit}: ${name}`);
+        button('edit').onclick = () => open(slug);
+        for (const [key, by] of [
+          ['up', -1],
+          ['down', 1],
+        ] as const) {
+          button(key).setAttribute('aria-label', admin[key].replace('{name}', name));
+          button(key).disabled = !slugs[i + by];
+          button(key).onclick = () => move(slugs, i, by);
+        }
+        return li;
+      }),
+    );
+    empty.hidden = slugs.length > 0;
+  }
+
+  /* Rewrites every position as 0..n-1, so horses seeded with the same default can move. */
+  function move(slugs: string[], i: number, by: number) {
+    const next = [...slugs];
+    [next[i], next[i + by]] = [next[i + by], next[i]];
+    listError.textContent = '';
+    update(
+      ref(db, 'horses'),
+      Object.fromEntries(next.map((slug, n) => [`${slug}/order`, n])),
+    ).catch(() => (listError.textContent = admin.saveFailed));
+  }
+
+  const controls = () =>
+    [...editor.elements].filter(
+      (el): el is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement =>
+        'name' in el && el.name !== '' && 'value' in el,
+    );
+
+  function open(slug: string | null) {
+    editing = slug;
+    editor.reset();
+    errors.replaceChildren();
+    slugInput.value = slug ?? '';
+    slugInput.readOnly = slug !== null;
+    editorTitle.textContent = slug ? (horses[slug].name ?? slug) : admin.newHorse;
+    if (slug) {
+      const fields = toFields(horses[slug]);
+      for (const el of controls()) if (el.name in fields) el.value = String(fields[el.name]);
+    }
+    listView.hidden = true;
+    editor.hidden = false;
+    editorTitle.focus();
+  }
+
+  function close() {
+    editing = null;
+    editor.hidden = true;
+    listView.hidden = false;
+    $('list-title').focus();
+  }
+
+  function fail(lines: string[]) {
+    errors.replaceChildren(
+      ...lines.map((line) => Object.assign(document.createElement('li'), { textContent: line })),
+    );
+  }
+
+  editor.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errors.replaceChildren();
+    const slug = slugInput.value;
+    if (editing === null && Object.hasOwn(horses, slug)) return fail([admin.slugTaken]);
+
+    const fields = Object.fromEntries(
+      controls().map((el) => [
+        el.name,
+        el instanceof HTMLInputElement && el.type === 'number'
+          ? el.value === ''
+            ? undefined
+            : el.valueAsNumber
+          : el.value,
+      ]),
+    );
+    // An edit keeps its place; a new horse goes to the end of the list.
+    const order =
+      editing !== null
+        ? (horses[editing].order ?? 0)
+        : Math.max(-1, ...Object.values(horses).map((h) => h.order ?? 0)) + 1;
+    const result = horseSchema.safeParse({ ...fromFields(fields), order });
+    if (!result.success) {
+      const issues = result.error.issues;
+      fail([admin.invalid, ...issues.map((i) => `${i.path.join('.')}: ${i.message}`)]);
+      const first = issues
+        .map((i) => editor.elements.namedItem(i.path.join('.')))
+        .find((el) => el instanceof HTMLElement);
+      first?.focus();
+      return;
+    }
+
+    save.disabled = true;
+    try {
+      // Through JSON: the Realtime Database rejects `undefined` anywhere in a write.
+      await set(ref(db, `horses/${slug}`), JSON.parse(JSON.stringify(result.data)));
+      close();
+    } catch {
+      fail([admin.saveFailed]);
+    } finally {
+      save.disabled = false;
+    }
+  });
+
+  $('add').addEventListener('click', () => open(null));
+  $('cancel').addEventListener('click', close);
+
   onAuthStateChanged(auth, async (user) => {
+    unsubscribe?.();
+    unsubscribe = undefined;
     if (!user) return show(form);
     // Forced refresh: a claim granted after sign-in shows up on the next load.
     const { claims } = await user.getIdTokenResult(true);
     if (claims.admin !== true) return show(noAccess);
     who.textContent = admin.signedInAs.replace('{email}', user.email ?? '');
+    unsubscribe = onValue(
+      ref(db, 'horses'),
+      (snapshot) => {
+        horses = snapshot.val() ?? {};
+        render();
+      },
+      () => (listError.textContent = admin.saveFailed),
+    );
+    editor.hidden = true;
+    listView.hidden = false;
     show(shell);
   });
 
@@ -129,30 +465,96 @@ const a = dict.admin;
 
 <style>
   main {
-    max-width: 28rem;
+    max-width: 60rem;
     margin: 0 auto;
     padding: var(--gutter-mobile);
   }
   /* :not([hidden]) — a display rule would otherwise beat the hidden attribute. */
   form:not([hidden]),
-  section:not([hidden]) {
+  section:not([hidden]),
+  fieldset {
     display: grid;
     gap: 1rem;
+  }
+  #sign-in,
+  #no-access {
+    max-width: 28rem;
+  }
+  fieldset {
+    margin: 0;
+    padding: 1rem 0 0;
+    border: 0;
+    border-top: 1px solid var(--rule);
+  }
+  legend {
+    font-weight: 600;
+  }
+  .pair {
+    border: 0;
+    padding: 0;
+  }
+  @media (min-width: 40rem) {
+    .pair {
+      grid-template-columns: 1fr 1fr;
+    }
+    .pair legend {
+      grid-column: 1 / -1;
+    }
   }
   label {
     display: grid;
     gap: 0.25rem;
   }
-  input {
+  small {
+    color: var(--ink-muted);
+  }
+  input,
+  select,
+  textarea {
     min-height: var(--tap);
     border-bottom: 1px solid var(--rule-field);
   }
+  textarea {
+    border: 1px solid var(--rule-field);
+    padding: 0.5rem;
+    resize: vertical;
+  }
+  .code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.875rem;
+  }
+  input:read-only {
+    color: var(--ink-muted);
+  }
   button {
     min-height: var(--tap);
+    min-width: var(--tap);
     justify-self: start;
     text-decoration: underline;
   }
   button:disabled {
     color: var(--ink-muted);
+    text-decoration: none;
+  }
+  ol {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1rem;
+  }
+  [data-status] {
+    color: var(--ink-muted);
+  }
+  #errors:empty,
+  #list-error:empty {
+    display: none;
+  }
+  .actions {
+    display: flex;
+    gap: 1.5rem;
   }
 </style>
