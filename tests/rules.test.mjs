@@ -57,7 +57,7 @@ for (const [name, method, path, auth, status] of cases) {
 
 /* Storage (E2.5): the same unsigned tokens, sent the way the web SDK sends them. */
 const storageHost = process.env.FIREBASE_STORAGE_EMULATOR_HOST;
-const bucket = `http://${storageHost}/v0/b/demo-hv.appspot.com/o`;
+const bucket = `http://${storageHost}/v0/b/hanna-vavilava-site/o`;
 const upload = (path, auth, type = 'image/jpeg') =>
   fetch(`${bucket}?name=${encodeURIComponent(path)}`, {
     method: 'POST',

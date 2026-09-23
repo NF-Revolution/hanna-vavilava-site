@@ -10,7 +10,8 @@ export const firebaseConfig = {
   databaseURL: 'https://hanna-vavilava-site-default-rtdb.europe-west1.firebasedatabase.app',
   projectId: 'hanna-vavilava-site',
   appId: '1:894554818339:web:711eb3aafb557b44ebae96',
-  storageBucket: 'hanna-vavilava-site.firebasestorage.app',
+  /* US-EAST1, not the project's Warsaw default: inside Cloud Storage's Always Free tier (E2.5). */
+  storageBucket: 'hanna-vavilava-site',
 };
 
 /* A photo's public URL — `storage.rules` allows anonymous reads under `photos/`. */

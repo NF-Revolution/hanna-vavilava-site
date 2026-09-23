@@ -11,6 +11,10 @@ Shipped 2026-09-23.
 - `npm run ci` green, `npm test` 26/26 (storage emulator added). Headless Chrome smoke of
   `downscale`: a 4032×3024 JPEG with a GPS APP1 comes out 2400×1800, no `Exif` bytes.
 - ticket-reviewer: clear.
+- Production upload returned 403: `storage.rules` had never been deployed. The owner then
+  swapped the Warsaw bucket for `hanna-vavilava-site` in US-EAST1, which is inside the Always Free
+  tier. Config, deploy target and `.firebaserc` changed, and the rules were deployed. An anonymous
+  GET of a missing photo now returns 404, not 403.
 
 ## What was built — 2026-09-23
 
@@ -113,8 +117,10 @@ the user's go-ahead — until then uploads are denied by the bucket's default ru
   objects on remove.
 - Traps for next time:
   - `storage.rules` is deployed by hand, like the database rules:
-    `npx firebase-tools@15 deploy --only storage --project hanna-vavilava-site`. Until then the
-    bucket's default rules deny every upload and every thumbnail.
+    `npx firebase-tools@15 deploy --only storage --project hanna-vavilava-site`. A new bucket's
+    default rules deny every upload and every thumbnail (the first production try hit 403).
+  - The bucket is not the project default, so the deploy goes through the `photos` target in
+    `.firebaserc`. A plain `"storage": { "rules": … }` fails with "Storage has not been set up".
   - `request.auth.token.admin` errors on a token without the claim; `token.get('admin', false)`
     denies quietly. Both deny, only one fills the emulator log.
   - Row inputs are renamed `photos.<i>.…` after every add, move and remove. `fromFields` relies

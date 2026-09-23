@@ -1,0 +1,6 @@
+{
+  "targets": {
+    "hanna-vavilava-site": { "storage": { "photos": ["hanna-vavilava-site"] } },
+    "demo-hv": { "storage": { "photos": ["hanna-vavilava-site"] } }
+  }
+}
