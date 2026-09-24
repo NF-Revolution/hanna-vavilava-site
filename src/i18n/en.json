@@ -153,6 +153,12 @@
     "photoAlt": "Alt text (required)",
     "photoCaption": "Gallery caption",
     "remove": "Remove: {name}",
+    "publish": "Publish",
+    "publishHint": "Saved changes reach the site only after publishing. It takes 2–3 minutes.",
+    "publishSending": "Sending…",
+    "publishBuilding": "The site is building…",
+    "publishDone": "Published. The site is up to date.",
+    "publishFailed": "Publishing failed. Try again.",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
       "basics": "Basics",

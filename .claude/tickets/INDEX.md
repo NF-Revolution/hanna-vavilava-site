@@ -27,6 +27,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
 | E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN               |
 | E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required          |
+| E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -212,3 +213,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   `hanna-vavilava-site` and for the emulator's `demo-hv`. `.firebaserc` holds targets only, never
   a default project. The rules deploy by hand, like the database rules:
   `npx firebase-tools@15 deploy --only storage --project hanna-vavilava-site`.
+- Publish is a callable Function, `publish` in `europe-central2`, plain ESM in `functions/` with no
+  build step (E2.6). It checks the `admin` claim first. Next it stamps `/site/updated` with the
+  Warsaw date through the Admin SDK, then it sends `repository_dispatch: publish` with a
+  fine-grained PAT held in the `PUBLISH_TOKEN` secret. The panel reads the deploy status from the
+  public Actions API. The ceiling is 60 unauthenticated requests an hour per IP, and the repo must
+  stay public. A status callable that uses the PAT is the upgrade. The Function deploys by hand,
+  like the rules: `npx firebase-tools@15 deploy --only functions --project hanna-vavilava-site`.

@@ -153,6 +153,12 @@
     "photoAlt": "Opis dla niewidomych (wymagany)",
     "photoCaption": "Podpis w galerii",
     "remove": "Usuń: {name}",
+    "publish": "Opublikuj",
+    "publishHint": "Zapisane zmiany trafiają na stronę dopiero po publikacji. Trwa to 2–3 minuty.",
+    "publishSending": "Wysyłanie…",
+    "publishBuilding": "Strona się buduje…",
+    "publishDone": "Opublikowano. Strona jest aktualna.",
+    "publishFailed": "Publikacja się nie udała. Spróbuj ponownie.",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {
       "basics": "Podstawy",

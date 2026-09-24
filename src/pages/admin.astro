@@ -10,6 +10,8 @@
  * mapping is `horse-form.ts`; the check before any write is `horseSchema`.
  * Photos (E2.5) upload to Storage as they are dropped, downscaled and
  * stripped of EXIF by `photo.ts`, and join the form as rows of fields.
+ * Publish (E2.6) calls the `publish` Function in `functions/` and watches the
+ * deploy it starts.
  *
  * ponytail: Polish only — one user. The strings exist in en.json too, so an
  * English panel is swapping the locale below if Hanna ever wants one.
@@ -149,6 +151,13 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             {a.empty}
           </p>
           <p id="list-error" role="alert"></p>
+          <p>
+            <button type="button" id="publish">
+              {a.publish}
+            </button>
+            <small>{a.publishHint}</small>
+          </p>
+          <p id="publish-status" role="status"></p>
         </section>
 
         <form id="editor" hidden>
@@ -298,6 +307,7 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     type AuthError,
   } from 'firebase/auth';
   import { getDatabase, onValue, ref, set, update } from 'firebase/database';
+  import { getFunctions, httpsCallable } from 'firebase/functions';
   import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
   import { firebaseConfig, photoUrl } from '../firebase';
   import { horseSchema } from '../horse';
@@ -551,6 +561,52 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
       fail([admin.saveFailed]);
     } finally {
       save.disabled = false;
+    }
+  });
+
+  /*
+   * Publish (E2.6): the Function stamps the date and dispatches `deploy.yml`,
+   * then the panel watches that run until it finishes or fails.
+   */
+  const publishButton = $<HTMLButtonElement>('publish');
+  const publishStatus = $('publish-status');
+  const publishCall = httpsCallable<void, { at: number }>(
+    getFunctions(app, 'europe-central2'),
+    'publish',
+  );
+  // ponytail: the unauthenticated Actions API — 60 requests an hour per IP, and the repo
+  // must stay public. A second callable reading runs with the PAT is the upgrade.
+  const runs =
+    'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site/actions/workflows/deploy.yml/runs?event=repository_dispatch&per_page=1';
+
+  /* Resolves true when the first deploy run created after `since` succeeds. Gives up after 15 minutes. */
+  async function deployed(since: number) {
+    for (let i = 0; i < 60; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 15_000));
+      const run = await fetch(runs, { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((body) => body.workflow_runs?.[0])
+        .catch(() => undefined);
+      // A few seconds of slack for the gap between Google's clock and GitHub's.
+      if (!run || Date.parse(run.created_at) < since - 5_000) continue;
+      if (run.status === 'completed') return run.conclusion === 'success';
+    }
+    return false;
+  }
+
+  publishButton.addEventListener('click', async () => {
+    publishButton.disabled = true;
+    publishStatus.textContent = admin.publishSending;
+    try {
+      const { data } = await publishCall();
+      publishStatus.textContent = admin.publishBuilding;
+      publishStatus.textContent = (await deployed(data.at))
+        ? admin.publishDone
+        : admin.publishFailed;
+    } catch {
+      publishStatus.textContent = admin.publishFailed;
+    } finally {
+      publishButton.disabled = false;
     }
   });
 

@@ -91,3 +91,27 @@ test('admin uploads a photo, anyone reads it, nobody deletes it', async () => {
   });
   assert.equal(del.status, 403);
 });
+
+/*
+ * The Publish Function (E2.6) refuses anyone without the admin claim, before it
+ * stamps the date. The admin path needs a real GitHub token and is not run here.
+ */
+const publish = (auth) =>
+  fetch('http://127.0.0.1:5001/demo-hv/europe-central2/publish', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(auth && { Authorization: `Bearer ${auth}` }),
+    },
+    body: JSON.stringify({ data: null }),
+  }).then((r) => r.status);
+
+test('Publish refuses anonymous and non-admin callers and stamps nothing', async () => {
+  assert.equal(await publish(null), 403);
+  assert.equal(await publish(user), 403);
+  const updated = await fetch(
+    `http://${host}/site/updated.json?ns=hanna-vavilava-site-default-rtdb`,
+    { headers: { Authorization: 'Bearer owner' } },
+  ).then((r) => r.json());
+  assert.equal(updated, null);
+});
