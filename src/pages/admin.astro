@@ -11,7 +11,8 @@
  * Photos (E2.5) upload to Storage as they are dropped, downscaled and
  * stripped of EXIF by `photo.ts`, and join the form as rows of fields.
  * Publish (E2.6) calls the `publish` Function in `functions/` and watches the
- * deploy it starts.
+ * deploy it starts. The enquiry inbox (E2.7) lists `/enquiries` live, newest
+ * first, and ticks them handled.
  *
  * ponytail: Polish only — one user. The strings exist in en.json too, so an
  * English panel is swapping the locale below if Hanna ever wants one.
@@ -140,6 +141,15 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
         </button>
 
         <section id="list-view">
+          <section>
+            <h2>{a.enquiries}</h2>
+            <ol id="enquiries"></ol>
+            <p id="enquiries-empty" hidden>
+              {a.enquiriesEmpty}
+            </p>
+            <p id="enquiry-error" role="alert"></p>
+          </section>
+
           <h2 id="list-title" tabindex="-1">
             {a.horses}
           </h2>
@@ -255,6 +265,17 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             <button type="button" data-down>
               ↓
             </button>
+          </li>
+        </template>
+
+        <template id="enquiry-row">
+          <li>
+            <time data-when></time>
+            <label>
+              <input type="checkbox" data-handled />
+              {a.handled}
+            </label>
+            <dl></dl>
           </li>
         </template>
 
@@ -610,6 +631,64 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     }
   });
 
+  /*
+   * The enquiry inbox (E2.7). E5.3 writes each record with `createdAt` (ms) and
+   * the form's fields; `handled` is the panel's own, `true` or absent. The values
+   * are anonymous public input, so they only ever reach the page as textContent.
+   *
+   * ponytail: field keys are shown raw — E5.1 has not fixed the field set yet.
+   * Polish labels for them are the upgrade once it has.
+   */
+  const enquiryList = $('enquiries');
+  const enquiryRow = $<HTMLTemplateElement>('enquiry-row');
+  const enquiryError = $('enquiry-error');
+  let enquiries: Record<string, Stored> = {};
+
+  function renderEnquiries() {
+    // Rows are rebuilt on every change, so the focused checkbox is found again by id.
+    const focused = (document.activeElement as HTMLElement | null)?.dataset.id;
+    // Newest first, never by `handled`, so a row stays put when it is ticked.
+    const ids = Object.keys(enquiries).sort(
+      (x, y) => (enquiries[y].createdAt ?? 0) - (enquiries[x].createdAt ?? 0),
+    );
+    enquiryList.replaceChildren(
+      ...ids.map((id) => {
+        const { createdAt, handled, ...fields } = enquiries[id];
+        const li = enquiryRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+        const when = li.querySelector('time')!;
+        const box = li.querySelector<HTMLInputElement>('[data-handled]')!;
+        if (typeof createdAt === 'number') {
+          when.dateTime = new Date(createdAt).toISOString();
+          when.textContent = new Date(createdAt).toLocaleString('pl-PL', {
+            timeZone: 'Europe/Warsaw',
+          });
+        }
+        box.checked = handled === true;
+        box.dataset.id = id;
+        box.setAttribute('aria-label', `${admin.handled}: ${when.textContent || id}`);
+        box.onchange = () => {
+          enquiryError.textContent = '';
+          set(ref(db, `enquiries/${id}/handled`), box.checked || null).catch(() => {
+            box.checked = !box.checked;
+            enquiryError.textContent = admin.saveFailed;
+          });
+        };
+        li.querySelector('dl')!.append(
+          ...Object.entries(fields).flatMap(([key, value]) => [
+            Object.assign(document.createElement('dt'), { textContent: key }),
+            Object.assign(document.createElement('dd'), {
+              textContent: typeof value === 'string' ? value : JSON.stringify(value),
+            }),
+          ]),
+        );
+        return li;
+      }),
+    );
+    $('enquiries-empty').hidden = ids.length > 0;
+    if (focused)
+      enquiryList.querySelector<HTMLElement>(`[data-id="${CSS.escape(focused)}"]`)?.focus();
+  }
+
   $('add').addEventListener('click', () => open(null));
   $('cancel').addEventListener('click', close);
 
@@ -621,14 +700,27 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     const { claims } = await user.getIdTokenResult(true);
     if (claims.admin !== true) return show(noAccess);
     who.textContent = admin.signedInAs.replace('{email}', user.email ?? '');
-    unsubscribe = onValue(
-      ref(db, 'horses'),
-      (snapshot) => {
-        horses = snapshot.val() ?? {};
-        render();
-      },
-      () => (listError.textContent = admin.saveFailed),
-    );
+    // ponytail: the whole `/enquiries` tree, fine to a few thousand records.
+    // orderByChild('createdAt') + limitToLast, with an `.indexOn` rule, is the upgrade.
+    const off = [
+      onValue(
+        ref(db, 'horses'),
+        (snapshot) => {
+          horses = snapshot.val() ?? {};
+          render();
+        },
+        () => (listError.textContent = admin.saveFailed),
+      ),
+      onValue(
+        ref(db, 'enquiries'),
+        (snapshot) => {
+          enquiries = snapshot.val() ?? {};
+          renderEnquiries();
+        },
+        () => (enquiryError.textContent = admin.saveFailed),
+      ),
+    ];
+    unsubscribe = () => off.forEach((f) => f());
     editor.hidden = true;
     listView.hidden = false;
     show(shell);
@@ -767,8 +859,27 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   [data-status] {
     color: var(--ink-muted);
   }
+  #enquiries li {
+    padding-bottom: 1rem;
+  }
+  #enquiries li:has(:checked) {
+    color: var(--ink-muted);
+  }
+  #enquiries dl {
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0;
+  }
+  #enquiries dd {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
   #errors:empty,
-  #list-error:empty {
+  #list-error:empty,
+  #enquiry-error:empty {
     display: none;
   }
   .actions {
