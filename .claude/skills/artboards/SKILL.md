@@ -92,8 +92,8 @@ Each of these fails silently — the board renders wrong, or not at all, with no
   fail at 10–11px and are recorded as a deviation — do not reach for them.
 - Anything invented is marked `PLACEHOLDER` in the board's header comment, as note `n3`
   on the canvas promises.
-- Do not verify afterwards unless asked: no screenshot, no render, no read-back pass.
-  Written is done.
+- Before publishing, re-read your scratch copy for the size triple and the `support.js`
+  line — the two failures above that show nothing. No screenshot or render unless asked.
 
 ## Both breakpoints
 

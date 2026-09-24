@@ -87,7 +87,7 @@ failed search — do not pad it with lower-severity notes to look thorough.
 
 ## Caps
 
-30 lines of output, 25 tool calls. No diff, issue body or comment pasted back.
+25 tool calls. No diff, issue body or comment pasted back.
 
 ## Never
 
