@@ -43,9 +43,11 @@ const cases = [
   ['anonymous read of /horses fails', 'GET', 'horses', null, 401],
   ['non-admin write to /horses fails', 'PUT', 'horses/cascada', user, 401],
   ['non-admin read of /enquiries fails', 'GET', 'enquiries', user, 401],
+  ['non-admin write to /enquiries fails', 'PUT', 'enquiries/x/handled', user, 401],
   ['admin writes /horses', 'PUT', 'horses/cascada', admin, 200],
   ['admin writes /site', 'PUT', 'site', admin, 200],
   ['admin reads /enquiries', 'GET', 'enquiries', admin, 200],
+  ['admin marks an enquiry handled', 'PUT', 'enquiries/x/handled', admin, 200],
   ['admin push to an unknown path fails', 'POST', 'other', admin, 401],
 ];
 
