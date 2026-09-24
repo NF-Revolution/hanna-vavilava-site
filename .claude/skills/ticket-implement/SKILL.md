@@ -150,10 +150,6 @@ The `create-pr` skill — it owns the commit subject, the body, `Closes #<N>` an
 One comment when the work lands: the pull-request link, what actually shipped if it differs
 from the plan, and any trap the next person would otherwise hit.
 
-This step has never run. Every closed build ticket was closed against the one scaffold
-commit `e2c959f`, silently, with no comment at all, and the repo has no pull requests —
-so the closed set shows what this skill is for, not what it looks like when followed.
-
 ## Rules
 
 - **Scope is the issue.** Work that reveals more work becomes a new linked issue via the

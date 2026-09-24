@@ -59,7 +59,7 @@ anything, so a convention that was not followed has to arrive here or it arrives
 
 ## Caps
 
-25 lines of output, 10 tool calls. No issue body, comment or `--json` blob pasted back —
+10 tool calls. No issue body, comment or `--json` blob pasted back —
 the caller asked for the verdict, not the thread. `--json` with a field list on every call;
 a bare `gh issue view` renders chrome you would only have to strip again.
 

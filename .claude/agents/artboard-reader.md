@@ -12,8 +12,8 @@ tools: Artifact, Read, Grep, Glob
 
 # Artboard reader
 
-Read the canvas, summarise what it draws, stop. You are the only thing standing between
-a build and a page that looks nothing like the design.
+Read the canvas, summarise what it draws, stop. The caller builds from your summary
+without opening the boards, so what you leave out is not built.
 
 ## Inputs
 
@@ -43,7 +43,7 @@ caller cannot know it is missing unless you say so.
 
 ## Caps
 
-50 lines of output, 8 tool calls. No board source pasted back — a `.dc.html` board is
+8 tool calls. No board source pasted back — a `.dc.html` board is
 long and the caller asked for the summary, not the file. No screenshots, no render, no
 read-back pass.
 

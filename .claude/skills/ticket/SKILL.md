@@ -65,12 +65,10 @@ to build. Its body is the question in one paragraph; its answer is a comment rit
 Three comments is the norm there, not two. A fourth is the smell that something was left
 open on a closed issue and had to be moved afterwards, as happened on #3.
 
-**The closed issues are not the reference.** Sixty-eight of the seventy were generated in
-one batch before this skill existed, so none of the twelve closed tickets has an
-acceptance checklist and there is not a single ticked box in the repo. The build tickets
-also end with `_Already implemented in the scaffold commit. Closed for the record._` —
-that is a fact about commit `e2c959f`, not a format to copy. Follow this file; #69 and
-#70 are the worked examples.
+**Older closed issues are not the reference.** Most were batch-generated before this skill
+existed: no acceptance checklist, and build tickets ending `_Already implemented in the
+scaffold commit. Closed for the record._` — a fact about commit `e2c959f`, not a format to
+copy. Follow this file; #69 and #70 are the worked examples.
 
 ## Creating one
 
