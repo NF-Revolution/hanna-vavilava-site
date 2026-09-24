@@ -27,7 +27,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`         |
 | E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN               |
 | E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required          |
-| E2.6 publish button          | #21                | done — `functions/` `publish`, deploy pending the PAT         |
+| E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |

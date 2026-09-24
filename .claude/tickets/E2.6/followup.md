@@ -14,6 +14,13 @@ Shipped 2026-09-23.
   test red (500 instead of 403).
 - ticket-reviewer: clear.
 
+## 2026-09-24
+
+- PAT set as `PUBLISH_TOKEN`, Function deployed to production. The anonymous call answers
+  `PERMISSION_DENIED` ("admin only"), so the invoker is public and the claim check runs.
+- The first deploy exited 1 after a successful create: no artifact cleanup policy. Fixed with
+  `functions:artifacts:setpolicy --location europe-central2 --force`, which deletes images after 1 day.
+
 ## What was built — 2026-09-23
 
 ## Context
@@ -85,8 +92,7 @@ The owner does the production steps, or I do them on their go-ahead:
 
 ## Outcome — 2026-09-23
 
-- Shipped as planned. The approach is on #21. The Function is not deployed yet: that needs the PAT
-  first, and then `functions:secrets:set PUBLISH_TOKEN` + `deploy --only functions`.
+- Shipped as planned. The approach is on #21. The Function has been deployed to production (2026-09-24).
 - The Publish test sits in `tests/rules.test.mjs` rather than in its own file, so it reuses the
   unsigned-token helper.
 - Rejected: a status path written back by the workflow, the panel stamping `/site/updated` itself,
@@ -100,5 +106,7 @@ The owner does the production steps, or I do them on their go-ahead:
     and a fresh checkout has to run it locally too.
   - `tsconfig.json` excludes `functions`, because the root `**/*` include would otherwise pull it
     into `astro check`.
+  - A first `deploy --only functions` in a new region exits 1 without an artifact cleanup policy,
+    even though the Function is live. Run `functions:artifacts:setpolicy` once per region.
   - A push to `main` during a publish cancels the dispatch run (`cancel-in-progress`). The panel then
     says the publish failed, but the push deploy still carries the edit.
