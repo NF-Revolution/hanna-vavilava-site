@@ -58,6 +58,12 @@
     "switchTo": "English",
     "current": "Polski"
   },
+  "sold": {
+    "mare": "Sprzedana",
+    "gelding": "Sprzedany",
+    "line": "{name} ma nowy dom.",
+    "link": "Konie na sprzedaż ({count})"
+  },
   "pages": {
     "home": {
       "title": "Hanna Vavilava — konie skokowe na sprzedaż, Polska",
@@ -162,6 +168,7 @@
     "publishBuilding": "Strona się buduje…",
     "publishDone": "Opublikowano. Strona jest aktualna.",
     "publishFailed": "Publikacja się nie udała. Spróbuj ponownie.",
+    "soldConfirm": "Ten koń ma zdjęcia RTG. Następna publikacja usunie je na stałe — tego nie da się cofnąć. Zapisać jako sprzedany?",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {
       "basics": "Podstawy",

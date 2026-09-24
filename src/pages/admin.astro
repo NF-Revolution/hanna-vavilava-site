@@ -572,6 +572,13 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
       first?.focus();
       return;
     }
+    // Publish deletes a sold horse's X-ray files for good (E2.8), so say so before it is too late.
+    if (
+      result.data.status === 'sold' &&
+      result.data.xrays?.files.length &&
+      !confirm(admin.soldConfirm)
+    )
+      return;
 
     save.disabled = true;
     try {

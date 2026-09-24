@@ -4,11 +4,11 @@ import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   const horses = await getCollection('horses');
-  return horses.map((horse) => ({ params: { slug: horse.id }, props: { name: horse.data.name } }));
+  return horses.map((horse) => ({ params: { slug: horse.id }, props: { horse: horse.data } }));
 }
 
 const { slug } = Astro.params;
-const { name } = Astro.props;
+const { horse } = Astro.props;
 ---
 
-<HorseDetailStub locale="pl" slug={slug!} name={name} />
+<HorseDetailStub locale="pl" slug={slug!} horse={horse} />

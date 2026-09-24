@@ -10,34 +10,204 @@
       "levelCm": 125,
       "price": 32000,
       "seller": "company",
-      "headline": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-      "facts": {
-        "breeding": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "trainingLevel": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "lastStart": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "starts": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "technique": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "rideability": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "temperament": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "handling": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "location": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "documents": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+      "headline": {
+        "pl": "PLACEHOLDER",
+        "en": "PLACEHOLDER"
       },
-      "suits": [{ "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }],
-      "notFor": [{ "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }],
+      "facts": {
+        "breeding": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "trainingLevel": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "lastStart": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "starts": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "technique": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "rideability": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "temperament": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "handling": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "location": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "documents": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      },
+      "suits": [
+        {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      ],
+      "notFor": [
+        {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      ],
       "health": {
-        "vaccinations": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
+        "vaccinations": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
         "dewormedOn": "2026-09-01",
-        "knownIssues": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+        "knownIssues": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
       },
       "xrays": null,
       "viewing": {
-        "lead": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "airport": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-        "visitDay": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+        "lead": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "airport": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "visitDay": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
       },
       "videos": [],
       "photos": []
+    },
+    "norton": {
+      "name": "Norton",
+      "sex": "gelding",
+      "born": 2014,
+      "heightCm": 168,
+      "breed": "PLACEHOLDER",
+      "pedigree": "PLACEHOLDER × PLACEHOLDER (PLACEHOLDER)",
+      "levelCm": 125,
+      "price": 32000,
+      "seller": "company",
+      "headline": {
+        "pl": "PLACEHOLDER",
+        "en": "PLACEHOLDER"
+      },
+      "facts": {
+        "breeding": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "trainingLevel": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "lastStart": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "starts": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "technique": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "rideability": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "temperament": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "handling": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "location": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "documents": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      },
+      "suits": [
+        {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      ],
+      "notFor": [
+        {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      ],
+      "health": {
+        "vaccinations": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "dewormedOn": "2026-09-01",
+        "knownIssues": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      },
+      "xrays": {
+        "count": 14,
+        "takenOn": "2026-02-11",
+        "scope": {
+          "pl": "PLACEHOLDER — nogi przednie i tylne",
+          "en": "PLACEHOLDER — front and hind limbs"
+        },
+        "files": [
+          {
+            "key": "norton/xrays-0000aaaa.pdf",
+            "bytes": 18000000
+          }
+        ]
+      },
+      "viewing": {
+        "lead": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "airport": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        },
+        "visitDay": {
+          "pl": "PLACEHOLDER",
+          "en": "PLACEHOLDER"
+        }
+      },
+      "videos": [],
+      "photos": [],
+      "status": "sold",
+      "order": 1
     }
   },
   "site": {
