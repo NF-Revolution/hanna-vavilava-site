@@ -34,6 +34,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, unmounted until E4.5 (#35)            |
+| E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -275,3 +276,11 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   the image box instead, and doubles as the counter. The boards draw no prev/next controls,
   so none are built. Arrow keys move, and a phone visitor closes and taps the next tile.
   With no JS, a thumbnail links to a full WebP built into `dist/`, never to the bucket.
+- The photo and X-ray intake guide is a static Polish page at `/admin/poradnik`, not a shared doc
+  and not a repo markdown file (E3.6). Standalone like `/admin`: `noindex`, no script, no sign-in,
+  out of `routes.ts`. It is owner documentation with one reader, so its prose is inline Polish and
+  deliberately outside `pl.json`/`en.json`; only the panel's link label, `admin.guideLink`, follows
+  the two-file rule. The 2400 px edge and the 100 MB X-ray limit are imported from `src/photo.ts`
+  and `src/media.ts`, so the guide cannot promise what the panel refuses. It tells Hanna to get the
+  owner-free page 1 from the clinic, because a box drawn over a name in Markup leaves the text in
+  the PDF.

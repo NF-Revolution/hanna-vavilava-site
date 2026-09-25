@@ -1,0 +1,177 @@
+---
+/*
+ * The photo and X-ray intake guide (E3.6) — owner documentation, not site UI.
+ * Standalone like /admin: noindex, not in routes.ts, no /en twin. No sign-in,
+ * because nothing here is secret and a gate would need the Firebase script.
+ *
+ * ponytail: Polish prose inline, not in pl.json/en.json — one reader, and a
+ * second language for a manual nobody reads in English is doubled upkeep. The
+ * limits are imported, so the guide cannot promise what the panel refuses.
+ */
+import '../../styles/fonts.css';
+import '../../styles/base.css';
+import { htmlLang, t } from '../../i18n';
+import { MAX_EDGE } from '../../photo';
+import { xrayMaxBytes } from '../../media';
+
+const dict = t('pl');
+const xrayMb = xrayMaxBytes / 1024 / 1024;
+---
+
+<!doctype html>
+<html lang={htmlLang.pl}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Zdjęcia i RTG — poradnik</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {dict.a11y.skipToContent}
+    </a>
+    <main id="main">
+      <h1>Zdjęcia i RTG — jak robić, jak wysyłać</h1>
+      <p>
+        Wszystko, czego strona potrzebuje od zdjęć i badania RTG. Zapisz tę stronę na ekranie
+        początkowym telefonu: w Safari <b>Udostępnij › Do ekranu początkowego</b>, w Chrome
+        <b>⋮ › Dodaj do ekranu głównego</b>.
+      </p>
+
+      <h2>Co fotografować</h2>
+      <p>
+        Sześć zdjęć na konia, w tej kolejności. Pierwsze jest okładką — w nagłówku, na liście i w
+        siatce.
+      </p>
+      <ol>
+        <li>
+          <b>Skok z profilu</b> — okładka. Koń w powietrzu nad przeszkodą, bokiem do aparatu.
+        </li>
+        <li>
+          <b>Sylwetka</b> — koń stoi bokiem na równym podłożu, wszystkie cztery nogi widoczne.
+        </li>
+        <li>
+          <b>Galop</b> — z boku, na ujeżdżalni albo na łące.
+        </li>
+        <li>
+          <b>Głowa</b> — z bliska, oko i ucho ostre.
+        </li>
+        <li>
+          <b>Nogi</b> — przód i tył, z boku, na wysokości kolan.
+        </li>
+        <li>
+          <b>Stajnia</b> — koń w boksie albo na korytarzu.
+        </li>
+      </ol>
+      <p>
+        Więcej niż sześć jest w porządku, ale te sześć to minimum. Jeździec z widoczną twarzą —
+        tylko za jego zgodą (art. 81 prawa autorskiego).
+      </p>
+
+      <h2>Kadr</h2>
+      <p>
+        To samo zdjęcie strona przycina na różne sposoby: na komputerze do szerokiego prostokąta
+        (16:10), na telefonie do wysokiego paska, w siatce prawie do kwadratu. Dlatego:
+      </p>
+      <ul>
+        <li>
+          <b>Trzymaj telefon poziomo.</b>
+        </li>
+        <li>
+          <b>Cały koń na środku, z zapasem miejsca z każdej strony</b> — łącznie z uszami, ogonem i
+          kopytami. Lepiej za dużo tła niż ucięte nogi.
+        </li>
+        <li>
+          <b>Nie przybliżaj i nie przycinaj</b> przed wysłaniem. Strona przytnie sama.
+        </li>
+        <li>Słońce za plecami fotografa, spokojne tło, bez samochodów i taczek w kadrze.</li>
+      </ul>
+
+      <h2>Jak wysłać zdjęcia</h2>
+      <p>
+        <b>Najlepiej samodzielnie w panelu</b>, prosto z telefonu: <a href="/admin">Panel</a> › koń
+        › Zdjęcia. Panel sam zmniejsza zdjęcia do {MAX_EDGE} px i usuwa z nich lokalizację GPS
+        stajni.
+      </p>
+      <p>
+        <b>Nigdy jako zdjęcie na WhatsAppie.</b> WhatsApp mocno kompresuje zdjęcia, nawet w trybie
+        HD, i na dużym ekranie wychodzą rozmyte. Jeśli zdjęcia robi ktoś inny, niech przyśle
+        oryginały przez Dysk Google, WeTransfer, AirDrop albo e-mailem jako załącznik. Jeśli jest
+        tylko WhatsApp — spinacz › <b>Dokument</b>, nie Galeria. Dokument przychodzi bez kompresji.
+      </p>
+
+      <h2>HEIC — zdjęcia z iPhone'a</h2>
+      <p>
+        iPhone zapisuje zdjęcia w formacie HEIC. Panel otwiera HEIC <b>tylko w Safari</b>. Na samym
+        iPhonie to nie problem. Na komputerze z Chrome albo Firefoksem panel zgłosi błąd przy takim
+        pliku. Wtedy:
+      </p>
+      <ul>
+        <li>otwórz panel w Safari, albo</li>
+        <li>wyeksportuj zdjęcia jako JPEG, albo</li>
+        <li>
+          na iPhonie ustaw <b>Ustawienia › Aparat › Formaty › Najbardziej zgodne</b> — kolejne
+          zdjęcia będą od razu w JPEG.
+        </li>
+      </ul>
+
+      <h2>Badanie RTG</h2>
+      <p>Kupujący pobiera PDF i przesyła go swojemu weterynarzowi. Z kliniki poproś o:</p>
+      <ul>
+        <li>
+          <b>jeden skompresowany plik PDF na całe badanie</b>, poniżej {xrayMb} MB — większego panel
+          nie przyjmie;
+        </li>
+        <li>
+          <b>stronę 1 bez imienia, nazwiska i adresu właściciela konia.</b> Najprościej, gdy klinika
+          wygeneruje PDF od razu bez danych właściciela.
+        </li>
+      </ul>
+      <p class="warn">
+        <b>Uwaga:</b> czarny prostokąt narysowany w Oznaczeniach na iPhonie albo w edytorze PDF
+        tylko zasłania tekst. Nazwisko zostaje w pliku i da się je skopiować. Jeśli klinika nie może
+        wygenerować pliku bez danych, poproś ją o poprawioną stronę 1.
+      </p>
+      <p>
+        <b>Nazwisko weterynarza zostaje.</b> Raport bez lekarza nic nie znaczy dla weterynarza
+        kupującego.
+      </p>
+      <p>
+        Zanim cokolwiek wyślesz, zapisz obok pliku trzy rzeczy — strona pokazuje je nawet wtedy, gdy
+        pliku jeszcze nie ma:
+      </p>
+      <ul>
+        <li>
+          <b>Liczba zdjęć</b> — np. 18
+        </li>
+        <li>
+          <b>Data badania</b> — np. 04.03.2026
+        </li>
+        <li>
+          <b>Zakres</b> — np. nogi przednie i tylne, stawy skokowe, kręgosłup
+        </li>
+      </ul>
+      <p>W panelu to pola RTG: Liczba zdjęć, Data badania, Zakres.</p>
+    </main>
+  </body>
+</html>
+
+<style>
+  main {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: var(--gutter-mobile);
+    line-height: 1.5;
+  }
+  h2 {
+    margin-top: 2rem;
+  }
+  li + li {
+    margin-top: 0.5rem;
+  }
+  .warn {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--ink);
+    background: var(--placeholder);
+  }
+</style>

@@ -204,7 +204,10 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
                 ) : kind === 'photos' ? (
                   <fieldset class="photos">
                     <legend>
-                      {f[path]} <small>{a.photoHint}</small>
+                      {f[path]} <small>{a.photoHint}</small>{' '}
+                      <a href="/admin/poradnik" target="_blank" rel="noopener">
+                        {a.guideLink}
+                      </a>
                     </legend>
                     <label id="drop" class="drop">
                       {a.photoDrop}
@@ -216,7 +219,10 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
                 ) : kind === 'xrays' ? (
                   <fieldset>
                     <legend>
-                      {f[path]} <small>{a.xrayHint}</small>
+                      {f[path]} <small>{a.xrayHint}</small>{' '}
+                      <a href="/admin/poradnik" target="_blank" rel="noopener">
+                        {a.guideLink}
+                      </a>
                     </legend>
                     <label class="confirm">
                       <input id="xray-confirm" type="checkbox" />

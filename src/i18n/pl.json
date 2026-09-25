@@ -155,6 +155,7 @@
     "xraysHint": "Pusta liczba = brak badania.",
     "photoDrop": "Upuść zdjęcia tutaj albo wybierz pliki",
     "photoHint": "Pierwsze zdjęcie to okładka. Zmniejszane do 2400 px, bez danych EXIF i lokalizacji GPS.",
+    "guideLink": "Poradnik: zdjęcia i RTG",
     "photoNeedSlug": "Najpierw wpisz adres konia.",
     "photoUploading": "Wysyłanie: {name}…",
     "photoFailed": "Nie udało się wysłać: {name}",
