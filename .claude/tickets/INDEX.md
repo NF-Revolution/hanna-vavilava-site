@@ -33,6 +33,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
+| E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, unmounted until E4.5 (#35)            |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -268,3 +269,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   H.264's universal support. HDR input is refused rather than tone-mapped, because
   Homebrew's ffmpeg has no `zscale`. The on-page "file < 2.5 MB" spec copy is placeholder,
   and E3.3 replaces that figure.
+- The gallery caption shows in the lightbox, not over the thumbnail (E3.5). The boards
+  centre a numbered label in each placeholder tile. On a real photo that label would need a
+  scrim the boards do not draw. The figcaption `NN · caption` sits in the board's gap under
+  the image box instead, and doubles as the counter. The boards draw no prev/next controls,
+  so none are built. Arrow keys move, and a phone visitor closes and taps the next tile.
+  With no JS, a thumbnail links to a full WebP built into `dist/`, never to the bucket.

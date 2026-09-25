@@ -1,0 +1,192 @@
+---
+/*
+ * The horse gallery (E3.5): a two-column grid of thumbnails and one <dialog>
+ * that shows them full size. With JavaScript off each thumbnail is a link to
+ * the full image, built into dist/ — never the Storage URL, which visitors do
+ * not read (E2.5). With it on, showModal() gives the focus trap, Escape and
+ * inertness; the script adds only the arrow keys and focus restore.
+ *
+ * Every photo sits in the dialog already, as a hidden figure with a lazy
+ * <img>. A hidden figure in a closed dialog is not rendered, so the browser
+ * fetches a full image only when it is shown, and no script swaps a `src`.
+ *
+ * ponytail: no prev/next buttons and no swipe, because the boards draw
+ * neither — on a phone the visitor closes and taps the next tile. Add two
+ * buttons calling `show(at ± 1)` if touch visitors need them.
+ */
+import { getImage } from 'astro:assets';
+import Photo from './Photo.astro';
+import { photoUrl } from '../firebase';
+import { t, type Locale } from '../i18n';
+import type { Horse } from '../horse';
+
+interface Props {
+  photos: Horse['photos'];
+  locale: Locale;
+}
+const { photos, locale } = Astro.props;
+const dict = t(locale);
+
+const full = await Promise.all(
+  photos.map((photo) => getImage({ src: photoUrl(photo.key), inferSize: true, format: 'webp' })),
+);
+const number = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<ul class="gallery">
+  {photos.map((photo, i) => (
+    <li>
+      <a class="gallery-thumb" href={full[i].src}>
+        <Photo photo={photo} locale={locale} sizes="50vw" />
+      </a>
+    </li>
+  ))}
+</ul>
+
+<dialog id="hv-gallery" class="lightbox" aria-label={dict.gallery.preview}>
+  <div class="lightbox-slides" aria-live="polite">
+    {photos.map((photo, i) => (
+      <figure hidden>
+        <Photo photo={photo} locale={locale} sizes="(max-width: 1160px) 100vw, 1120px" />
+        <figcaption class="lbl num">
+          {[number(i), photo.caption[locale]].filter(Boolean).join(' · ')}
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+  <form method="dialog">
+    <button type="submit" class="lbl lightbox-close">
+      {dict.gallery.close}
+    </button>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('hv-gallery') as HTMLDialogElement | null;
+
+  if (dialog?.showModal) {
+    const thumbs = document.querySelectorAll<HTMLAnchorElement>('.gallery-thumb');
+    const slides = dialog.querySelectorAll('figure');
+    let at = 0;
+    const show = (i: number) => {
+      at = (i + slides.length) % slides.length;
+      slides.forEach((slide, k) => (slide.hidden = k !== at));
+    };
+
+    thumbs.forEach((thumb, i) =>
+      thumb.addEventListener('click', (event) => {
+        // Let modified clicks still open the full image in a new tab.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        show(i);
+        dialog.showModal();
+        document.body.style.overflow = 'hidden';
+      }),
+    );
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') show(at + 1);
+      if (event.key === 'ArrowLeft') show(at - 1);
+    });
+
+    // Explicit, because Safari never focuses a clicked link, so the dialog's own
+    // restore would land on <body>. The last photo viewed keeps the visitor's place.
+    dialog.addEventListener('close', () => {
+      document.body.style.overflow = '';
+      thumbs[at].focus();
+    });
+  }
+</script>
+
+<style>
+  .gallery {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .gallery-thumb {
+    display: block;
+    height: 470px;
+    background: var(--ground-light);
+  }
+
+  .gallery-thumb :global(img),
+  .lightbox :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .gallery-thumb :global(img) {
+    object-fit: cover;
+  }
+
+  .lightbox {
+    border: 0;
+    padding: 20px var(--gutter-mobile);
+    margin: 0;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: rgba(14, 14, 13, 0.94);
+    color: var(--ink-inv);
+  }
+
+  .lightbox[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+
+  .lightbox-slides {
+    width: min(1120px, 100%);
+    min-height: 0;
+  }
+
+  .lightbox figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .lightbox figure[hidden] {
+    display: none;
+  }
+
+  .lightbox :global(picture) {
+    display: block;
+    height: min(700px, calc(100dvh - 180px));
+    background: #1e1e1b;
+  }
+
+  .lightbox :global(img) {
+    object-fit: contain;
+  }
+
+  .lightbox figcaption {
+    color: var(--ink-inv-muted);
+    text-align: center;
+  }
+
+  .lightbox-close {
+    min-height: var(--tap);
+    padding: 16px 34px;
+    box-sizing: border-box;
+    border: 1px solid var(--ink-inv);
+    color: var(--ink-inv);
+  }
+
+  @media (max-width: 720px) {
+    .gallery-thumb {
+      height: 190px;
+    }
+  }
+</style>
