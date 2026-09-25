@@ -21,6 +21,12 @@ Issue [#31](https://github.com/NF-Revolution/hanna-vavilava-site/issues/31) · b
   - The entry cue moves to bottom 132px, with padding 15px 26px and a min-height of 48px.
 - `Header.astro` overlay status: the date sits in `.status-date` behind a `.status-sep`. At ≤720px the separator hides and the date drops to its own line, as MobileHome draws it.
 - `en.json` `home.soundHint` is "Hoofbeats, breathing, the rail", from EN-Opening.
+- A stand-in hero is in `src/media.ts`: `intro_video.mp4`, AI footage with a Veo watermark, marked `PLACEHOLDER`.
+- The MP4 `<source>` now comes before the WebM. Safari picked the VP9 WebM and stopped looping after one pass, and the MP4 is the smaller file anyway.
+- The sound toggle is icon-only, as the owner asked:
+  - Muted shows a speaker with a ×. Sound on shows two arcs that pulse (1.4 s, the outer arc 0.2 s behind).
+  - The label is kept as visually hidden text, so the button still has a name. The hint stays.
+  - Canvas version 23 redraws Main, MobileHome and EN-Opening to match.
 
 ## Outcome — 2026-09-25
 
