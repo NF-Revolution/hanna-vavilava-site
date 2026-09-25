@@ -59,11 +59,16 @@ Two things `npm run ci` cannot check, so check them by eye:
 
     git add <the changed files>
     git commit -m "<type>: <subject>"
+    git fetch origin && git rebase origin/main
     git push -u origin HEAD
 
 Conventional Commits, lower case, imperative, no ticket ID and no `Closes` in the subject —
 that line belongs in the pull-request body, where a squash merge keeps it. Types in use:
 `feat`, `fix`, `docs`, `chore`. Tree already clean → skip the commit, still push.
+
+The rebase keeps parallel pull requests (one per worktree) mergeable in any order. It
+conflicts → resolve, `git rebase --continue`, re-run `npm run ci`. Branch already pushed
+before the rebase → `git push --force-with-lease`.
 
 End the commit message with the attribution line the session's instructions give.
 

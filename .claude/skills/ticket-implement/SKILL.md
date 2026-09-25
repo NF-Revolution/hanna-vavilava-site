@@ -115,6 +115,8 @@ Follow `AGENTS.md`. The conventions that actually bite:
 
 ## 7. Verify
 
+Fresh worktree (no `node_modules`) → `npm ci` first.
+
     npm run ci
 
 Format check, types, build, internal link check. Then tick the acceptance-criteria boxes in
