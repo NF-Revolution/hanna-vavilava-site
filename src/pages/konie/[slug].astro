@@ -1,5 +1,5 @@
 ---
-import HorseDetailStub from '../../components/HorseDetailStub.astro';
+import HorseDetail from '../../components/HorseDetail.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -11,4 +11,4 @@ const { slug } = Astro.params;
 const { horse } = Astro.props;
 ---
 
-<HorseDetailStub locale="pl" slug={slug!} horse={horse} />
+<HorseDetail locale="pl" slug={slug!} horse={horse} />
