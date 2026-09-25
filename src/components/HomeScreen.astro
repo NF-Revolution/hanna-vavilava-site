@@ -90,8 +90,12 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
             fetchpriority="high"
           />
           <video class="loop" muted loop playsinline preload="none" aria-hidden="true">
-            <source data-src={`${media.base}/${hero.webmKey}`} type="video/webm" />
+            <!--
+              MP4 first: Safari picks the WebM when it comes first and stops
+              looping it after one pass. The MP4 is also the smaller file.
+            -->
             <source data-src={`${media.base}/${hero.mp4Key}`} type="video/mp4" />
+            <source data-src={`${media.base}/${hero.webmKey}`} type="video/webm" />
           </video>
         </>
       ) : (
@@ -126,11 +130,13 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
           aria-hidden="true"
         >
           <path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4Z"></path>
-          <path d="M15.8 9.2a4 4 0 0 1 0 5.6"></path>
-          <path d="M18.4 6.9a7.4 7.4 0 0 1 0 10.2"></path>
+          <path class="wave" d="M15.8 9.2a4 4 0 0 1 0 5.6"></path>
+          <path class="wave wave-2" d="M18.4 6.9a7.4 7.4 0 0 1 0 10.2"></path>
+          <path class="mute" d="M15.5 9.5l5 5M20.5 9.5l-5 5"></path>
         </svg>
-        <span class="lbl sound-on">{dict.home.sound}</span>
-        <span class="lbl sound-off">{dict.home.soundOff}</span>
+        <!-- The icon is the control; the label stays as its accessible name. -->
+        <span class="visually-hidden sound-on">{dict.home.sound}</span>
+        <span class="visually-hidden sound-off">{dict.home.soundOff}</span>
         <span class="lbl sound-hint">{dict.home.soundHint}</span>
       </button>
 
@@ -188,10 +194,16 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
 </script>
 
 <style>
+  /*
+   * Fixed, not 100dvh: a fixed box's bottom edge follows the visible viewport
+   * on every iOS Safari, where the 100vh fallback before 15.4 is the large
+   * viewport and hides the bottom bar under the toolbar. Nothing scrolls, so
+   * the toolbar never resizes under it.
+   * ponytail: `height: 100dvh` on a relative box if fixed misbehaves on hardware.
+   */
   .screen {
-    position: relative;
-    height: 100vh;
-    height: 100dvh;
+    position: fixed;
+    inset: 0;
     overflow: hidden;
     background: var(--ground-dark);
     color: var(--ink-inv);
@@ -296,6 +308,7 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: var(--tap);
     min-height: var(--tap);
     color: inherit;
   }
@@ -303,6 +316,36 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
   /* visibility, not display: the horse line keeps its place on the right. */
   .sound[disabled] {
     visibility: hidden;
+  }
+
+  .sound svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Muted: the speaker is crossed. Sound on: the two waves pulse outward. */
+  .sound:not([data-on]) .wave,
+  .sound[data-on] .mute {
+    display: none;
+  }
+
+  .sound[data-on] .wave {
+    animation: hv-wave 1.4s ease-in-out infinite;
+  }
+
+  .sound[data-on] .wave-2 {
+    animation-delay: 0.2s;
+  }
+
+  /* Ends on full opacity, so reduced motion's one-frame run leaves the waves shown. */
+  @keyframes hv-wave {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.2;
+    }
   }
 
   .sound[data-on] .sound-on,
@@ -333,22 +376,51 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
   }
 
   @media (max-width: 720px) {
-    .poster-alt,
-    .sound-hint {
+    .poster-alt {
       display: none;
     }
 
+    /* MobileHome stacks two bars: the horse above, the sound below. */
     .edge {
-      padding-inline: var(--gutter-mobile);
-      gap: 12px;
+      flex-direction: column-reverse;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
     }
 
-    .horse-facts {
+    .sound {
+      justify-content: flex-start;
+      min-height: 56px;
+      padding: 0 12px;
+      border-top: 1px solid rgba(242, 241, 237, 0.22);
+    }
+
+    .sound-hint {
+      margin-left: auto;
+    }
+
+    /* No toggle means no bar: an empty 56px strip is worse than none. */
+    .sound[disabled] {
+      display: none;
+    }
+
+    .horse {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      min-height: 52px;
+      padding: 6px var(--gutter-mobile);
+      text-align: center;
+    }
+
+    .horse-arrow {
       display: none;
     }
 
     .enter {
-      bottom: 96px;
+      bottom: 132px;
+      min-height: 48px;
+      padding: 15px 26px;
     }
   }
 </style>
