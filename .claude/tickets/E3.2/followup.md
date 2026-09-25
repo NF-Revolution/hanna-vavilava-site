@@ -13,7 +13,7 @@ Issue [#26](https://github.com/NF-Revolution/hanna-vavilava-site/issues/26) · b
   - a 1080x1920 portrait clip
   - a 4K60 HEVC clip
   - a 10-bit HLG HEVC clip
-- The upload path was not exercised, because it needs `wrangler login`.
+- Upload verified on the live bucket: `horses/e32-upload-test/videos/sales-6902fe9f.mp4` and `.jpg` were served `200` with the right type and the immutable `cache-control`. They are throwaway test objects, deleted by hand.
 
 ## What was built — 2026-09-25
 
