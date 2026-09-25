@@ -92,7 +92,14 @@
     "horses": {
       "title": "Horses for sale — Hanna Vavilava",
       "description": "The current stable: show jumping horses from 110 to 130 cm, with full documentation, uncut footage and X-rays shared before the visit.",
-      "label": "All horses"
+      "label": "All horses",
+      "asOf": "Stable as of {date}",
+      "more": "Horse profile",
+      "onRequest": "Price on request",
+      "sex": {
+        "mare": "mare",
+        "gelding": "gelding"
+      }
     },
     "horsesGrid": {
       "title": "Horses for sale, grid — Hanna Vavilava",

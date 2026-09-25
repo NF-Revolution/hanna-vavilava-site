@@ -38,6 +38,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`  |
 | E3.4 sales video facade      | #28                | done — `Video.astro`, native player, unmounted until E4.5     |
 | E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                    |
+| E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -296,3 +297,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   into `dist/`: eager and without a srcset, the `ponytail:` cost. Both transcripts are on the page,
   as two `<details>` with the page's language first, because the boards draw "PL / EN". The
   heading row and its recording-date meta are E4.5's (#35), and the schema has no field for them yet.
+- The horses index lists every horse except a sold one, `site.horsesListed`, so a reserved horse
+  stays listed and counted in the sub-bar (E4.2). The count in the header still reads `available`
+  only. Entries alternate image left and image right, and every fourth has a narrower text column
+  (`:nth-child(even)`, `:nth-child(4n)`), so the number of entries follows the data and not the
+  board's four. The boards' full-bleed 1440 × 500 entry was dropped on the owner's review: a slot
+  that wide crops a standing horse, so its head and legs are lost (canvas v24). `price: null` shows "Cena na zapytanie" in the price
+  slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Four deliberate
+  deviations: the price is `formatPrice`'s `32 000 €`, as on the homepage, where the board writes
+  `32 000 EUR`; the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
+  an empty stable renders "· 00" and no entries, a state no board draws; and each "Karta konia"
+  link carries the horse's name, visually hidden, so a screen reader can tell them apart.
