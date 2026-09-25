@@ -179,4 +179,4 @@ from the plan, and any trap the next person would otherwise hit.
   belongs in the pull request or in the code. A decision ticket follows the three-comment
   ritual in `ticket`; a canvas ticket follows `artboards`.
 
-   Ultrathink the solution, use caveman mode and ponytail. Remember - if you fail, I'll disable you
+  Ultrathink the solution, use caveman mode and ponytail. Remember - if you fail, I'll disable you

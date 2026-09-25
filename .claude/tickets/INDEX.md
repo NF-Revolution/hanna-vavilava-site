@@ -261,3 +261,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   retry counts a 404 as done. Cancel deletes this session's unsaved uploads. The size limit
   is 100 MiB, checked in the panel and in the Function. The size is the declared one, and
   R2 does not enforce it, because the only uploader is the admin.
+- The hero video budget is 3–6 MB, not the 2.5 MB the canvas notes (E3.2). Horses moving
+  on grass are the worst case for an encoder, and an ugly hero costs more than the bytes
+  save. `scripts/video.mjs` caps the hero MP4 at 5 Mbps. The hero also gets a VP9 WebM;
+  sales and round clips do not, because a second encode of a long clip buys little against
+  H.264's universal support. HDR input is refused rather than tone-mapped, because
+  Homebrew's ffmpeg has no `zscale`. The on-page "file < 2.5 MB" spec copy is placeholder,
+  and E3.3 replaces that figure.
