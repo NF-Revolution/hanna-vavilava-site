@@ -1,6 +1,6 @@
 # E2.8 · Sold-horse handling
 
-Shipped 2026-09-24 — PR open. Live purge test waits on `CLOUDFLARE_TOKEN`.
+Shipped 2026-09-24 — #90. Verified live 2026-09-25.
 
 ## 2026-09-24 — build
 
@@ -51,6 +51,7 @@ Approach as planned. Review clear. `npm run ci` and `npm test` (30/30) green.
 - Trap: the canvas publish can be refused as stale even when `canvas.json` is unchanged. Re-read it,
   compare the sha, then publish again.
 - Trap: a horse flipped back from sold has lost its X-ray files; they must be re-uploaded.
-- Open: the live check needs the Cloudflare token. Upload a throwaway PDF under a test slug, mark that horse sold, Publish,
-  then expect 404 and no `cf-cache-status: HIT` from `curl -I`. #63 changes the zone id and the base in
-  `functions/index.js`.
+- Verified live 2026-09-25: the Function was deployed with `CLOUDFLARE_TOKEN`. A throwaway PDF was `HIT` at the edge;
+  after Publish it answered `404`, the object was gone, `xrays/files` was removed and the deploy succeeded. After
+  a purge the edge caches the `404` itself, so a `HIT` on a `404` is expected. #63 changes the zone id and the
+  base in `functions/index.js`.
