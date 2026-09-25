@@ -30,7 +30,8 @@ For each ticket, read its code from `gh issue view <N> --json title` (`E2.9` →
     claude --bg -w <worktree> --permission-mode plan "/ticket-implement #<N>"
 
 Return one line per ticket — code, session id — and point at `claude agents` and
-`claude attach <id>`. Each session checks its own blockers (§3).
+`claude attach <id>`. Each session checks its own blockers (§3). Once the pull requests
+merge, `worktree-clean` removes the sessions, worktrees and branches.
 
 A session started in plan mode does §1–§3 and the board read, then presents the approach
 for approval. The branch (§4) and the approach comment (§5) come right after approval.
@@ -177,3 +178,5 @@ from the plan, and any trap the next person would otherwise hit.
 - Two comments per build ticket is the target: one approach, one outcome. Anything else
   belongs in the pull request or in the code. A decision ticket follows the three-comment
   ritual in `ticket`; a canvas ticket follows `artboards`.
+
+   Ultrathink the solution, use caveman mode and ponytail. Remember - if you fail, I'll disable you
