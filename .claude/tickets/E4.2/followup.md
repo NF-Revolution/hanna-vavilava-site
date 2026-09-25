@@ -1,9 +1,9 @@
 # E4.2 — followup
 
-Shipped 2026-09-25 — see the last `## Outcome` at the bottom.
+Reopened 2026-09-25 — shipped again, see the last `## Outcome` at the bottom.
 
 Issue [#32](https://github.com/NF-Revolution/hanna-vavilava-site/issues/32) ·
-branch `32-e42-horses-index-editorial-view` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 22
+branch `32-e42-horses-index-editorial-view` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 24
 
 ## 2026-09-25
 
@@ -38,3 +38,19 @@ the `€` price, "Wszystkie konie" kept at 390, the undrawn empty stable, and th
 link names. The `ticket-reviewer` verdict was clear. Out of scope: the view toggle belongs to
 #33, and the "Szukają Państwo czegoś innego?" form and the dark band belong to #41. Reserved
 horses are listed with no marker, because no board draws a reserved state on the index.
+
+## What was built — 2026-09-25, reopened
+
+- The owner looked at PR #104 with a real photo. The full-bleed step (1440 × 500, about 2.9:1)
+  cut off a standing horse's head and legs. The full-bleed step is gone: entries now alternate
+  image left and image right, and every fourth has the narrow text column and the 1000px image.
+  The pattern is `:nth-child(even)` and `:nth-child(4n)`. Every image slot is 700px tall, at
+  1.26–1.43:1.
+- Canvas v24: `Horses` entry 03 (Ilaria) is redrawn with the image left, 880 × 700, in the same
+  shape as 01. The board height is unchanged. `MobileHorses` needed no change.
+
+## Outcome — 2026-09-25, reopened
+
+The full-bleed entry was dropped from both the code and the board. The trap for next time is
+to check a new image slot's aspect ratio against a real horse photo before building it. A
+standing horse is about 4:3, and anything much wider than 3:2 cuts it off.

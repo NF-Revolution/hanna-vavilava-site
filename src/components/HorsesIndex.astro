@@ -1,9 +1,10 @@
 ---
 /*
  * The horses index, editorial view (E4.2), drawn as `Horses` and `MobileHorses`.
- * Four entry layouts in turn — image left, image right, full bleed, image right
- * with a narrower text column — chosen by `:nth-child(4n+k)`, so a fifth horse
- * starts the pattern again. A sold horse is not listed; its page stays (#23).
+ * Entries alternate image left and image right, and every fourth has a narrower
+ * text column and a wider image — chosen by `:nth-child`, so the rhythm holds for
+ * any number of horses. No full-bleed entry: a 1440 × 500 slot crops a standing
+ * horse (#32). A sold horse is not listed; its page stays (#23).
  */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
@@ -22,7 +23,7 @@ const page = dict.pages.horses;
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /* Drawn image widths on the 1440 board, per step of the pattern. */
-const imageVw = [61, 61, 100, 70];
+const imageVw = [61, 61, 61, 70];
 ---
 
 <Page locale={locale} routeKey="horses" title={page.title} description={page.description}>
@@ -97,12 +98,12 @@ const imageVw = [61, 61, 100, 70];
     border-top: 1px solid var(--rule-hair);
   }
 
-  .entry:nth-child(4n + 2) {
+  .entry:nth-child(even) {
     grid-template-columns: 560fr 880fr;
     grid-template-areas: 'text fig';
   }
 
-  .entry:nth-child(4n + 4) {
+  .entry:nth-child(4n) {
     grid-template-columns: 440fr 1000fr;
     grid-template-areas: 'text fig';
   }
@@ -132,7 +133,7 @@ const imageVw = [61, 61, 100, 70];
     padding: 0 80px;
   }
 
-  .entry:nth-child(4n + 4) .text {
+  .entry:nth-child(4n) .text {
     padding: 0 44px 0 var(--gutter);
   }
 
@@ -177,49 +178,6 @@ const imageVw = [61, 61, 100, 70];
     align-self: flex-start;
   }
 
-  /* Step three: the image runs full bleed, and the text is one row under it. */
-  .entry:nth-child(4n + 3) {
-    grid-template-columns: 1fr;
-    grid-template-rows: 500px auto;
-    grid-template-areas: 'fig' 'text';
-  }
-
-  .entry:nth-child(4n + 3) .text {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas:
-      'nr blurb price'
-      'name blurb price'
-      'facts blurb more';
-    align-items: start;
-    gap: 16px 60px;
-    min-height: 200px;
-    box-sizing: border-box;
-    padding: 46px var(--gutter) 54px;
-  }
-
-  .entry:nth-child(4n + 3) .nr {
-    grid-area: nr;
-  }
-  .entry:nth-child(4n + 3) .name {
-    grid-area: name;
-  }
-  .entry:nth-child(4n + 3) .facts {
-    grid-area: facts;
-  }
-  .entry:nth-child(4n + 3) .price {
-    grid-area: price;
-    justify-self: end;
-  }
-  .entry:nth-child(4n + 3) .blurb {
-    grid-area: blurb;
-    max-width: 420px;
-  }
-  .entry:nth-child(4n + 3) .more {
-    grid-area: more;
-    justify-self: end;
-  }
-
   @media (max-width: 720px) {
     /* The date does not fit beside the label at 390; the board drops it. */
     .as-of {
@@ -236,9 +194,6 @@ const imageVw = [61, 61, 100, 70];
 
     .text,
     .entry:nth-child(n) .text {
-      display: flex;
-      align-items: stretch;
-      min-height: 0;
       gap: 11px;
       padding: 20px var(--gutter-mobile) 28px;
     }

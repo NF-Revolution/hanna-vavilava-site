@@ -298,8 +298,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   heading row and its recording-date meta are E4.5's (#35), and the schema has no field for them yet.
 - The horses index lists every horse except a sold one, `site.horsesListed`, so a reserved horse
   stays listed and counted in the sub-bar (E4.2). The count in the header still reads `available`
-  only. The boards' four entry layouts repeat by `:nth-child(4n+k)`, so the number of entries
-  follows the data and not the board's four. `price: null` shows "Cena na zapytanie" in the price
+  only. Entries alternate image left and image right, and every fourth has a narrower text column
+  (`:nth-child(even)`, `:nth-child(4n)`), so the number of entries follows the data and not the
+  board's four. The boards' full-bleed 1440 × 500 entry was dropped on the owner's review: a slot
+  that wide crops a standing horse, so its head and legs are lost (canvas v24). `price: null` shows "Cena na zapytanie" in the price
   slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Four deliberate
   deviations: the price is `formatPrice`'s `32 000 €`, as on the homepage, where the board writes
   `32 000 EUR`; the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
