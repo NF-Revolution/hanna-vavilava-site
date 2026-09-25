@@ -1,0 +1,49 @@
+---
+/*
+ * One horse photo as a responsive <picture> (E3.1): WebP with a JPEG fallback,
+ * real width and height on the <img>, lazy unless it is the hero. Only the hero
+ * adds AVIF — encoding every gallery photo to AVIF is slow on a free build
+ * container for about a tenth more saving.
+ *
+ * `sizes` is required: each slot knows its own drawn width from its board, and
+ * a missing one silently makes the browser assume 100vw.
+ *
+ * ponytail: the size is read from the photo at build (one request per photo),
+ * because the schema stores none. Store `width`/`height` at upload (E2.5's
+ * panel knows them) if build time or Storage reads ever matter.
+ */
+import { Picture, inferRemoteSize } from 'astro:assets';
+import { photoUrl } from '../firebase';
+import type { Horse } from '../horse';
+import type { Locale } from '../i18n';
+
+interface Props {
+  photo: Horse['photos'][number];
+  locale: Locale;
+  sizes: string;
+  hero?: boolean;
+  class?: string;
+}
+const { photo, locale, sizes, hero = false, class: className } = Astro.props;
+
+const src = photoUrl(photo.key);
+const { width, height } = await inferRemoteSize(src);
+// Astro trims the ladder to the original only for imported files; a remote one
+// would get a `1920w` entry sharp will not upscale, so the label would lie.
+const widths = [...[640, 960, 1280, 1920].filter((w) => w < width), width];
+---
+
+<Picture
+  src={src}
+  width={width}
+  height={height}
+  widths={widths}
+  sizes={sizes}
+  formats={hero ? ['avif', 'webp'] : ['webp']}
+  fallbackFormat="jpg"
+  alt={photo.alt[locale]}
+  loading={hero ? 'eager' : 'lazy'}
+  decoding="async"
+  fetchpriority={hero ? 'high' : undefined}
+  class={className}
+/>

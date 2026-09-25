@@ -1,7 +1,8 @@
 /*
  * The web app's Firebase config (`firebase apps:sdkconfig WEB`). Public by
  * design: the API key identifies the project, it does not unlock it — the
- * database and storage rules and the `admin` claim do. Imported only by the admin panel,
+ * database and storage rules and the `admin` claim do. Holds no SDK import: the admin
+ * panel imports the SDK itself, and `Photo.astro` reads `photoUrl` at build time only,
  * so the SDK never reaches a public page.
  */
 export const firebaseConfig = {
