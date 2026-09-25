@@ -1,0 +1,119 @@
+---
+/*
+ * One horse video — the sales film or the uncut round (E3.4) — with its
+ * transcripts. Not mounted yet: E4.5 (#35) places it, with the heading row.
+ *
+ * The facade is the browser's own: `preload="none"` downloads nothing but the
+ * poster until the visitor presses play, from the first-party media host, so
+ * no third party sees the page and no cookie is set (#1). No script — a poster
+ * button that swaps in <video autoplay> would cost ~250 B, and beside the
+ * drawer and the gallery that breaks the 1 KB public-JS budget. The boards'
+ * own play glyph gave way to the native control for the same reason.
+ *
+ * The transcripts are text in the page, both languages with the page's own
+ * first, because the boards draw "PL / EN" and it is the indexable asset #52
+ * feeds to `VideoObject`. An empty one — the round has no commentary — is left out.
+ *
+ * ponytail: `poster=` is eager and has no srcset, so every video costs one
+ * WebP at page load. A lazy <Picture> behind a scripted button if the budget
+ * ever allows.
+ * ponytail: no <track>. The transcript carries the commentary; add WebVTT
+ * captions if a clip ever needs them.
+ */
+import { getImage, inferRemoteSize } from 'astro:assets';
+import { media } from '../media';
+import { locales, t, type Locale } from '../i18n';
+import { fill, plural } from '../i18n/format';
+import type { Horse } from '../horse';
+
+interface Props {
+  video: Horse['videos'][number];
+  locale: Locale;
+}
+const { video, locale } = Astro.props;
+const dict = t(locale);
+
+const posterSrc = `${media.base}/${video.posterKey}`;
+const { width, height } = await inferRemoteSize(posterSrc);
+const posterWidth = Math.min(1280, width);
+const poster = await getImage({
+  src: posterSrc,
+  width: posterWidth,
+  height: Math.round((height * posterWidth) / width),
+  format: 'webp',
+});
+
+const minutes = Math.floor(video.durationS / 60);
+const seconds = video.durationS % 60;
+const duration = [
+  minutes && plural(locale, dict.video.minutes, minutes),
+  seconds && plural(locale, dict.video.seconds, seconds),
+]
+  .filter(Boolean)
+  .join(' ');
+
+const transcripts = [locale, ...locales.filter((other) => other !== locale)].filter((lang) =>
+  video.transcript[lang].trim(),
+);
+---
+
+<figure class="video" data-kind={video.kind}>
+  <video
+    controls
+    preload="none"
+    playsinline
+    poster={poster.src}
+    width={width}
+    height={height}
+    aria-label={fill(dict.video.label, { title: dict.video[video.kind], duration })}
+  >
+    <source src={`${media.base}/${video.key}`} type="video/mp4" />
+  </video>
+  {transcripts.map((lang) => (
+    <details>
+      <summary class="lbl">
+        {dict.video.transcript} · <span lang={lang}>{t(lang).lang.current}</span>
+      </summary>
+      <div class="copy" lang={lang}>
+        {video.transcript[lang]
+          .trim()
+          .split(/\n\s*\n/)
+          .map((para) => (
+            <p>{para}</p>
+          ))}
+      </div>
+    </details>
+  ))}
+</figure>
+
+<style>
+  .video {
+    margin: 0;
+  }
+
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 640px;
+    object-fit: contain;
+    background: var(--placeholder);
+  }
+
+  [data-kind='round'] video {
+    max-height: 480px;
+  }
+
+  /* Stays `list-item`: `flex` drops the disclosure marker and the space before the <span>. */
+  summary {
+    min-height: var(--tap);
+    padding: 15px 0;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  details p {
+    margin: 0 0 18px;
+    max-width: 68ch;
+  }
+</style>
