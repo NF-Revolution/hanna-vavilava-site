@@ -3,8 +3,9 @@
  * The horses index, editorial view (E4.2), drawn as `Horses` and `MobileHorses`.
  * Entries alternate image left and image right, and every fourth has a narrower
  * text column and a wider image — chosen by `:nth-child`, so the rhythm holds for
- * any number of horses. No full-bleed entry: a 1440 × 500 slot crops a standing
- * horse (#32). A sold horse is not listed; its page stays (#23).
+ * any number of horses. Each photo shows whole at its own ratio: a fixed slot
+ * crops a standing horse's head (#32, #33). A sold horse is not listed; its page
+ * stays (#23).
  */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
@@ -91,7 +92,7 @@ const imageVw = [61, 61, 61, 70];
 
   .entry {
     display: grid;
-    min-height: 700px;
+    align-items: center;
     grid-template-columns: 880fr 560fr;
     grid-template-areas: 'fig text';
   }
@@ -113,17 +114,20 @@ const imageVw = [61, 61, 61, 70];
   .fig {
     grid-area: fig;
     margin: 0;
-    min-height: 0;
-    overflow: hidden;
     background: var(--placeholder);
   }
 
+  /* No photo: hold a 3:2 block, the shape of a landscape photo. */
+  .fig:empty {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* The photo at its own ratio, never cropped: a fixed slot cut off heads (#33). */
   .fig :global(picture),
   .fig :global(img) {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
   }
 
   .text {
@@ -132,11 +136,11 @@ const imageVw = [61, 61, 61, 70];
     flex-direction: column;
     justify-content: center;
     gap: 26px;
-    padding: 0 80px;
+    padding: 40px 80px;
   }
 
   .entry:nth-child(4n) .text {
-    padding: 0 44px 0 var(--gutter);
+    padding: 40px 44px 40px var(--gutter);
   }
 
   .text > * {
@@ -188,9 +192,9 @@ const imageVw = [61, 61, 61, 70];
 
     .entry,
     .entry:nth-child(n) {
-      min-height: 0;
+      align-items: stretch;
       grid-template-columns: 1fr;
-      grid-template-rows: 420px auto;
+      grid-template-rows: auto auto;
       grid-template-areas: 'fig' 'text';
     }
 

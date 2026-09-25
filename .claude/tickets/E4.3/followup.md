@@ -48,3 +48,26 @@ was clear. Out of scope: the "Szukają Państwo czegoś innego?" form and the da
 already decided. When the price is `null`, the card shows "Cena na zapytanie", reusing
 `pages.horses.onRequest`, although no grid board draws it. The trap for next time is to check
 every new photo slot against a real 4:3 horse photo before building to the board.
+
+## What was built — 2026-09-25, editorial crop
+
+- The owner's screenshots of PR #105 showed Red Bull's head cut off in the editorial view,
+  both at 1440 and at 390. The cause was the E4.2 fixed slots (880 × 700, 1.26:1, and
+  390 × 420, 0.93:1) with `object-fit: cover`. The owner chose to show the photo at its
+  natural ratio.
+- `HorsesIndex.astro` changes:
+  - `.entry` loses `min-height: 700px` and gains `align-items: center`.
+  - The image is `height: auto` with no `object-fit`.
+  - `.fig:empty` holds a 3:2 placeholder.
+  - The text padding is `40px` top and bottom.
+  - The mobile rows are `auto auto`, with `align-items: stretch`.
+- `/admin/poradnik`: the "Kadr" paragraph said the phone view crops to a tall strip. It now
+  says the list shows the whole photo and the grid crops it to 4:3.
+- Canvas v27: `Horses` entries are 880 × 587 (entry 04 is 1000 × 667) and the board is 3548px
+  tall. `MobileHorses` photos are 390 × 260 and the board is 3760px tall.
+
+## Outcome — 2026-09-25, editorial crop
+
+An editorial entry's height now follows its photo. A portrait upload would make a tall entry,
+but the guide asks for landscape photos. Not verified against a real photo in this session,
+because the fixture has no photos. Check it on the PR preview channel.
