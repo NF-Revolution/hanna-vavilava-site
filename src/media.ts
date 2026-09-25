@@ -12,3 +12,6 @@ export const media = {
   bucket: 'hanna-vavilava-media',
   cacheControl: 'public, max-age=31536000, immutable',
 } as const;
+
+/* The X-ray PDF ceiling (E2.10), checked in the panel and again in `functions/`. */
+export const xrayMaxBytes = 100 * 1024 * 1024;

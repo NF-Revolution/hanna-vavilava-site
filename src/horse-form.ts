@@ -4,17 +4,16 @@
  * horse — `name`, `facts.breeding.pl`, `xrays.count` — and the output is
  * checked by `horseSchema`, the same parse the build runs, before any write.
  *
- * Photos (E2.5) are rows of dotted fields too — `photos.0.alt.pl` — which the
- * panel numbers in display order.
+ * Photos (E2.5) and X-ray files (E2.10) are rows of dotted fields too —
+ * `photos.0.alt.pl`, `xrays.files.0.key` — which the panel numbers in display order.
  *
- * ponytail: `videos` and `xrays.files` are edited as JSON until #26 and #70
- * give them real controls.
+ * ponytail: `videos` is edited as JSON until #26 gives it real controls.
  */
 type Fields = Record<string, unknown>;
 
 /* Lists of PL/EN pairs, edited as two textareas with one item per line. */
 const LINES = ['suits', 'notFor'];
-const JSON_PATHS = ['videos', 'xrays.files'];
+const JSON_PATHS = ['videos'];
 
 export function toFields(horse: object): Fields {
   const out: Fields = {};
@@ -65,6 +64,11 @@ export function fromFields(fields: Fields): Record<string, any> {
 
   // `photos.0.key` built an object keyed "0", "1"…; integer keys enumerate in order.
   horse.photos = Object.values(horse.photos ?? {});
+  if (horse.xrays?.files) {
+    horse.xrays.files = Object.values(horse.xrays.files);
+    // The label is optional, and two empty halves are no label.
+    for (const file of horse.xrays.files) if (!file.label?.pl && !file.label?.en) delete file.label;
+  }
 
   for (const path of JSON_PATHS) {
     const keys = path.split('.');

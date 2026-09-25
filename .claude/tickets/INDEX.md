@@ -31,6 +31,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.7 admin enquiry inbox     | #22                | done — `/admin` lists `/enquiries`, ticks `handled`           |
 | E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays   |
 | E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
+| E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -242,3 +243,20 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   because E5.1 has not fixed the eight fields yet; Polish labels come once it has. The values
   are anonymous public input and reach the page only as `textContent`. Rows are ordered by
   date only, so a ticked row does not jump away from its checkbox. The contract is noted on #42.
+- X-ray PDFs go from the browser straight to R2 on a SigV4 presigned PUT that the
+  `xrayUpload` Function signs (E2.10). The Function builds the key,
+  `horses/<slug>/xrays/<takenOn>-<rand8>.pdf`, so no key is ever reused under the one-year
+  `immutable` cache, and it signs `Content-Type`, `Cache-Control` and
+  `Content-Disposition: attachment; filename="<slug>-xray-<takenOn>.pdf"`, so the object
+  cannot land without the download header. The uploaded file's own name is never used: it
+  is where an owner's surname tends to sit (#3). SigV4 is `functions/presign.js` on
+  `node:crypto`, tested against AWS's published example, instead of `@aws-sdk/*`. It signs
+  with an R2 API token scoped to the bucket (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`),
+  because `CLOUDFLARE_TOKEN` is a REST bearer token and cannot sign S3. The bucket's CORS
+  rules are `r2.cors.json`, applied by hand. The panel reads every key back with a `HEAD`
+  on the public host before the row exists. A removed file goes on Save, not on click: Save
+  deletes and purges (the stored keys plus this session's uploads) minus the kept keys
+  through `xrayDelete`, then writes the record, so a failed delete changes nothing and a
+  retry counts a 404 as done. Cancel deletes this session's unsaved uploads. The size limit
+  is 100 MiB, checked in the panel and in the Function. The size is the declared one, and
+  R2 does not enforce it, because the only uploader is the admin.
