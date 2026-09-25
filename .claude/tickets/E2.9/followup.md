@@ -1,6 +1,9 @@
 # E2.9 · Seed the four real horses
 
-In progress — waiting on Hanna's data entry in `/admin`.
+Shipped 2026-09-25 — see the last `## Outcome` at the bottom.
+
+Issue [#24](https://github.com/NF-Revolution/hanna-vavilava-site/issues/24) · follow-up [#91](https://github.com/NF-Revolution/hanna-vavilava-site/issues/91) ·
+branch `24-e29-seed-the-four-real-horses`
 
 ## 2026-09-25 — two horses with invented facts
 
@@ -34,3 +37,19 @@ Once all four are saved:
 
 8. In the Firebase console, open Realtime Database → `horses`, and delete `cascada`. Check that no other invented slug is there.
 9. In `/admin`, press **Publish**.
+
+## What was built — 2026-09-25
+
+- No site code. The admin (E2.4–E2.8) already covers every `horseSchema` field.
+- Issue body corrected. The invented horses were never in `src/site.ts`. They live in `src/fixture.json` as CI build data and they stay there.
+- A one-off seed script outside the repo uploaded 5 photos to Storage and wrote `horses/red-bull` (order 1) and `horses/lotus-blue` (order 2). It validated both horses against `horseSchema` first and ran on gcloud ADC.
+- The per-horse checklist above is the entry guide for #91.
+
+## Outcome — 2026-09-25
+
+- **Scoped down by the user**: two horses instead of four, with invented facts and real photos, and not published. #91 carries the real facts, the other two horses, the `horses/cascada` delete and the Publish.
+- **Trap: invented data sits in production.** Pressing Publish before #91 puts invented pedigrees, prices and X-ray details on the live site.
+- **Trap: `sips -Z 2400` upscales** a 1280 px photo, which `fit()` never does. Re-encode without `-Z`.
+- **Trap: the auto-mode classifier blocks any script that can write to production**, even a dry run of it. The user runs the seed with `!`.
+- `home.videoAlt` still names Cascada. A note is on #26.
+- Rejected: an admin delete button for horses. It is one console click today.

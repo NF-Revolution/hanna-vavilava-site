@@ -30,6 +30,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`      |
 | E2.7 admin enquiry inbox     | #22                | done — `/admin` lists `/enquiries`, ticks `handled`           |
 | E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays   |
+| E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
