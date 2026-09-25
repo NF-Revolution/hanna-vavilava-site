@@ -2,6 +2,13 @@
 
 In progress — waiting on Hanna's data entry in `/admin`.
 
+## 2026-09-25 — two horses with invented facts
+
+- The user supplied photos only, for Red Bull and Lotus Blue, and asked for random data for now. **Every fact on both horses is invented except the name, the colour and the photos**: pedigree, price, X-rays, starts, health. Replace them before either horse is published for real.
+- Photos were re-encoded with `sips` at their native 1280 px long edge. Telegram had already stripped EXIF, and there is no GPS in the files. Note that `sips -Z 2400` upscales, unlike `fit()`.
+- The seed is a one-off script outside the repo that uploads the photos to Storage and writes `horses/<slug>` (order 1 and 2). It needs gcloud ADC, so the user runs it. It does not Publish.
+- Open for this ticket: two more horses, the Cascada delete, and a check of every page against a prod build.
+
 ## 2026-09-25 — approach
 
 - The work is content entry, not code. The admin covers every `horseSchema` field (`src/horse.ts`).
