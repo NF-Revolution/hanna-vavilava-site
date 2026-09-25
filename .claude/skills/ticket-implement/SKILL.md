@@ -9,7 +9,9 @@ description: >
   a ticket or issue — "implement #16", "let's do E2.1", "pick up the next ticket",
   "continue #17", "work on the database rules ticket", "start the horses page ticket",
   or a bare ticket reference with an instruction to build it. Also use when resuming
-  work on a branch that was created from an issue. This skill owns reading the issue's
+  work on a branch that was created from an issue, and when the user asks to run one or
+  more tickets in parallel, in the background or in a worktree — "run #24 and #31 in
+  parallel", "start E2.9 in the background". This skill owns reading the issue's
   full history, the branch and pull-request mechanics, and what gets written back to
   the ticket.
 ---
@@ -18,6 +20,20 @@ description: >
 
 Repo: `NF-Revolution/hanna-vavilava-site`. Every ticket gets a branch and a pull request.
 The issue — body plus comments — is the source of truth, not memory and not the plan file.
+
+## 0. In parallel
+
+Asked to run tickets in parallel or in the background → build nothing in this session.
+For each ticket, read its code from `gh issue view <N> --json title` (`E2.9` → worktree
+`e2-9`) and launch one background session:
+
+    claude --bg -w <worktree> --permission-mode plan "/ticket-implement #<N>"
+
+Return one line per ticket — code, session id — and point at `claude agents` and
+`claude attach <id>`. Each session checks its own blockers (§3).
+
+A session started in plan mode does §1–§3 and the board read, then presents the approach
+for approval. The branch (§4) and the approach comment (§5) come right after approval.
 
 ## 1. Resolve which issue
 
