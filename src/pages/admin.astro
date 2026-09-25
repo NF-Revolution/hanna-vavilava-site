@@ -12,7 +12,9 @@
  * stripped of EXIF by `photo.ts`, and join the form as rows of fields.
  * Publish (E2.6) calls the `publish` Function in `functions/` and watches the
  * deploy it starts. The enquiry inbox (E2.7) lists `/enquiries` live, newest
- * first, and ticks them handled.
+ * first, and ticks them handled. X-ray PDFs (E2.10) go straight to R2 on a
+ * presigned PUT from the `xrayUpload` Function, byte for byte, once a tick says
+ * page 1 names no private owner; Save deletes the ones the form let go.
  *
  * ponytail: Polish only — one user. The strings exist in en.json too, so an
  * English panel is swapping the locale below if Hanna ever wants one.
@@ -28,8 +30,8 @@ const a = dict.admin;
 const f = a.fields as Record<string, string>;
 const o = a.options as Record<string, string>;
 
-/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, or a select. */
-type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | string[];
+/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, X-ray files, or a select. */
+type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | 'xrays' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
 const sections: [legend: string, fields: Field[]][] = [
@@ -76,7 +78,7 @@ const sections: [legend: string, fields: Field[]][] = [
       ['xrays.count', 'number'],
       ['xrays.takenOn', 'date'],
       ['xrays.scope', 'pair'],
-      ['xrays.files', 'json'],
+      ['xrays.files', 'xrays'],
     ],
   ],
   [
@@ -211,6 +213,28 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
                     <p id="photo-status" role="status"></p>
                     <ol id="photos"></ol>
                   </fieldset>
+                ) : kind === 'xrays' ? (
+                  <fieldset>
+                    <legend>
+                      {f[path]} <small>{a.xrayHint}</small>
+                    </legend>
+                    <label class="confirm">
+                      <input id="xray-confirm" type="checkbox" />
+                      {a.xrayConfirm}
+                    </label>
+                    <label class="drop">
+                      {a.xrayDrop}
+                      <input
+                        id="xray-input"
+                        type="file"
+                        accept="application/pdf"
+                        multiple
+                        disabled
+                      />
+                    </label>
+                    <p id="xray-status" role="status"></p>
+                    <ol id="xrays"></ol>
+                  </fieldset>
                 ) : kind === 'json' ? (
                   <label>
                     {f[path]}
@@ -313,6 +337,28 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             </button>
           </li>
         </template>
+
+        <template id="xray-row">
+          <li>
+            <a data-link>PDF</a>
+            <input type="hidden" data-field="key" />
+            <input type="number" hidden data-field="bytes" />
+            <fieldset class="pair">
+              <legend data-legend></legend>
+              <label>
+                {a.xrayLabel} · PL
+                <input type="text" data-field="label.pl" />
+              </label>
+              <label>
+                {a.xrayLabel} · EN
+                <input type="text" data-field="label.en" lang="en" />
+              </label>
+            </fieldset>
+            <button type="button" data-remove>
+              {a.remove.replace(': {name}', '')}
+            </button>
+          </li>
+        </template>
       </section>
     </main>
   </body>
@@ -334,13 +380,14 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   import { horseSchema } from '../horse';
   import { fromFields, toFields } from '../horse-form';
   import { admin } from '../i18n/pl.json';
-  import { media } from '../media';
+  import { media, xrayMaxBytes } from '../media';
   import { downscale, photoKey } from '../photo';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
   const storage = getStorage(app);
+  const functions = getFunctions(app, 'europe-central2');
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
   const form = $<HTMLFormElement>('sign-in');
@@ -362,6 +409,11 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   const photoRow = $<HTMLTemplateElement>('photo-row');
   const photoStatus = $('photo-status');
   const photoInput = $<HTMLInputElement>('photo-input');
+  const xrayList = $('xrays');
+  const xrayRow = $<HTMLTemplateElement>('xray-row');
+  const xrayStatus = $('xray-status');
+  const xrayInput = $<HTMLInputElement>('xray-input');
+  const xrayConfirm = $<HTMLInputElement>('xray-confirm');
 
   const show = (view: HTMLElement | null) => {
     for (const el of [form, noAccess, shell]) el.hidden = el !== view;
@@ -509,6 +561,110 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     upload(event.dataTransfer?.files);
   });
 
+  /*
+   * X-ray PDFs (E2.10). The Function builds the key and signs the headers, so the
+   * object cannot land without `Content-Disposition: attachment`; the panel only
+   * sends the bytes, then reads the key back through the public host once.
+   */
+  const xrayUpload = httpsCallable<
+    { slug: string; takenOn: string; bytes: number },
+    { key: string; url: string; headers: Record<string, string> }
+  >(functions, 'xrayUpload');
+  const xrayDelete = httpsCallable<{ keys: string[] }, void>(functions, 'xrayDelete');
+  /* Keys uploaded since the editor opened. Save deletes any the form no longer holds. */
+  let uploaded = new Set<string>();
+
+  // The Realtime Database hands a list back as an object once its keys stop being 0..n-1.
+  const storedXrays = (): { key: string; bytes: number }[] =>
+    Object.values((editing !== null && horses[editing].xrays?.files) || {});
+
+  function numberXrays() {
+    [...xrayList.children].forEach((li, i) => {
+      const name = admin.xrayFile.replace('{n}', String(i + 1));
+      li.querySelector('[data-legend]')!.textContent = name;
+      for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+        el.name = `xrays.files.${i}.${el.dataset.field}`;
+      }
+      li.querySelector('[data-remove]')!.setAttribute(
+        'aria-label',
+        admin.remove.replace('{name}', name),
+      );
+    });
+  }
+
+  function addXray(file: { key: string; bytes: number }) {
+    const li = xrayRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+    const link = li.querySelector('a')!;
+    link.href = `${media.base}/${file.key}`;
+    link.textContent = `PDF · ${(file.bytes / 1024 ** 2).toFixed(1)} MB`;
+    for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+      el.value = el.dataset.field!.split('.').reduce((v: any, k) => v?.[k], file) ?? '';
+    }
+    // Undone by Cancel; the object goes only when Save writes the horse without it.
+    li.querySelector<HTMLButtonElement>('[data-remove]')!.onclick = () => {
+      li.remove();
+      numberXrays();
+      xrayConfirm.focus();
+    };
+    xrayList.append(li);
+    numberXrays();
+  }
+
+  async function uploadXrays(files: FileList | null) {
+    if (!files?.length) return;
+    // The exam date is in the download's filename, so it comes first.
+    const takenOn = (editor.elements.namedItem('xrays.takenOn') as HTMLInputElement).value;
+    if (!slugInput.value || !slugInput.checkValidity() || !takenOn) {
+      xrayStatus.textContent = admin.xrayNeedDate;
+      xrayInput.value = '';
+      return;
+    }
+    const slug = slugInput.value;
+    let done = 0;
+    const failed: string[] = [];
+    for (const file of files) {
+      if (file.type !== 'application/pdf') {
+        failed.push(admin.xrayNotPdf.replace('{name}', file.name));
+        continue;
+      }
+      if (file.size > xrayMaxBytes) {
+        failed.push(admin.xrayTooBig.replace('{name}', file.name));
+        continue;
+      }
+      xrayStatus.textContent = admin.photoUploading.replace('{name}', file.name);
+      try {
+        const { data } = await xrayUpload({ slug, takenOn, bytes: file.size });
+        // Before the PUT, so a half-finished upload is still deleted by Save or Cancel.
+        uploaded.add(data.key);
+        const put = await fetch(data.url, { method: 'PUT', headers: data.headers, body: file });
+        if (!put.ok) throw new Error(`R2 answered ${put.status}`);
+        // The link check skips off-origin hrefs, so this is the only check a dead download meets.
+        const head = await fetch(`${media.base}/${data.key}`, {
+          method: 'HEAD',
+          cache: 'no-store',
+        });
+        if (!head.ok) throw new Error(`${media.base} answered ${head.status}`);
+        addXray({ key: data.key, bytes: file.size });
+        done++;
+      } catch {
+        failed.push(admin.xrayFailed.replace('{name}', file.name));
+      }
+    }
+    xrayStatus.textContent = [
+      done ? admin.xrayDone.replace('{count}', String(done)) : '',
+      ...failed,
+    ]
+      .filter(Boolean)
+      .join(' ');
+    // The tick covered the files just checked, not the next ones.
+    xrayInput.value = '';
+    xrayConfirm.checked = false;
+    xrayInput.disabled = true;
+  }
+
+  xrayConfirm.addEventListener('change', () => (xrayInput.disabled = !xrayConfirm.checked));
+  xrayInput.addEventListener('change', () => uploadXrays(xrayInput.files));
+
   function open(slug: string | null) {
     editing = slug;
     editor.reset();
@@ -516,6 +672,11 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     photoStatus.textContent = '';
     photoList.replaceChildren();
     for (const photo of (slug && horses[slug].photos) || []) addPhoto(photo);
+    uploaded = new Set();
+    xrayStatus.textContent = '';
+    xrayInput.disabled = true;
+    xrayList.replaceChildren();
+    for (const file of storedXrays()) addXray(file);
     slugInput.value = slug ?? '';
     slugInput.readOnly = slug !== null;
     editorTitle.textContent = slug ? (horses[slug].name ?? slug) : admin.newHorse;
@@ -580,8 +741,15 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     )
       return;
 
+    const kept = new Set(result.data.xrays?.files.map((file) => file.key));
+    const gone = [...new Set([...storedXrays().map((file) => file.key), ...uploaded])].filter(
+      (key) => !kept.has(key),
+    );
+
     save.disabled = true;
     try {
+      // Before the write: a failed delete leaves the record as it was, and a retry counts a 404 as done.
+      if (gone.length) await xrayDelete({ keys: gone });
       // Through JSON: the Realtime Database rejects `undefined` anywhere in a write.
       await set(ref(db, `horses/${slug}`), JSON.parse(JSON.stringify(result.data)));
       close();
@@ -598,10 +766,7 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
    */
   const publishButton = $<HTMLButtonElement>('publish');
   const publishStatus = $('publish-status');
-  const publishCall = httpsCallable<void, { at: number }>(
-    getFunctions(app, 'europe-central2'),
-    'publish',
-  );
+  const publishCall = httpsCallable<void, { at: number }>(functions, 'publish');
   // ponytail: the unauthenticated Actions API — 60 requests an hour per IP, and the repo
   // must stay public. A second callable reading runs with the PAT is the upgrade.
   const runs =
@@ -697,7 +862,14 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   }
 
   $('add').addEventListener('click', () => open(null));
-  $('cancel').addEventListener('click', close);
+  $('cancel').addEventListener('click', () => {
+    // Uploaded and never saved: nothing links to it, so it goes now.
+    // ponytail: a failure here leaves an unlinked object nobody can reach from the panel.
+    const stored = new Set(storedXrays().map((file) => file.key));
+    const orphans = [...uploaded].filter((key) => !stored.has(key));
+    if (orphans.length) xrayDelete({ keys: orphans }).catch(() => {});
+    close();
+  });
 
   onAuthStateChanged(auth, async (user) => {
     unsubscribe?.();
@@ -820,11 +992,16 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     padding: 0.5rem;
     resize: vertical;
   }
+  .confirm {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
   .drop {
     padding: 1.5rem;
     border: 1px dashed var(--rule-field);
   }
-  #photos li {
+  #photos li,
+  #xrays li {
     align-items: start;
     gap: 1rem;
     padding-bottom: 1rem;
@@ -833,7 +1010,8 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
     object-fit: cover;
     background: var(--rule);
   }
-  #photos .pair {
+  #photos .pair,
+  #xrays .pair {
     flex: 1 1 20rem;
   }
   .code {

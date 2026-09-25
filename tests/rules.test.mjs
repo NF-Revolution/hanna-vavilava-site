@@ -95,18 +95,19 @@ test('admin uploads a photo, anyone reads it, nobody deletes it', async () => {
 });
 
 /*
- * The Publish Function (E2.6) refuses anyone without the admin claim, before it
- * stamps the date. The admin path needs a real GitHub token and is not run here.
+ * The Functions refuse anyone without the admin claim, before they write or sign
+ * anything. The admin paths need real GitHub and R2 credentials and are not run here.
  */
-const publish = (auth) =>
-  fetch('http://127.0.0.1:5001/demo-hv/europe-central2/publish', {
+const callFn = (name, auth, data = null) =>
+  fetch(`http://127.0.0.1:5001/demo-hv/europe-central2/${name}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(auth && { Authorization: `Bearer ${auth}` }),
     },
-    body: JSON.stringify({ data: null }),
+    body: JSON.stringify({ data }),
   }).then((r) => r.status);
+const publish = (auth) => callFn('publish', auth);
 
 test('Publish refuses anonymous and non-admin callers and stamps nothing', async () => {
   assert.equal(await publish(null), 403);
@@ -116,4 +117,14 @@ test('Publish refuses anonymous and non-admin callers and stamps nothing', async
     { headers: { Authorization: 'Bearer owner' } },
   ).then((r) => r.json());
   assert.equal(updated, null);
+});
+
+test('X-ray upload and delete refuse non-admins, an oversize file and a key outside X-rays', async () => {
+  const upload = { slug: 'cascada', takenOn: '2026-03-04', bytes: 1 };
+  assert.equal(await callFn('xrayUpload', null, upload), 403);
+  assert.equal(await callFn('xrayUpload', user, upload), 403);
+  assert.equal(await callFn('xrayUpload', admin, { ...upload, bytes: 100 * 1024 * 1024 + 1 }), 400);
+  assert.equal(await callFn('xrayUpload', admin, { ...upload, slug: '../videos' }), 400);
+  assert.equal(await callFn('xrayDelete', user, { keys: ['cascada/sales-1a2b3c4d.mp4'] }), 403);
+  assert.equal(await callFn('xrayDelete', admin, { keys: ['cascada/sales-1a2b3c4d.mp4'] }), 400);
 });

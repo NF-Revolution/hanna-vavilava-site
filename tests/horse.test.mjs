@@ -85,6 +85,21 @@ test('the admin form round-trips a horse, status, order and photos included', ()
   assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
 });
 
+test('the admin form round-trips X-ray files, and an empty label is no label', () => {
+  const files = [
+    { key: 'horses/cascada/xrays/2026-03-04-1a2b3c4d.pdf', bytes: 24_000_000, label: t('przód') },
+    { key: 'horses/cascada/xrays/2026-03-04-5e6f7a8b.pdf', bytes: 1 },
+  ];
+  const horse = horseSchema.parse({ ...cascada, xrays: { ...cascada.xrays, files } });
+  assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
+  const fields = {
+    ...toFields(horse),
+    'xrays.files.1.label.pl': '',
+    'xrays.files.1.label.en': '',
+  };
+  assert.deepEqual(horseSchema.parse(fromFields(fields)).xrays?.files, files);
+});
+
 test('a blank price and a blank X-ray block are null, as the form leaves them', () => {
   const fields = {
     ...toFields(horseSchema.parse(cascada)),
@@ -93,7 +108,6 @@ test('a blank price and a blank X-ray block are null, as the form leaves them', 
     'xrays.takenOn': '',
     'xrays.scope.pl': '',
     'xrays.scope.en': '',
-    'xrays.files': '',
   };
   const horse = horseSchema.parse(fromFields(fields));
   assert.equal(horse.price, null);

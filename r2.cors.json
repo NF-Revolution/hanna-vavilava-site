@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://hanna-vavilava-site.web.app",
+          "https://hanna-vavilava-site.firebaseapp.com",
+          "http://localhost:4321"
+        ],
+        "methods": ["PUT", "HEAD"],
+        "headers": ["content-type", "content-disposition", "cache-control"]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
