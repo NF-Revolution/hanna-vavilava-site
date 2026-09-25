@@ -36,6 +36,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, unmounted until E4.5 (#35)            |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code   |
 | E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`  |
+| E3.4 sales video facade      | #28                | done — `Video.astro`, native player, unmounted until E4.5     |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -285,3 +286,12 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   and `src/media.ts`, so the guide cannot promise what the panel refuses. It tells Hanna to get the
   owner-free page 1 from the clinic, because a box drawn over a name in Markup leaves the text in
   the PDF.
+- The sales and round videos play in the browser's own `<video controls preload="none">`, not
+  behind a scripted poster button, and the boards' custom play glyph with "Odtwórz" under it
+  gave way to the native control (E3.4). A button that swaps in `<video autoplay>` costs about
+  250 B, and on the detail page the drawer (364 B) and the gallery (~600 B) already sit near the
+  1 KB public-JS ceiling. `preload="none"` downloads nothing but the poster until play, from the
+  first-party media host, and works with no JS. The poster is `poster=`, one WebP ≤1280 px built
+  into `dist/`: eager and without a srcset, the `ponytail:` cost. Both transcripts are on the page,
+  as two `<details>` with the page's language first, because the boards draw "PL / EN". The
+  heading row and its recording-date meta are E4.5's (#35), and the schema has no field for them yet.

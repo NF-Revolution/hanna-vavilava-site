@@ -4,6 +4,24 @@
     "tagline": "Show Jumping Horses · Poland"
   },
   "gallery": { "preview": "Podgląd zdjęcia", "close": "Zamknij podgląd" },
+  "video": {
+    "sales": "Film sprzedażowy",
+    "round": "Pełny przejazd, bez cięć",
+    "label": "{title} — {duration}",
+    "minutes": {
+      "one": "{count} minuta",
+      "few": "{count} minuty",
+      "many": "{count} minut",
+      "other": "{count} minuty"
+    },
+    "seconds": {
+      "one": "{count} sekunda",
+      "few": "{count} sekundy",
+      "many": "{count} sekund",
+      "other": "{count} sekundy"
+    },
+    "transcript": "Transkrypcja komentarza"
+  },
   "a11y": {
     "skipToContent": "Przejdź do treści",
     "openMenu": "Menu — konie, jak przebiega zakup, o mnie, zapytanie",

@@ -4,6 +4,24 @@
     "tagline": "Show Jumping Horses · Poland"
   },
   "gallery": { "preview": "Photo preview", "close": "Close preview" },
+  "video": {
+    "sales": "Sales video",
+    "round": "Full round, no cuts",
+    "label": "{title} — {duration}",
+    "minutes": {
+      "one": "{count} minute",
+      "few": "{count} minutes",
+      "many": "{count} minutes",
+      "other": "{count} minutes"
+    },
+    "seconds": {
+      "one": "{count} second",
+      "few": "{count} seconds",
+      "many": "{count} seconds",
+      "other": "{count} seconds"
+    },
+    "transcript": "Commentary transcript"
+  },
   "a11y": {
     "skipToContent": "Skip to content",
     "openMenu": "Menu — horses, how buying works, about, enquiry",
