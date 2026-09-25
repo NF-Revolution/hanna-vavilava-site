@@ -1,0 +1,722 @@
+---
+/*
+ * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, facts,
+ * suitability, health, viewing and the other horses. E4.5 (#35) adds the two
+ * videos and the gallery at the marked places.
+ *
+ * A sold horse keeps its URL for good, because WhatsApp links circulate for
+ * years (E2.8). Its page is the trimmed state on `HorseDetailSold` /
+ * `MobileDetailSold`: the hero with the sold label, the dark band to the horses
+ * still for sale, and the other horses. The price, the facts, the health record
+ * and the X-rays belong to the new owner and are not rendered.
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import Photo from './Photo.astro';
+import { t, type Locale } from '../i18n';
+import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { media } from '../media';
+import { site, whatsappHref } from '../site';
+import type { Horse } from '../horse';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+  horse: Horse;
+}
+const { locale, slug, horse } = Astro.props;
+const dict = t(locale);
+const d = dict.detail;
+const sex = dict.pages.horses.sex;
+const sold = horse.status === 'sold' && dict.sold[horse.sex];
+const priceOf = (price: number | null) =>
+  price === null ? dict.pages.horses.onRequest : formatPrice(locale, price);
+const price = priceOf(horse.price);
+const f = horse.facts;
+const url = new URL(path(locale, 'horse', slug), Astro.site).href;
+const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
+
+/* The board's two columns of six, each closed by one of the sale rows (#2, #3). */
+const factColumns = [
+  [
+    [d.rows.pedigree, horse.pedigree],
+    [d.rows.breeding, f.breeding[locale]],
+    [d.rows.trainingLevel, f.trainingLevel[locale]],
+    [d.rows.level, `${horse.levelCm} cm`],
+    [d.rows.lastStart, f.lastStart[locale]],
+    [d.rows.starts, f.starts[locale]],
+    [d.rows.price, price],
+  ],
+  [
+    [d.rows.technique, f.technique[locale]],
+    [d.rows.rideability, f.rideability[locale]],
+    [d.rows.temperament, f.temperament[locale]],
+    [d.rows.handling, f.handling[locale]],
+    [d.rows.location, f.location[locale]],
+    [d.rows.documents, f.documents[locale]],
+    [d.rows.sale, d.saleKind[horse.seller]],
+  ],
+];
+
+const xrays = horse.xrays;
+const xrayDate = xrays && formatDate(locale, xrays.takenOn);
+
+/*
+ * ponytail: three, as the row is drawn, in the editor's order. A sold horse is
+ * never listed (#23). An "all horses" link if the stable ever outgrows a row.
+ */
+const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
+---
+
+<Page
+  locale={locale}
+  routeKey="horse"
+  slug={slug}
+  title={`${horse.name} — ${dict.brand.name}`}
+  description={dict.pages.horses.description}
+  headerLinks={['horses', 'enquiry']}
+  header="overlay"
+>
+  <section class="hero">
+    {horse.photos[0] && (
+      <Photo photo={horse.photos[0]} locale={locale} sizes="100vw" hero class="hero-img" />
+    )}
+    <div class="hero-text">
+      <div class="hero-id">
+        <h1 class="hero-name">{horse.name}</h1>
+        <p class="meta hero-meta">
+          {[
+            horse.born,
+            `${horse.heightCm} cm`,
+            sex[horse.sex],
+            horse.breed,
+            `${horse.levelCm} cm`,
+          ].join(' · ')}
+        </p>
+      </div>
+      {sold ? (
+        <p class="hero-price">{sold}</p>
+      ) : (
+        <div class="hero-offer fade-late">
+          <p class="num hero-price">{price}</p>
+          <a class="lbl hero-cta" href={cta}>
+            {fill(d.cta[horse.sex], { name: horse.name })}
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <SubBar>
+    <p slot="label" class="lbl crumb">
+      <a href={path(locale, 'horses')}>{dict.nav.horses}</a>
+      <span aria-hidden="true">/</span>
+      {horse.name}
+    </p>
+    <p class="meta num subbar-meta">{sold || price}</p>
+  </SubBar>
+
+  {sold ? (
+    <section class="sold">
+      <h2 class="lbl sold-label">{sold}</h2>
+      <p class="sold-line">{fill(dict.sold.line, { name: horse.name })}</p>
+      <a class="lbl num sold-link" href={path(locale, 'horses')}>
+        {fill(dict.sold.link, { count: site.horsesAvailable })}
+        <span aria-hidden="true">&#8594;</span>
+      </a>
+    </section>
+  ) : (
+    <>
+      <!-- E4.5 (#35) — the sales video. -->
+      <section class="band">
+        <h2 class="lbl head">{d.facts}</h2>
+        <div class="cols">
+          {factColumns.map((rows) => (
+            <dl class="rows">
+              {rows.map(([label, value]) => (
+                <div>
+                  <dt class="lbl">{label}</dt>
+                  <dd class="num">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          ))}
+        </div>
+      </section>
+      <!-- E4.5 (#35) — the full round, no cuts. -->
+      <section class="band cols">
+        <div class="ruled">
+          <h2 class="lbl head">{d.suits}</h2>
+          <ul class="list">
+            {horse.suits.map((item) => (
+              <li class="copy">{item[locale]}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="ruled">
+          <h2 class="lbl head">{d.notFor}</h2>
+          <ul class="list">
+            {horse.notFor.map((item) => (
+              <li class="copy">{item[locale]}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+      <section class="band">
+        <h2 class="lbl head">{d.health}</h2>
+        <div class="cols">
+          <dl class="rows">
+            <div>
+              <dt class="lbl">{d.rows.vaccinations}</dt>
+              <dd>{horse.health.vaccinations[locale]}</dd>
+            </div>
+            <div>
+              <dt class="lbl">{d.rows.dewormedOn}</dt>
+              <dd class="num">{formatDate(locale, horse.health.dewormedOn)}</dd>
+            </div>
+          </dl>
+          <dl class="rows">
+            {xrays && (
+              <div>
+                <dt class="lbl">{d.rows.xrays}</dt>
+                <dd class="num">
+                  {fill(d.xrays.summary, {
+                    films: plural(locale, d.xrays.films, xrays.count),
+                    date: xrayDate!,
+                    scope: xrays.scope[locale],
+                  })}
+                  {xrays.files.length === 0 ? (
+                    <span class="xray-pending">{d.xrays.pending}</span>
+                  ) : (
+                    xrays.files.map((file) => (
+                      <a
+                        class="lbl xray-link"
+                        href={`${media.base}/${file.key}`}
+                        download
+                        data-event="xray_download"
+                        data-horse={slug}
+                      >
+                        <span aria-hidden="true">&#8595;</span>
+                        <span>
+                          {d.xrays.download}
+                          <span class="visually-hidden">
+                            {' '}
+                            {fill(d.xrays.downloadDate, { date: xrayDate! })}
+                          </span>{' '}
+                          PDF{file.label?.[locale] && ` · ${file.label[locale]}`} ·{' '}
+                          {formatSize(locale, file.bytes)}
+                        </span>
+                      </a>
+                    ))
+                  )}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt class="lbl">{d.rows.knownIssues}</dt>
+              <dd>{horse.health.knownIssues[locale]}</dd>
+            </div>
+          </dl>
+        </div>
+        <p class="copy note">{d.vetNote}</p>
+      </section>
+      <!-- E4.5 (#35) — the gallery. -->
+      <section class="band">
+        <h2 class="lbl head">{d.viewing}</h2>
+        <div class="cols cols-3">
+          {(
+            [
+              [d.rows.lead, horse.viewing.lead],
+              [d.rows.airport, horse.viewing.airport],
+              [d.rows.visitDay, horse.viewing.visitDay],
+            ] as const
+          ).map(([label, value]) => (
+            <div class="ruled">
+              <h3 class="lbl head">{label}</h3>
+              <p class="copy">{value[locale]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <!-- E5.2 (#41) — the enquiry for this horse. -->
+    </>
+  )}
+
+  {others.length > 0 && (
+    <section class="band">
+      <h2 class="lbl head">{d.others}</h2>
+      <ul class="others">
+        {others.map((other) => (
+          <li>
+            <a class="card" href={path(locale, 'horse', other.slug)}>
+              <figure class="thumb">
+                {other.photos[0] && (
+                  <Photo
+                    photo={other.photos[0]}
+                    locale={locale}
+                    sizes="(max-width: 720px) 74px, 33vw"
+                  />
+                )}
+              </figure>
+              <div class="card-text">
+                <h3 class="card-name">{other.name}</h3>
+                <p class="meta card-meta">
+                  {[other.born, `${other.heightCm} cm`, sex[other.sex], `${other.levelCm} cm`].join(
+                    ' · ',
+                  )}
+                </p>
+                <p class="num card-price">{priceOf(other.price)}</p>
+              </div>
+              <span class="card-arrow" aria-hidden="true">
+                &#8594;
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Page>
+
+<style>
+  /* ---- Hero: the header floats on it, the text sits on a scrim ---- */
+
+  .hero {
+    position: relative;
+    height: min(900px, 100svh);
+    min-height: 560px;
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    overflow: hidden;
+  }
+
+  .hero :global(picture),
+  .hero :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /*
+   * The boards draw no scrim; the homepage decision applies (E1.10). --ink-inv
+   * needs --scrim under it on a white frame, so the gradient is solid for the
+   * full height of the text and only fades above it.
+   */
+  .hero-text {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 60px;
+    padding: 160px var(--gutter) 56px;
+    background: linear-gradient(0deg, var(--scrim) 0, var(--scrim) calc(100% - 120px), transparent);
+  }
+
+  .hero-text p {
+    margin: 0;
+  }
+
+  .hero-name {
+    margin: 0 0 18px;
+    font-size: 62px;
+    font-weight: inherit;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .hero-offer {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+
+  .hero-price {
+    font-size: 30px;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    padding: 19px 36px;
+    box-sizing: border-box;
+    background: var(--ink-inv);
+    color: var(--ground-dark);
+  }
+
+  .crumb {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--ink-muted);
+  }
+
+  .subbar-meta {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Sections ---- */
+
+  .band {
+    padding: 80px var(--gutter);
+  }
+
+  .band + .band {
+    padding-top: 0;
+  }
+
+  .head {
+    margin: 0 0 32px;
+    font-weight: inherit;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 80px;
+  }
+
+  .cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 60px;
+  }
+
+  .ruled {
+    border-top: 1px solid var(--ink);
+    padding-top: 28px;
+  }
+
+  .ruled p {
+    margin: 0;
+  }
+
+  .rows {
+    margin: 0;
+  }
+
+  .rows > div {
+    display: flex;
+    gap: 28px;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .rows > div:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rows dt {
+    width: 200px;
+    flex-shrink: 0;
+    padding-top: 3px;
+    color: var(--ink-muted);
+  }
+
+  .rows dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .xray-pending {
+    display: block;
+    margin-top: 12px;
+    color: var(--ink-muted);
+  }
+
+  .xray-link {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--tap);
+    box-sizing: border-box;
+    margin-top: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .note {
+    margin: 32px 0 0;
+    max-width: 720px;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Other horses: cards at 1440, rows at 390 ---- */
+
+  .others {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .thumb {
+    margin: 0;
+    height: 300px;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+
+  .thumb :global(picture),
+  .thumb :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .card-text > * {
+    margin: 0;
+  }
+
+  .card-name {
+    font-size: 20px;
+    font-weight: inherit;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .card-meta {
+    color: var(--ink-muted);
+  }
+
+  .card-price {
+    font-size: 16px;
+  }
+
+  .card-arrow {
+    display: none;
+  }
+
+  /* ---- Sold: the page's one inverted band ---- */
+
+  .sold {
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    padding: 84px var(--gutter) 90px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 60px;
+  }
+
+  .sold + .band {
+    padding-top: 80px;
+  }
+
+  .sold-label {
+    flex-basis: 100%;
+    margin: 0;
+    font-weight: inherit;
+    color: var(--ink-inv-muted);
+  }
+
+  .sold-line {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+  }
+
+  .sold-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 44px;
+    padding: 19px 36px;
+    box-sizing: border-box;
+    background: var(--ink-inv);
+    color: var(--ground-dark);
+  }
+
+  @media (max-width: 720px) {
+    .hero {
+      height: min(844px, 100svh);
+      min-height: 520px;
+    }
+
+    .hero-text {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+      padding: 120px var(--gutter-mobile) 24px;
+    }
+
+    .hero-name {
+      margin-bottom: 12px;
+      font-size: 38px;
+    }
+
+    .hero-meta {
+      font-size: 10px;
+    }
+
+    .hero-offer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .hero-price {
+      font-size: 24px;
+    }
+
+    .band {
+      padding: 28px var(--gutter-mobile);
+    }
+
+    .band + .band {
+      padding-top: 0;
+    }
+
+    .head {
+      margin-bottom: 12px;
+    }
+
+    .cols,
+    .cols-3 {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+
+    /* Stacked, the two fact columns read as one table. */
+    .cols:has(> .rows) {
+      gap: 0;
+    }
+
+    .cols > .rows:first-child > div:last-child {
+      border-bottom: 0;
+    }
+
+    .ruled {
+      padding-top: 18px;
+    }
+
+    .rows > div {
+      flex-direction: column;
+      gap: 7px;
+      padding: 15px 0;
+    }
+
+    .rows dt {
+      width: auto;
+      padding-top: 0;
+    }
+
+    .rows dd {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .list {
+      gap: 11px;
+    }
+
+    .others {
+      display: block;
+    }
+
+    .card {
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .thumb {
+      flex: 0 0 74px;
+      height: 56px;
+    }
+
+    /* Meta and price share one line under the name, as MobileDetail draws it. */
+    .card-text {
+      flex-grow: 1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px 0.6em;
+      font-size: 10px;
+      color: var(--ink-muted);
+    }
+
+    .card-name {
+      flex-basis: 100%;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .card-meta,
+    .card-price {
+      font-size: inherit;
+    }
+
+    .card-price::before {
+      content: '· ';
+    }
+
+    .card-arrow {
+      display: block;
+      font-size: 11px;
+    }
+
+    .sold {
+      padding: 30px var(--gutter-mobile) 34px;
+    }
+
+    .sold + .band {
+      padding-top: 28px;
+    }
+
+    .sold-line {
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .sold-link {
+      flex-basis: 100%;
+      min-height: 52px;
+      padding: 0;
+    }
+  }
+</style>

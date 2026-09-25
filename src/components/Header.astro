@@ -14,9 +14,16 @@ interface Props {
   locale: Locale;
   variant?: 'page' | 'overlay';
   links?: RouteKey[];
+  /* The status line rides only on the homepage overlay; the detail hero draws none. */
+  status?: boolean;
 }
 
-const { locale, variant = 'page', links = ['horses', 'enquiry'] } = Astro.props;
+const {
+  locale,
+  variant = 'page',
+  links = ['horses', 'enquiry'],
+  status: showStatus = variant === 'overlay',
+} = Astro.props;
 const dict = t(locale);
 
 const status = [
@@ -39,7 +46,7 @@ const SEP = '  |  ';
       <span class="wordmark-name">{dict.brand.name}</span>
       <span class="lbl wordmark-tagline">{dict.brand.tagline}</span>
     </a>
-    {variant === 'overlay' && (
+    {showStatus && (
       <p class="meta status">
         {status.slice(0, 2).join(SEP)}
         <span class="status-sep">{SEP}</span>

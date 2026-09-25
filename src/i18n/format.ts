@@ -33,3 +33,12 @@ export function formatPrice(locale: Locale, eur: number): string {
     maximumFractionDigits: 0,
   }).format(eur);
 }
+
+/* "24 MB" — decimal megabytes, as the owner's file manager shows the same PDF. */
+export function formatSize(locale: Locale, bytes: number): string {
+  return new Intl.NumberFormat(htmlLang[locale], {
+    style: 'unit',
+    unit: 'megabyte',
+    maximumSignificantDigits: 2,
+  }).format(bytes / 1e6);
+}

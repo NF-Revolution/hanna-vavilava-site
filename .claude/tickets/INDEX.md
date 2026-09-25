@@ -39,6 +39,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.4 sales video facade      | #28                | done — `Video.astro`, native player, unmounted until E4.5     |
 | E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                    |
 | E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24   |
+| E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -308,3 +309,19 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   `32 000 EUR`; the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
   an empty stable renders "· 00" and no entries, a state no board draws; and each "Karta konia"
   link carries the horse's name, visually hidden, so a screen reader can tell them apart.
+- The horse detail page is one component, `HorseDetail.astro`, for both locales and both states
+  (E4.4). The price and the sale kind are fact rows: "Cena" closes the left column and
+  "Sprzedaż" the right one, so each column has seven rows. `HorseDetail` and `MobileDetail`
+  gained both rows (canvas v26). The X-ray link reads "Pobierz PDF · 24 MB" as #71 drew it. The
+  exam date sits in a visually hidden span inside the link rather than in an `aria-label`, so the
+  visible words stay part of the accessible name. The link carries
+  `data-event="xray_download" data-horse`, like the homepage's `home_*` hooks, and #55 wires
+  them. The other-horses row is `site.horsesListed` minus this horse, capped at the three the
+  board draws. Five deliberate deviations. The hero has a `--scrim` under its text, which the
+  boards do not draw; the homepage reasoning applies to a photo too. The CTA reads "Zapytaj o
+  klacz Cascada" / "Zapytaj o wałacha …", because the accusative of an arbitrary name cannot be
+  derived, and the boards now say so. The sub-bar's right side shows only the price: the board's
+  "Ostatni start 6.09.2026" cannot be parsed out of free-text `lastStart`. At 390 the hero keeps
+  the CTA the board moves into a sticky bar, because the bar is #38's and #47's and the page
+  would otherwise have no WhatsApp button but the header icon. The header over the hero is the
+  homepage's `overlay` variant without its status line, so it carries the same top scrim.

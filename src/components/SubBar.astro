@@ -1,7 +1,11 @@
 ---
-/* The 56px band under the header: what this page is, on the left. */
+/*
+ * The 56px band under the header: what this page is, on the left. Without a
+ * `label` the page's h1 lives elsewhere (the horse detail hero) and the left
+ * side is only the `label` slot.
+ */
 interface Props {
-  label: string;
+  label?: string;
 }
 const { label } = Astro.props;
 ---
@@ -9,7 +13,7 @@ const { label } = Astro.props;
 <div class="subbar">
   <div class="subbar-left">
     <!-- The sub-bar label is the page title, so it is the page's one h1. -->
-    <h1 class="lbl subbar-label">{label}</h1>
+    {label && <h1 class="lbl subbar-label">{label}</h1>}
     <slot name="label" />
   </div>
   <div class="subbar-right">
