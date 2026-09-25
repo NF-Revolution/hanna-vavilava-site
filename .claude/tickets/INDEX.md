@@ -35,6 +35,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, unmounted until E4.5 (#35)            |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code   |
+| E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
