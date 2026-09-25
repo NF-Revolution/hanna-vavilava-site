@@ -7,7 +7,8 @@
  * Photos (E2.5) and X-ray files (E2.10) are rows of dotted fields too —
  * `photos.0.alt.pl`, `xrays.files.0.key` — which the panel numbers in display order.
  *
- * ponytail: `videos` is edited as JSON until #26 gives it real controls.
+ * ponytail: `videos` is edited as JSON, pasted from `npm run video` (#26), which
+ * owns the encode and the upload. Give it rows if hand-editing ever gets common.
  */
 type Fields = Record<string, unknown>;
 

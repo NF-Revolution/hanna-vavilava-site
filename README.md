@@ -51,6 +51,12 @@ object carries the long immutable `Cache-Control`, so a key is never overwritten
     npx wrangler@4 r2 object put hanna-vavilava-media/<key> --file <file> --remote \
       --cache-control "public, max-age=31536000, immutable"
 
+Video goes through `scripts/video.mjs`, never the admin panel. It needs ffmpeg. The script
+encodes the clip, cuts the poster, uploads everything this way, and prints the JSON to paste:
+
+    npm run video -- <file> hero                  # homepage loop: MP4 + WebM + poster
+    npm run video -- <file> sales|round <slug>    # a horse's clip: MP4 + poster
+
 A sold horse's X-rays are deleted and purged from the edge by Publish (E2.8). The
 Function's `CLOUDFLARE_TOKEN` secret is a Cloudflare API token with Account · Workers
 R2 Storage · Edit and Zone · Cache Purge on `nfrevolution.com`.
