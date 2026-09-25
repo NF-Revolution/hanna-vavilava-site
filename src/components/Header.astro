@@ -24,6 +24,8 @@ const status = [
   plural(locale, dict.status.horsesAvailable, site.horsesAvailable),
   fill(dict.status.updated, { date: formatDate(locale, site.updated) }),
 ];
+/* Two lines on a phone, as MobileHome draws it: the separator before the date hides. */
+const SEP = '  |  ';
 ---
 
 <header class:list={['head', variant]}>
@@ -37,7 +39,13 @@ const status = [
       <span class="wordmark-name">{dict.brand.name}</span>
       <span class="lbl wordmark-tagline">{dict.brand.tagline}</span>
     </a>
-    {variant === 'overlay' && <p class="meta status">{status.join('  |  ')}</p>}
+    {variant === 'overlay' && (
+      <p class="meta status">
+        {status.slice(0, 2).join(SEP)}
+        <span class="status-sep">{SEP}</span>
+        <span class="status-date">{status[2]}</span>
+      </p>
+    )}
   </div>
 
   <nav class="head-nav" aria-label={dict.a11y.navPrimary}>
@@ -194,6 +202,12 @@ const status = [
       display: block;
       font-size: 9px;
       letter-spacing: 0.14em;
+    }
+    .status-sep {
+      display: none;
+    }
+    .status-date {
+      display: block;
     }
   }
 </style>

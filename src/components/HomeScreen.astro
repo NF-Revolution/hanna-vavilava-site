@@ -188,10 +188,16 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
 </script>
 
 <style>
+  /*
+   * Fixed, not 100dvh: a fixed box's bottom edge follows the visible viewport
+   * on every iOS Safari, where the 100vh fallback before 15.4 is the large
+   * viewport and hides the bottom bar under the toolbar. Nothing scrolls, so
+   * the toolbar never resizes under it.
+   * ponytail: `height: 100dvh` on a relative box if fixed misbehaves on hardware.
+   */
   .screen {
-    position: relative;
-    height: 100vh;
-    height: 100dvh;
+    position: fixed;
+    inset: 0;
     overflow: hidden;
     background: var(--ground-dark);
     color: var(--ink-inv);
@@ -333,22 +339,51 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
   }
 
   @media (max-width: 720px) {
-    .poster-alt,
-    .sound-hint {
+    .poster-alt {
       display: none;
     }
 
+    /* MobileHome stacks two bars: the horse above, the sound below. */
     .edge {
-      padding-inline: var(--gutter-mobile);
-      gap: 12px;
+      flex-direction: column-reverse;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
     }
 
-    .horse-facts {
+    .sound {
+      justify-content: flex-start;
+      min-height: 56px;
+      padding: 0 12px;
+      border-top: 1px solid rgba(242, 241, 237, 0.22);
+    }
+
+    .sound-hint {
+      margin-left: auto;
+    }
+
+    /* No toggle means no bar: an empty 56px strip is worse than none. */
+    .sound[disabled] {
+      display: none;
+    }
+
+    .horse {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      min-height: 52px;
+      padding: 6px var(--gutter-mobile);
+      text-align: center;
+    }
+
+    .horse-arrow {
       display: none;
     }
 
     .enter {
-      bottom: 96px;
+      bottom: 132px;
+      min-height: 48px;
+      padding: 15px 26px;
     }
   }
 </style>

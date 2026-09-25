@@ -140,7 +140,7 @@
     },
     "sound": "Turn sound on",
     "soundOff": "Turn sound off",
-    "soundHint": "Hoofbeat, breath, pole",
+    "soundHint": "Hoofbeats, breathing, the rail",
     "videoSpec": "Video · 100vh · 8 s loop · muted · no captions over the frame",
     "videoSpecDetail": "Poster < 120 kb · file < 2.5 MB · still image under prefers-reduced-motion",
     "videoAlt": "ALT: the mare Cascada jumps a 125 cm oxer, side view in an indoor arena — clicking the frame leads to the horses"
