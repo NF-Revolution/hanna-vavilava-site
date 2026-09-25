@@ -3,6 +3,7 @@
     "name": "Hanna Vavilava",
     "tagline": "Show Jumping Horses · Poland"
   },
+  "gallery": { "preview": "Photo preview", "close": "Close preview" },
   "a11y": {
     "skipToContent": "Skip to content",
     "openMenu": "Menu — horses, how buying works, about, enquiry",
