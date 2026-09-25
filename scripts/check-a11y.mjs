@@ -119,6 +119,10 @@ function checkPage(file, failures) {
   }
   for (const [, attrs] of html.matchAll(/<img\b([^>]*)>/g)) {
     if (!/\salt\s*=/.test(attrs)) fail('<img> with no alt');
+    // Not WCAG, but the same kind of slip: no size means layout shift (E3.1).
+    if (!/\swidth\s*=/.test(attrs) || !/\sheight\s*=/.test(attrs)) {
+      fail('<img> with no width and height');
+    }
   }
   for (const [, tag, attrs, inner] of html.matchAll(/<(a|button)\b([^>]*)>([\s\S]*?)<\/\1>/g)) {
     if (text(inner) === '' && !named(attrs) && !/\stitle\s*=\s*"[^"]+"/.test(attrs)) {

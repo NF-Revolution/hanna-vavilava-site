@@ -32,6 +32,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays   |
 | E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
+| E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
