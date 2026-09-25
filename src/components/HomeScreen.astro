@@ -4,8 +4,17 @@
  * underneath. Nothing scrolls. Three ways in — the hamburger, the video
  * itself, and the horse line on the bottom edge.
  *
- * Ticket 3.3 replaces the poster figure with the real gated <video>.
+ * The loop (E3.3) fetches nothing until a script has asked: no `src`, no
+ * `autoplay`, `preload="none"`. The poster is an <img> under an invisible
+ * <video>, not `poster=`, because iOS Low Power Mode refuses even muted autoplay
+ * and draws a play glyph over a video that shows its poster. Reduced motion,
+ * Save-Data, a sub-4g connection and no JavaScript all get the same still.
+ *
+ * ponytail: one landscape rendition, cropped by `object-fit` on a portrait
+ * phone where the board draws 9:16. A second encode behind
+ * <source media="(orientation: portrait)"> if the crop loses the horse.
  */
+import { Picture, inferRemoteSize } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
 import MenuDrawer from './MenuDrawer.astro';
@@ -13,6 +22,7 @@ import { t, type Locale } from '../i18n';
 import { path } from '../i18n/routes';
 import { formatPrice, plural } from '../i18n/format';
 import { site } from '../site';
+import { hero, media } from '../media';
 
 interface Props {
   locale: Locale;
@@ -34,6 +44,9 @@ const horseFacts =
   ]
     .filter((part) => part !== null)
     .join(' · ');
+
+const posterSrc = hero && `${media.base}/${hero.posterKey}`;
+const poster = posterSrc && (await inferRemoteSize(posterSrc));
 ---
 
 <Base
@@ -62,14 +75,35 @@ const horseFacts =
       aria-label={dict.nav.horses}
       data-event="home_frame"
     >
-      <figure class="poster">
-        <!-- PLACEHOLDER: poster frame and video asset, ticket 3.2. -->
-        <div class="poster-spec">
-          <span class="lbl">{dict.home.videoSpec}</span>
-          <span class="lbl poster-spec-faint">{dict.home.videoSpecDetail}</span>
-        </div>
-        <figcaption class="lbl poster-alt">{dict.home.videoAlt}</figcaption>
-      </figure>
+      {hero && posterSrc && poster ? (
+        <>
+          <Picture
+            src={posterSrc}
+            width={poster.width}
+            height={poster.height}
+            widths={[...[640, 960, 1280, 1920].filter((w) => w < poster.width), poster.width]}
+            sizes="100vw"
+            formats={['avif', 'webp']}
+            fallbackFormat="jpg"
+            alt=""
+            loading="eager"
+            fetchpriority="high"
+          />
+          <video class="loop" muted loop playsinline preload="none" aria-hidden="true">
+            <source data-src={`${media.base}/${hero.webmKey}`} type="video/webm" />
+            <source data-src={`${media.base}/${hero.mp4Key}`} type="video/mp4" />
+          </video>
+        </>
+      ) : (
+        <figure class="poster">
+          <!-- PLACEHOLDER: poster frame and video asset, ticket 3.2. -->
+          <div class="poster-spec">
+            <span class="lbl">{dict.home.videoSpec}</span>
+            <span class="lbl poster-spec-faint">{dict.home.videoSpecDetail}</span>
+          </div>
+          <figcaption class="lbl poster-alt">{dict.home.videoAlt}</figcaption>
+        </figure>
+      )}
     </a>
 
     <a class="enter fade-late" href={path(locale, 'horses')} data-event="home_enter">
@@ -80,7 +114,7 @@ const horseFacts =
     </a>
 
     <div class="edge">
-      <!-- Sound is off by default; ticket 3.3 wires this to the real element. -->
+      <!-- Hidden until the loop plays: there is nothing to unmute before that. -->
       <button type="button" class="sound" disabled>
         <svg
           width="17"
@@ -95,7 +129,8 @@ const horseFacts =
           <path d="M15.8 9.2a4 4 0 0 1 0 5.6"></path>
           <path d="M18.4 6.9a7.4 7.4 0 0 1 0 10.2"></path>
         </svg>
-        <span class="lbl">{dict.home.sound}</span>
+        <span class="lbl sound-on">{dict.home.sound}</span>
+        <span class="lbl sound-off">{dict.home.soundOff}</span>
         <span class="lbl sound-hint">{dict.home.soundHint}</span>
       </button>
 
@@ -118,6 +153,40 @@ const horseFacts =
   <MenuDrawer locale={locale} routeKey="home" />
 </Base>
 
+<script>
+  const video = document.querySelector<HTMLVideoElement>('.loop');
+  const sound = document.querySelector<HTMLButtonElement>('.sound')!;
+  const net = (navigator as { connection?: { saveData?: boolean; effectiveType?: string } })
+    .connection;
+
+  // The gate runs before any `src` exists, so a refusal costs no bytes.
+  // Safari and Firefox expose no `connection`, and pass.
+  if (
+    video &&
+    !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    !net?.saveData &&
+    (net?.effectiveType ?? '4g') === '4g'
+  ) {
+    for (const source of video.querySelectorAll('source')) source.src = source.dataset.src!;
+    video.load();
+    video.addEventListener(
+      'playing',
+      () => {
+        video.classList.add('is-playing');
+        sound.disabled = false;
+      },
+      { once: true },
+    );
+    // Rejected in iOS Low Power Mode: the video stays invisible over the poster.
+    video.play().catch(() => {});
+
+    sound.addEventListener('click', () => {
+      video.muted = !video.muted;
+      sound.toggleAttribute('data-on', !video.muted);
+    });
+  }
+</script>
+
 <style>
   .screen {
     position: relative;
@@ -132,6 +201,25 @@ const horseFacts =
     position: absolute;
     inset: 0;
     display: block;
+  }
+
+  .frame :global(img),
+  .loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+  }
+
+  .loop {
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
+  }
+
+  .loop.is-playing {
+    opacity: 1;
   }
 
   .poster {
@@ -212,9 +300,14 @@ const horseFacts =
     color: inherit;
   }
 
+  /* visibility, not display: the horse line keeps its place on the right. */
   .sound[disabled] {
-    cursor: default;
-    opacity: 0.5;
+    visibility: hidden;
+  }
+
+  .sound[data-on] .sound-on,
+  .sound:not([data-on]) .sound-off {
+    display: none;
   }
 
   .sound-hint {

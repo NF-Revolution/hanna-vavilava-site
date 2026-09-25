@@ -118,7 +118,8 @@ function checkPage(file, failures) {
     if (!named(attrs)) fail('<nav> landmark with no accessible name');
   }
   for (const [, attrs] of html.matchAll(/<img\b([^>]*)>/g)) {
-    if (!/\salt\s*=/.test(attrs)) fail('<img> with no alt');
+    // Astro renders alt="" as a bare `alt`, which HTML reads the same.
+    if (!/\salt(?=[\s=]|$)/.test(attrs)) fail('<img> with no alt');
     // Not WCAG, but the same kind of slip: no size means layout shift (E3.1).
     if (!/\swidth\s*=/.test(attrs) || !/\sheight\s*=/.test(attrs)) {
       fail('<img> with no width and height');

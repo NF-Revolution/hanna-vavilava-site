@@ -13,5 +13,13 @@ export const media = {
   cacheControl: 'public, max-age=31536000, immutable',
 } as const;
 
+/*
+ * The homepage loop (E3.3), pasted from `npm run video -- <file> hero`. A file,
+ * not a database field: whoever can run the encode can edit a line, and either
+ * way it takes a rebuild. `null` draws the placeholder frame.
+ */
+// PLACEHOLDER: no hero footage yet. Rewrite `home.videoAlt` when it lands.
+export const hero: { mp4Key: string; webmKey: string; posterKey: string } | null = null;
+
 /* The X-ray PDF ceiling (E2.10), checked in the panel and again in `functions/`. */
 export const xrayMaxBytes = 100 * 1024 * 1024;

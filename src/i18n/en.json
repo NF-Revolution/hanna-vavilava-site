@@ -121,6 +121,7 @@
       "other": "Enter — {count} horses"
     },
     "sound": "Turn sound on",
+    "soundOff": "Turn sound off",
     "soundHint": "Hoofbeat, breath, pole",
     "videoSpec": "Video · 100vh · 8 s loop · muted · no captions over the frame",
     "videoSpecDetail": "Poster < 120 kb · file < 2.5 MB · still image under prefers-reduced-motion",
