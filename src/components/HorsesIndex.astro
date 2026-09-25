@@ -9,6 +9,7 @@
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import Photo from './Photo.astro';
+import ViewSwitch from './ViewSwitch.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -32,6 +33,7 @@ const imageVw = [61, 61, 61, 70];
       <span aria-hidden="true">·</span>
       {fill(page.asOf, { date: formatDate(locale, site.updated) })}
     </p>
+    <ViewSwitch locale={locale} current="horses" />
   </SubBar>
   <ol class="entries">
     {site.horsesListed.map((horse, i) => (

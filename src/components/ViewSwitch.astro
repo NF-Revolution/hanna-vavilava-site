@@ -1,0 +1,72 @@
+---
+/*
+ * The horses index view switch (E4.3): two links between two static routes, not
+ * a JS toggle, so each view is shareable and crawlable. The current view keeps
+ * its link and says so with `aria-current`.
+ */
+import { t, type Locale } from '../i18n';
+import { path } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  current: 'horses' | 'horsesGrid';
+}
+const { locale, current } = Astro.props;
+const view = t(locale).pages.horses.view;
+const links = [
+  { key: 'horses', label: view.editorial },
+  { key: 'horsesGrid', label: view.grid },
+] as const;
+---
+
+<nav class="switch" aria-label={view.label}>
+  <span class="lbl switch-label" aria-hidden="true">
+    {view.label}
+  </span>
+  {links.map((link) => (
+    <a
+      class="lbl"
+      href={path(locale, link.key)}
+      aria-current={link.key === current ? 'page' : undefined}
+    >
+      {link.label}
+    </a>
+  ))}
+</nav>
+
+<style>
+  .switch {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .switch-label,
+  .switch a {
+    color: var(--ink-muted);
+  }
+
+  .switch a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  /* An underline, not a border: a border would sit at the foot of the 44px tap box. */
+  .switch a[aria-current='page'] {
+    color: var(--ink);
+    text-decoration: underline 1px;
+    text-underline-offset: 6px;
+  }
+
+  @media (max-width: 720px) {
+    .switch {
+      gap: 14px;
+    }
+
+    /* The 390 boards draw the two links alone. */
+    .switch-label {
+      display: none;
+    }
+  }
+</style>
