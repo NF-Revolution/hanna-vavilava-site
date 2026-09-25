@@ -155,6 +155,7 @@
     "xraysHint": "Empty count = no study.",
     "photoDrop": "Drop photos here or choose files",
     "photoHint": "The first photo is the cover. Downscaled to 2400 px, EXIF and GPS location removed.",
+    "guideLink": "Guide: photos and X-rays",
     "photoNeedSlug": "Enter the horse's address first.",
     "photoUploading": "Uploading: {name}…",
     "photoFailed": "Upload failed: {name}",
