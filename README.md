@@ -45,7 +45,7 @@ Repository settings the workflows expect:
 
 Video, posters and X-ray PDFs live in the Cloudflare R2 bucket `hanna-vavilava-media`,
 served from `https://hv-media.nfrevolution.com` until E8.1. The values sit in
-`site.media` in `src/site.ts`. Uploads need `npx wrangler@4 login` once, and every
+`media` in `src/media.ts`. Uploads need `npx wrangler@4 login` once, and every
 object carries the long immutable `Cache-Control`, so a key is never overwritten:
 
     npx wrangler@4 r2 object put hanna-vavilava-media/<key> --file <file> --remote \
@@ -56,6 +56,9 @@ encodes the clip, cuts the poster, uploads everything this way, and prints the J
 
     npm run video -- <file> hero                  # homepage loop: MP4 + WebM + poster
     npm run video -- <file> sales|round <slug>    # a horse's clip: MP4 + poster
+
+The hero's JSON replaces `hero` in `src/media.ts`, and a rebuild puts it on the homepage.
+A horse's clip goes into its Videos in the admin.
 
 A sold horse's X-rays are deleted and purged from the edge by Publish (E2.8). The
 Function's `CLOUDFLARE_TOKEN` secret is a Cloudflare API token with Account · Workers

@@ -121,6 +121,7 @@
       "other": "Wejdź — {count} konia"
     },
     "sound": "Włącz dźwięk",
+    "soundOff": "Wyłącz dźwięk",
     "soundHint": "Tętent, oddech, drąg",
     "videoSpec": "Wideo · 100vh · pętla 8 s · wyciszone · bez napisów na kadrze",
     "videoSpecDetail": "Poster < 120 kb · plik < 2,5 MB · obraz statyczny przy prefers-reduced-motion",

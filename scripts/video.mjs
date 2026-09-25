@@ -91,8 +91,15 @@ const h264 = [
 ];
 const files = hero
   ? {
-      // A 5 Mbps ceiling keeps an 8 s loop inside the 3-6 MB hero budget, noisy footage too.
-      mp4: ffmpeg([...h264, '-crf', '21', '-maxrate', '5M', '-bufsize', '10M', '-an'], 'hero.mp4'),
+      /*
+       * A 5 Mbps ceiling keeps an 8 s loop inside the 3-6 MB hero budget, noisy footage too.
+       * The audio stays: the homepage sound toggle (#27) unmutes it. Thin, because
+       * it is hoofbeats and breath, not music.
+       */
+      mp4: ffmpeg(
+        [...h264, '-crf', '21', '-maxrate', '5M', '-bufsize', '10M', '-c:a', 'aac', '-b:a', '96k'],
+        'hero.mp4',
+      ),
       // A second encode of an 8-second loop is worth the saving; the clips' is not.
       webm: ffmpeg(
         [
@@ -106,7 +113,10 @@ const files = hero
           '1',
           '-pix_fmt',
           'yuv420p',
-          '-an',
+          '-c:a',
+          'libopus',
+          '-b:a',
+          '64k',
           '-cues_to_front',
           '1',
         ],
@@ -151,12 +161,9 @@ for (const [ext, file] of Object.entries(files)) {
 }
 
 if (hero) {
+  console.error(`Paste this over \`hero\` in src/media.ts (${durationS} s loop):`);
   console.log(
-    JSON.stringify(
-      { mp4Key: keys.mp4, webmKey: keys.webm, posterKey: keys.jpg, durationS },
-      null,
-      2,
-    ),
+    JSON.stringify({ mp4Key: keys.mp4, webmKey: keys.webm, posterKey: keys.jpg }, null, 2),
   );
 } else {
   console.error(`Add this to ${slug}'s Videos in the admin, and fill in the transcript:`);
