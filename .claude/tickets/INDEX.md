@@ -29,6 +29,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required          |
 | E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`      |
 | E2.7 admin enquiry inbox     | #22                | done — `/admin` lists `/enquiries`, ticks `handled`           |
+| E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays   |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -69,7 +70,19 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   contrast, the scrim floors, one `<h1>` per page, named `<nav>` landmarks,
   `alt` on images, `aria-label` on icon-only controls. Regex and arithmetic, no
   dependency — axe-core behind a headless browser is the named upgrade.
-- The artboards have no sold-horse state. Raised in E2.8.
+- A sold horse keeps its URL and gets a trimmed page, drawn as `HorseDetailSold` and
+  `MobileDetailSold` (E2.8). The hero stays, `Sprzedana`/`Sprzedany` by sex takes the
+  price's place, and the dark band links to the horses for sale with their count. Price,
+  X-rays, health, viewing, videos, gallery and the enquiry for that horse are all dropped,
+  because the health record belongs to the new owner just as the X-rays do. Publish
+  deletes a sold horse's X-ray objects through Cloudflare's REST API (the endpoint
+  `wrangler r2 object delete` uses), purges their URLs, and only then removes
+  `xrays/files`. A failure leaves the database alone, so the next Publish retries. The
+  admin editor `confirm()`s before saving a sold horse that still has files. The
+  `CLOUDFLARE_TOKEN` secret carries R2 Edit and Zone Cache Purge. The ids are duplicated in
+  `functions/index.js`, because `functions/` cannot import `src/media.ts`. The index, the
+  detail page, the structured data and the sitemap did not exist yet, so #32, #33, #34, #52
+  and #53 each carry the exclusion line.
 - Video lives on Cloudflare R2, played by a native `<video>` behind the facade —
   not YouTube, not Firebase (E0.1). The homepage hero has to be a local element
   anyway, so an embed would have been a second video system; and R2 is the only

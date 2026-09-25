@@ -58,6 +58,12 @@
     "switchTo": "Polski",
     "current": "English"
   },
+  "sold": {
+    "mare": "Sold",
+    "gelding": "Sold",
+    "line": "{name} has a new home.",
+    "link": "Horses for sale ({count})"
+  },
   "pages": {
     "home": {
       "title": "Hanna Vavilava — show jumping horses for sale, Poland",
@@ -162,6 +168,7 @@
     "publishBuilding": "The site is building…",
     "publishDone": "Published. The site is up to date.",
     "publishFailed": "Publishing failed. Try again.",
+    "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
       "basics": "Basics",
