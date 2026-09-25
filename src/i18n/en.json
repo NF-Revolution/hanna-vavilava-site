@@ -3,7 +3,10 @@
     "name": "Hanna Vavilava",
     "tagline": "Show Jumping Horses · Poland"
   },
-  "gallery": { "preview": "Photo preview", "close": "Close preview" },
+  "gallery": {
+    "preview": "Photo preview",
+    "close": "Close preview"
+  },
   "video": {
     "sales": "Sales video",
     "round": "Full round, no cuts",
@@ -83,6 +86,59 @@
     "line": "{name} has a new home.",
     "link": "Horses for sale ({count})"
   },
+  "detail": {
+    "facts": "Facts",
+    "suits": "Who this horse is for",
+    "notFor": "Who it is not for",
+    "health": "Health and veterinary records",
+    "viewing": "Viewing",
+    "others": "Other horses",
+    "cta": {
+      "mare": "Ask about {name}",
+      "gelding": "Ask about {name}"
+    },
+    "prefill": "Hello, I am writing about {name}: {url}",
+    "rows": {
+      "pedigree": "Pedigree",
+      "breeding": "Breeding",
+      "trainingLevel": "Training level",
+      "level": "Competition level",
+      "lastStart": "Last start",
+      "starts": "Starts",
+      "price": "Price",
+      "technique": "Jumping technique",
+      "rideability": "Rideability",
+      "temperament": "Temperament",
+      "handling": "Handling",
+      "location": "Location",
+      "documents": "Documents",
+      "sale": "Sale",
+      "vaccinations": "Vaccinations",
+      "dewormedOn": "Deworming",
+      "xrays": "X-rays",
+      "knownIssues": "Known issues",
+      "lead": "Lead time",
+      "airport": "Nearest airport",
+      "visitDay": "On the day"
+    },
+    "saleKind": {
+      "company": "Company sale · VAT invoice",
+      "private": "Private sale · no VAT invoice · 2% PCC paid by the buyer"
+    },
+    "xrays": {
+      "films": {
+        "one": "{count} X-ray",
+        "few": "{count} X-rays",
+        "many": "{count} X-rays",
+        "other": "{count} X-rays"
+      },
+      "summary": "{films} from {date}: {scope}",
+      "pending": "Shared before the visit",
+      "download": "Download",
+      "downloadDate": "X-rays from {date},"
+    },
+    "vetNote": "The pre-purchase exam is done by a vet the buyer chooses, at the buyer's cost, to the scope the buyer sets. The horse is at the stable on the day of the exam."
+  },
   "pages": {
     "home": {
       "title": "Hanna Vavilava — show jumping horses for sale, Poland",
@@ -91,7 +147,7 @@
     },
     "horses": {
       "title": "Horses for sale — Hanna Vavilava",
-      "description": "The current stable: show jumping horses from 110 to 130 cm, with full documentation, uncut footage and X-rays shared before the visit.",
+      "description": "The current stable: show jumping horses from 110 to 130 cm, with full documentation, uncut footage and downloadable X-rays.",
       "label": "All horses",
       "asOf": "Stable as of {date}",
       "more": "Horse profile",
