@@ -178,3 +178,5 @@ from the plan, and any trap the next person would otherwise hit.
 - Two comments per build ticket is the target: one approach, one outcome. Anything else
   belongs in the pull request or in the code. A decision ticket follows the three-comment
   ritual in `ticket`; a canvas ticket follows `artboards`.
+
+   Ultrathink the solution, use caveman mode and ponytail. Remember - if you fail, I'll disable you
