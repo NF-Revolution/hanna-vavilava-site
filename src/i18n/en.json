@@ -96,6 +96,11 @@
       "asOf": "Stable as of {date}",
       "more": "Horse profile",
       "onRequest": "Price on request",
+      "view": {
+        "label": "View",
+        "editorial": "Editorial",
+        "grid": "Grid"
+      },
       "sex": {
         "mare": "mare",
         "gelding": "gelding"
@@ -103,7 +108,7 @@
     },
     "horsesGrid": {
       "title": "Horses for sale, grid — Hanna Vavilava",
-      "description": "The current stable in a grid view — four show jumping horses, price, level and height on one screen.",
+      "description": "The current stable in a grid view — show jumping horses, price, level and height on one screen.",
       "label": "All horses"
     },
     "about": {

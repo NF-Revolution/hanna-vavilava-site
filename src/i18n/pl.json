@@ -96,6 +96,11 @@
       "asOf": "Stan stajni na {date}",
       "more": "Karta konia",
       "onRequest": "Cena na zapytanie",
+      "view": {
+        "label": "Widok",
+        "editorial": "Edytorski",
+        "grid": "Siatka"
+      },
       "sex": {
         "mare": "klacz",
         "gelding": "wałach"
@@ -103,7 +108,7 @@
     },
     "horsesGrid": {
       "title": "Konie na sprzedaż, siatka — Hanna Vavilava",
-      "description": "Aktualny stan stajni w widoku siatki — cztery konie skokowe, cena, poziom i wzrost na jednym ekranie.",
+      "description": "Aktualny stan stajni w widoku siatki — konie skokowe, cena, poziom i wzrost na jednym ekranie.",
       "label": "Wszystkie konie"
     },
     "about": {

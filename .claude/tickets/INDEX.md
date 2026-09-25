@@ -39,6 +39,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.4 sales video facade      | #28                | done — `Video.astro`, native player, unmounted until E4.5     |
 | E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                    |
 | E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24   |
+| E4.3 horses index, grid      | #33                | done — `HorsesGrid.astro`, `ViewSwitch.astro`, 4:3 cards      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -64,6 +65,10 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   is the designer's sign-off the ticket asked for.
 - The grid view is a second static route, not a JS toggle — shareable,
   crawlable, and less code (E4.3).
+- The grid card photo is 4:3, not the 437 × 560 portrait `HorsesGrid` first drew (E4.3).
+  The owner decided it: a standing horse is about 4:3, and a portrait cover-crop cuts off
+  its head and tail, the same trap as E4.2's full-bleed entry. `HorsesGrid` and
+  `MobileHorsesGrid` were redrawn to match.
 - The homepage scrim is an addition — the boards draw none — because text over
   moving video has no guaranteed contrast, and the worst case is a white frame,
   not `--ground-dark`. Two strengths, both computed against white: `--scrim`

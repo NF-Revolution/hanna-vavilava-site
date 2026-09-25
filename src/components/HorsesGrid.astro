@@ -1,0 +1,173 @@
+---
+/*
+ * The horses index, grid view (E4.3), drawn as `HorsesGrid` and `MobileHorsesGrid`:
+ * three columns at 1440, two at 390, each card one link to the horse. The photo is
+ * 4:3, not the boards' first 437 × 560 portrait — a standing horse is about 4:3 and
+ * a portrait crop cuts off its head and tail (#32). A sold horse is not listed (#23).
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import Photo from './Photo.astro';
+import ViewSwitch from './ViewSwitch.astro';
+import { t, type Locale } from '../i18n';
+import { fill, formatDate, formatPrice } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { site } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const page = dict.pages.horsesGrid;
+const horses = dict.pages.horses;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<Page locale={locale} routeKey="horsesGrid" title={page.title} description={page.description}>
+  <SubBar label={`${page.label} · ${pad(site.horsesListed.length)}`}>
+    <p slot="label" class="lbl as-of">
+      <span aria-hidden="true">·</span>
+      {fill(horses.asOf, { date: formatDate(locale, site.updated) })}
+    </p>
+    <ViewSwitch locale={locale} current="horsesGrid" />
+  </SubBar>
+  <ul class="grid">
+    {site.horsesListed.map((horse, i) => (
+      <li>
+        <a class="card" href={path(locale, 'horse', horse.slug)}>
+          <figure class="fig">
+            {horse.photos[0] && (
+              <Photo
+                photo={horse.photos[0]}
+                locale={locale}
+                sizes="(max-width: 720px) 50vw, 33vw"
+                hero={i === 0}
+              />
+            )}
+          </figure>
+          <h2 class="name">{horse.name}</h2>
+          <p class="num price">
+            {horse.price === null ? horses.onRequest : formatPrice(locale, horse.price)}
+          </p>
+          <p class="meta num facts">
+            <span>{`${horse.born} · ${horse.heightCm} cm`}</span>
+            <span class="sep">{' · '}</span>
+            <span class="facts-rest">
+              {horses.sex[horse.sex]}
+              <span class="breed">{` · ${horse.breed}`}</span>
+              {` · ${horse.levelCm} cm`}
+            </span>
+          </p>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Page>
+
+<style>
+  .as-of {
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    color: var(--ink-muted);
+  }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 40px var(--gutter) 56px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px 24px;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'fig fig' 'name price' 'facts facts';
+    align-items: baseline;
+    gap: 16px 20px;
+  }
+
+  .card > * {
+    margin: 0;
+  }
+
+  .fig {
+    grid-area: fig;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+
+  .fig :global(picture),
+  .fig :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .name {
+    grid-area: name;
+    font-size: 20px;
+    font-weight: inherit;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .price {
+    grid-area: price;
+    font-size: 16px;
+  }
+
+  .facts {
+    grid-area: facts;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 720px) {
+    /* The date does not fit beside the label at 390; the board drops it. */
+    .as-of {
+      display: none;
+    }
+
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 14px;
+      /* 16px, not the 20px gutter: the board's two 172px columns need it. */
+      padding: 16px 16px 28px;
+    }
+
+    .card {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'fig' 'name' 'facts' 'price';
+      row-gap: 10px;
+    }
+
+    .facts {
+      line-height: 1.6;
+    }
+
+    .name {
+      font-size: 15px;
+      letter-spacing: 0.12em;
+    }
+
+    .price {
+      font-size: 14px;
+    }
+
+    /* The 390 board drops the breed and breaks the facts after the height. */
+    .breed,
+    .sep {
+      display: none;
+    }
+
+    .facts-rest {
+      display: block;
+    }
+  }
+</style>
