@@ -69,11 +69,6 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   The owner decided it: a standing horse is about 4:3, and a portrait cover-crop cuts off
   its head and tail, the same trap as E4.2's full-bleed entry. `HorsesGrid` and
   `MobileHorsesGrid` were redrawn to match.
-- The editorial view shows each photo whole, at the photo's own ratio (E4.3). This replaces
-  E4.2's fixed 880 × 700 and 390 × 420 slots. The owner's first real photo, cover-cropped
-  into those slots, lost the horse's head. An entry is now as tall as its photo. The boards
-  (canvas v27) draw the slots at 3:2. The grid keeps its uniform 4:3 crop, because its rows
-  must line up.
 - The homepage scrim is an addition — the boards draw none — because text over
   moving video has no guaranteed contrast, and the worst case is a white frame,
   not `--ground-dark`. Two strengths, both computed against white: `--scrim`
