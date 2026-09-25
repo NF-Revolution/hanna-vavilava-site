@@ -1,0 +1,264 @@
+---
+/*
+ * The horses index, editorial view (E4.2), drawn as `Horses` and `MobileHorses`.
+ * Four entry layouts in turn — image left, image right, full bleed, image right
+ * with a narrower text column — chosen by `:nth-child(4n+k)`, so a fifth horse
+ * starts the pattern again. A sold horse is not listed; its page stays (#23).
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import Photo from './Photo.astro';
+import { t, type Locale } from '../i18n';
+import { fill, formatDate, formatPrice } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { site } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const page = dict.pages.horses;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/* Drawn image widths on the 1440 board, per step of the pattern. */
+const imageVw = [61, 61, 100, 70];
+---
+
+<Page locale={locale} routeKey="horses" title={page.title} description={page.description}>
+  <SubBar label={`${page.label} · ${pad(site.horsesListed.length)}`}>
+    <p slot="label" class="lbl as-of">
+      <span aria-hidden="true">·</span>
+      {fill(page.asOf, { date: formatDate(locale, site.updated) })}
+    </p>
+  </SubBar>
+  <ol class="entries">
+    {site.horsesListed.map((horse, i) => (
+      <li class="entry">
+        <figure class="fig">
+          {horse.photos[0] && (
+            <Photo
+              photo={horse.photos[0]}
+              locale={locale}
+              sizes={`(max-width: 720px) 100vw, ${imageVw[i % 4]}vw`}
+              hero={i === 0}
+            />
+          )}
+        </figure>
+        <div class="text">
+          <p class="meta num nr">{pad(i + 1)}</p>
+          <h2 class="name">{horse.name}</h2>
+          <p class="meta num facts">
+            {[
+              horse.born,
+              `${horse.heightCm} cm`,
+              page.sex[horse.sex],
+              horse.breed,
+              `${horse.levelCm} cm`,
+            ].join(' · ')}
+          </p>
+          <p class="num price">
+            {horse.price === null ? page.onRequest : formatPrice(locale, horse.price)}
+          </p>
+          <p class="copy blurb">{horse.headline[locale]}</p>
+          <a class="more" href={path(locale, 'horse', horse.slug)}>
+            <span class="lbl">{page.more}</span>
+            <span class="visually-hidden">: {horse.name}</span>
+            <span aria-hidden="true">&#8594;</span>
+          </a>
+        </div>
+      </li>
+    ))}
+  </ol>
+</Page>
+
+<style>
+  .as-of {
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    color: var(--ink-muted);
+  }
+
+  .entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .entry {
+    display: grid;
+    min-height: 700px;
+    grid-template-columns: 880fr 560fr;
+    grid-template-areas: 'fig text';
+  }
+
+  .entry + .entry {
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .entry:nth-child(4n + 2) {
+    grid-template-columns: 560fr 880fr;
+    grid-template-areas: 'text fig';
+  }
+
+  .entry:nth-child(4n + 4) {
+    grid-template-columns: 440fr 1000fr;
+    grid-template-areas: 'text fig';
+  }
+
+  .fig {
+    grid-area: fig;
+    margin: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+
+  .fig :global(picture),
+  .fig :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .text {
+    grid-area: text;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 26px;
+    padding: 0 80px;
+  }
+
+  .entry:nth-child(4n + 4) .text {
+    padding: 0 44px 0 var(--gutter);
+  }
+
+  .text > * {
+    margin: 0;
+  }
+
+  .nr {
+    color: var(--ink-muted);
+  }
+
+  .name {
+    font-size: 34px;
+    font-weight: inherit;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .facts {
+    line-height: 1.9;
+  }
+
+  .price {
+    font-size: 22px;
+    letter-spacing: 0.04em;
+  }
+
+  .blurb {
+    color: var(--ink-muted);
+    max-width: 360px;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--ink);
+    align-self: flex-start;
+  }
+
+  /* Step three: the image runs full bleed, and the text is one row under it. */
+  .entry:nth-child(4n + 3) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 500px auto;
+    grid-template-areas: 'fig' 'text';
+  }
+
+  .entry:nth-child(4n + 3) .text {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'nr blurb price'
+      'name blurb price'
+      'facts blurb more';
+    align-items: start;
+    gap: 16px 60px;
+    min-height: 200px;
+    box-sizing: border-box;
+    padding: 46px var(--gutter) 54px;
+  }
+
+  .entry:nth-child(4n + 3) .nr {
+    grid-area: nr;
+  }
+  .entry:nth-child(4n + 3) .name {
+    grid-area: name;
+  }
+  .entry:nth-child(4n + 3) .facts {
+    grid-area: facts;
+  }
+  .entry:nth-child(4n + 3) .price {
+    grid-area: price;
+    justify-self: end;
+  }
+  .entry:nth-child(4n + 3) .blurb {
+    grid-area: blurb;
+    max-width: 420px;
+  }
+  .entry:nth-child(4n + 3) .more {
+    grid-area: more;
+    justify-self: end;
+  }
+
+  @media (max-width: 720px) {
+    /* The date does not fit beside the label at 390; the board drops it. */
+    .as-of {
+      display: none;
+    }
+
+    .entry,
+    .entry:nth-child(n) {
+      min-height: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: 420px auto;
+      grid-template-areas: 'fig' 'text';
+    }
+
+    .text,
+    .entry:nth-child(n) .text {
+      display: flex;
+      align-items: stretch;
+      min-height: 0;
+      gap: 11px;
+      padding: 20px var(--gutter-mobile) 28px;
+    }
+
+    /* The 390 board numbers no entry. */
+    .nr {
+      display: none;
+    }
+
+    .blurb {
+      max-width: none;
+    }
+
+    .name {
+      font-size: 24px;
+      letter-spacing: 0.14em;
+    }
+
+    .price {
+      font-size: 18px;
+    }
+  }
+</style>

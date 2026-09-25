@@ -26,6 +26,10 @@ export const site = {
    * available, and the line is omitted.
    */
   featuredHorse: first && { slug: first.id, ...first.data },
+  /* The horses index, in the editor's order. A sold horse keeps its page but leaves the list (#23). */
+  horsesListed: horses
+    .filter((h) => h.data.status !== 'sold')
+    .map((h) => ({ slug: h.id, ...h.data })),
 };
 
 export const whatsappHref = (text?: string): string =>

@@ -92,7 +92,14 @@
     "horses": {
       "title": "Konie na sprzedaż — Hanna Vavilava",
       "description": "Aktualny stan stajni: konie skokowe od 110 do 130 cm, z pełną dokumentacją, nagraniami bez cięć i zdjęciami RTG udostępnianymi przed wizytą.",
-      "label": "Wszystkie konie"
+      "label": "Wszystkie konie",
+      "asOf": "Stan stajni na {date}",
+      "more": "Karta konia",
+      "onRequest": "Cena na zapytanie",
+      "sex": {
+        "mare": "klacz",
+        "gelding": "wałach"
+      }
     },
     "horsesGrid": {
       "title": "Konie na sprzedaż, siatka — Hanna Vavilava",
