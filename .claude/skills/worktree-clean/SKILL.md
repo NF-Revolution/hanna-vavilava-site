@@ -55,6 +55,15 @@ request says `MERGED`, so nothing is lost.
 
     git worktree prune
 
+## 6. Pull
+
+Always, even when nothing was cleaned — the merges landed on GitHub, not in the main checkout:
+
+    git -C <repo root> pull --ff-only
+
+`--ff-only` so a diverged `main` fails loudly instead of growing a merge commit. A failure,
+or a main checkout not on `main`: report the message verbatim and leave it.
+
 ## Rules
 
 - Never pass `--discard-unpushed` or `--force-remove-worktree` to `claude rm`, and never
