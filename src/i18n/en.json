@@ -93,6 +93,7 @@
     "health": "Health and veterinary records",
     "viewing": "Viewing",
     "others": "Other horses",
+    "gallery": "Gallery",
     "cta": {
       "mare": "Ask about {name}",
       "gelding": "Ask about {name}"

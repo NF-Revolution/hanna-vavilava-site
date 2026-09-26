@@ -1,8 +1,8 @@
 ---
 /*
- * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, facts,
- * suitability, health, viewing and the other horses. E4.5 (#35) adds the two
- * videos and the gallery at the marked places.
+ * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, sales
+ * video, facts, the uncut round, suitability, health, gallery, viewing and the
+ * other horses. A video or a gallery with nothing to show is left out (E4.5).
  *
  * A sold horse keeps its URL for good, because WhatsApp links circulate for
  * years (E2.8). Its page is the trimmed state on `HorseDetailSold` /
@@ -13,6 +13,8 @@
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import Photo from './Photo.astro';
+import Video from './Video.astro';
+import Gallery from './Gallery.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -58,6 +60,10 @@ const factColumns = [
     [d.rows.sale, d.saleKind[horse.seller]],
   ],
 ];
+
+/* ponytail: the first of each kind, as the boards draw one of each. */
+const salesVideo = horse.videos.find((v) => v.kind === 'sales');
+const roundVideo = horse.videos.find((v) => v.kind === 'round');
 
 const xrays = horse.xrays;
 const xrayDate = xrays && formatDate(locale, xrays.takenOn);
@@ -128,7 +134,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     </section>
   ) : (
     <>
-      <!-- E4.5 (#35) — the sales video. -->
+      {salesVideo && (
+        <section class="band">
+          <Video video={salesVideo} locale={locale} />
+        </section>
+      )}
       <section class="band">
         <h2 class="lbl head">{d.facts}</h2>
         <div class="cols">
@@ -144,7 +154,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           ))}
         </div>
       </section>
-      <!-- E4.5 (#35) — the full round, no cuts. -->
+      {roundVideo && (
+        <section class="band">
+          <Video video={roundVideo} locale={locale} />
+        </section>
+      )}
       <section class="band cols">
         <div class="ruled">
           <h2 class="lbl head">{d.suits}</h2>
@@ -221,7 +235,12 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
         </div>
         <p class="copy note">{d.vetNote}</p>
       </section>
-      <!-- E4.5 (#35) — the gallery. -->
+      {horse.photos.length > 0 && (
+        <section class="band">
+          <h2 class="lbl head">{d.gallery}</h2>
+          <Gallery photos={horse.photos} locale={locale} />
+        </section>
+      )}
       <section class="band">
         <h2 class="lbl head">{d.viewing}</h2>
         <div class="cols cols-3">
