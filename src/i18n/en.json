@@ -171,7 +171,41 @@
     "about": {
       "title": "About and how buying works — Hanna Vavilava",
       "description": "I have sold horses since 2016, and only show jumpers since 2021. Five steps: enquiry, video call, viewing, pre-purchase exam, contract.",
-      "label": "About"
+      "label": "About",
+      "meta": "Selling since 2016 · show jumpers since 2021",
+      "portraitAlt": "Hanna Vavilava on a bay horse in an orange winner's rug, wearing a championship sash, in a show arena",
+      "bio": "I have sold horses since 2016, and since 2021 only show jumpers that I choose and train myself. Between three and six horses stand in the stable at any one time — I ride each of them myself for at least four months before it appears on this site. I speak Polish, English and Russian, and I answer myself, with no intermediary.",
+      "stepsHead": "How buying works",
+      "steps": [
+        {
+          "title": "Enquiry",
+          "text": "The form on this site or WhatsApp. I reply personally within the hour, {hours}."
+        },
+        {
+          "title": "Video call and the full footage",
+          "text": "Twenty minutes about your level and your goals, and after the call the complete set of recordings: a round with no cuts, flatwork, the horse in the stable and at the farrier."
+        },
+        {
+          "title": "Viewing",
+          "text": "In person at the stable near Warsaw, with your trainer if you work with one — or through a trusted representative if travelling is not possible."
+        },
+        {
+          "title": "Pre-purchase exam",
+          "text": "A vet chosen by the buyer, and the buyer sets the scope of the exam. I share X-rays from the last twelve months in advance."
+        },
+        {
+          "title": "Contract, payment, collection",
+          "text": "A written contract with the horse's description, the price and its health on the day of sale. The collection date is agreed in writing and discussed directly."
+        }
+      ],
+      "band": {
+        "one": "{count} horse in the stable now.",
+        "few": "{count} horses in the stable now.",
+        "many": "{count} horses in the stable now.",
+        "other": "{count} horses in the stable now."
+      },
+      "bandReply": "I reply within the hour.",
+      "seeHorses": "See the horses"
     },
     "faq": {
       "title": "Questions — Hanna Vavilava",

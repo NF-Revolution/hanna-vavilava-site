@@ -42,6 +42,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.3 horses index, grid      | #33                | done — `HorsesGrid.astro`, `ViewSwitch.astro`, 4:3 cards      |
 | E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26   |
 | E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                 |
+| E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio         |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -342,3 +343,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   rather than moving to a line under the player: `MobileDetail` drops the sales note and moves
   the round one, and one place for both is simpler. The desktop round h2's "/ Full round, no
   cuts" suffix is not built, because `MobileDetail` drops it too and the page is one language.
+- The About portrait is a 3:4 column beside the bio, not the board's first 1440 × 620 band (E4.6).
+  The owner decided it: the photo is portrait, and the band cut it to the rider's torso. The
+  column is `min(480px, 40%)` so the bio keeps a readable measure between 721 and 1200. The
+  photo is a repo asset (`src/assets/about/hanna.jpg`), not a database field. The band's count is
+  `site.horsesAvailable` as a digit, where the board spells out "Cztery". At 390 the sub-bar drops
+  the "od 2016" meta, because the bio's first line says the same. `MobileAbout` draws it.

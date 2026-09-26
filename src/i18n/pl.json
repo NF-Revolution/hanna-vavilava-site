@@ -171,7 +171,41 @@
     "about": {
       "title": "O mnie i jak przebiega zakup — Hanna Vavilava",
       "description": "Sprzedaję konie od 2016 roku, od 2021 wyłącznie konie skokowe. Pięć kroków zakupu: zapytanie, rozmowa wideo, oglądanie, badanie przedzakupowe, umowa.",
-      "label": "O mnie"
+      "label": "O mnie",
+      "meta": "Sprzedaję od 2016 · konie skokowe od 2021",
+      "portraitAlt": "Hanna Vavilava na gniadym koniu w pomarańczowej derce zwycięzcy, z szarfą mistrzostw, na placu konkursowym",
+      "bio": "Sprzedaję konie od 2016 roku, a od 2021 wyłącznie konie skokowe, które sama wybieram i trenuję. W stajni stoi jednocześnie od trzech do sześciu koni — każdego jeżdżę osobiście przez co najmniej cztery miesiące, zanim trafi na tę stronę. Rozmawiam po polsku, angielsku i rosyjsku, i odpowiadam sama, bez pośrednika.",
+      "stepsHead": "Jak przebiega zakup",
+      "steps": [
+        {
+          "title": "Zapytanie",
+          "text": "Formularz na tej stronie albo WhatsApp. Odpowiadam osobiście w ciągu godziny, w godzinach {hours}."
+        },
+        {
+          "title": "Rozmowa wideo i pełny materiał",
+          "text": "Dwadzieścia minut o Państwa poziomie i celach, a po rozmowie komplet nagrań: przejazd bez cięć, praca na płaskim, koń w stajni i przy kowalu."
+        },
+        {
+          "title": "Oglądanie",
+          "text": "Osobiście w stajni pod Warszawą, z trenerem, jeśli Państwo z nim pracują — albo przez zaufanego przedstawiciela, jeśli przyjazd nie jest możliwy."
+        },
+        {
+          "title": "Badanie przedzakupowe",
+          "text": "Weterynarz wybrany przez kupującego, zakres badania ustala kupujący. Zdjęcia RTG z ostatnich dwunastu miesięcy udostępniam wcześniej."
+        },
+        {
+          "title": "Umowa, płatność, odbiór",
+          "text": "Umowa pisemna z opisem konia, ceną i stanem zdrowia na dzień sprzedaży. Termin odbioru ustalamy na piśmie i omawiamy bezpośrednio."
+        }
+      ],
+      "band": {
+        "one": "{count} koń w stajni teraz.",
+        "few": "{count} konie w stajni teraz.",
+        "many": "{count} koni w stajni teraz.",
+        "other": "{count} konia w stajni teraz."
+      },
+      "bandReply": "Odpowiadam w ciągu godziny.",
+      "seeHorses": "Zobacz konie"
     },
     "faq": {
       "title": "Pytania — Hanna Vavilava",

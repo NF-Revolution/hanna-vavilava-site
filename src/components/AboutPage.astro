@@ -1,0 +1,291 @@
+---
+/*
+ * About (E4.6): the portrait beside the bio and its script signature, the five
+ * buying steps, and the dark band. The portrait sits in a 3:4 column, not the
+ * board's first 1440 × 620 band: the photo is portrait and the band cut it to
+ * the rider's torso (#36).
+ */
+import { Picture } from 'astro:assets';
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import portrait from '../assets/about/hanna.jpg';
+import { t, type Locale } from '../i18n';
+import { fill, plural } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { site, whatsappHref } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const page = dict.pages.about;
+---
+
+<Page
+  locale={locale}
+  routeKey="about"
+  title={page.title}
+  description={page.description}
+  headerLinks={['horses', 'faq', 'enquiry']}
+>
+  <SubBar label={page.label}>
+    <p class="meta sub-meta">{page.meta}</p>
+  </SubBar>
+
+  <section class="intro">
+    <Picture
+      src={portrait}
+      widths={[480, 960, portrait.width]}
+      sizes="(max-width: 720px) calc(100vw - 40px), 480px"
+      formats={['avif', 'webp']}
+      fallbackFormat="jpg"
+      alt={page.portraitAlt}
+      loading="eager"
+      fetchpriority="high"
+      class="portrait"
+    />
+    <div class="bio">
+      <p>{page.bio}</p>
+      <p class="signature">{dict.brand.name}</p>
+    </div>
+  </section>
+
+  <section class="steps">
+    <h2 class="lbl head">{page.stepsHead}</h2>
+    <ol>
+      {page.steps.map((step, i) => (
+        <li>
+          <span class="meta num step-num">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="lbl step-title">{step.title}</h3>
+          <p class="copy step-text">{fill(step.text, { hours: site.responseWindow })}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- ponytail: inline until a second page draws this band (E4.7, E4.8); then a component. -->
+  <section class="band dk">
+    <p class="band-line">
+      {`${plural(locale, page.band, site.horsesAvailable)} ${page.bandReply}`}
+    </p>
+    <div class="band-actions">
+      <a class="lbl btn btn-solid" href={whatsappHref()}>
+        {dict.menu.whatsapp}
+      </a>
+      <a class="lbl btn btn-outline" href={path(locale, 'horses')}>
+        {page.seeHorses}
+      </a>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .sub-meta {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Portrait and bio ---- */
+
+  /* The portrait gives way below 1200 so the bio keeps a readable measure. */
+  .intro {
+    display: grid;
+    grid-template-columns: min(480px, 40%) minmax(0, 1fr);
+    align-items: start;
+    gap: 80px;
+    padding: 48px var(--gutter) 60px;
+  }
+
+  .intro :global(picture) {
+    display: block;
+  }
+
+  .portrait {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    background: var(--placeholder);
+  }
+
+  .bio {
+    max-width: 760px;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .bio p {
+    margin: 0;
+  }
+
+  .bio .signature {
+    margin-top: 40px;
+    font-family: var(--font-script);
+    font-size: 56px;
+    line-height: 1;
+  }
+
+  /* ---- The five steps ---- */
+
+  .steps {
+    border-top: 1px solid var(--rule);
+    padding: 68px var(--gutter) 80px;
+  }
+
+  .head {
+    margin: 0 0 44px;
+    font-weight: inherit;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 40px;
+    padding: 24px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  li:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .step-num {
+    flex: none;
+    width: 60px;
+    color: var(--ink-muted);
+  }
+
+  .step-title {
+    flex: none;
+    width: 320px;
+    margin: 0;
+    font-weight: inherit;
+  }
+
+  .step-text {
+    max-width: 640px;
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  /* ---- The page's one inverted band ---- */
+
+  .band {
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    padding: 60px var(--gutter);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+
+  .band-line {
+    max-width: 620px;
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+  }
+
+  .band-actions {
+    display: flex;
+    gap: 26px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    padding: 19px 36px;
+    border: 1px solid var(--ink-inv);
+  }
+
+  .btn-solid {
+    background: var(--ink-inv);
+    color: var(--ground-dark);
+  }
+
+  .band a.btn-solid:hover {
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 720px) {
+    /* No room beside the label at 390, and the bio's first line says the same. */
+    .sub-meta {
+      display: none;
+    }
+
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding: 20px var(--gutter-mobile) 44px;
+    }
+
+    .bio {
+      font-size: 16px;
+    }
+
+    .bio .signature {
+      margin-top: 24px;
+      font-size: 48px;
+    }
+
+    .steps {
+      padding: 44px var(--gutter-mobile) 52px;
+    }
+
+    .head {
+      margin-bottom: 28px;
+    }
+
+    /* Number and title on one line, the text under them. */
+    li {
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding: 20px 0;
+    }
+
+    .step-num {
+      width: auto;
+    }
+
+    .step-title {
+      width: auto;
+      flex: 1;
+    }
+
+    .step-text {
+      flex-basis: 100%;
+    }
+
+    .band {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 28px;
+      padding: 40px var(--gutter-mobile) 44px;
+    }
+
+    .band-line {
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .band-actions {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      min-height: 52px;
+      padding: 0;
+    }
+  }
+</style>
