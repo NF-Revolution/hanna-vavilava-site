@@ -107,6 +107,12 @@ export const horseSchema = z.strictObject({
         posterKey: key,
         durationS: z.number().int().positive(),
         transcript: text,
+        /*
+         * The heading row after the duration: "nagrane 12.09.2026 · bez podkładu
+         * muzycznego", "jedna kamera · 6.09.2026, Zakrzów, 125 cm" (E4.5). Free
+         * text, because the two boards' rows carry different facts.
+         */
+        note: text.default({ pl: '', en: '' }),
       }),
     )
     .default([]),

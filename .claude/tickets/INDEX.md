@@ -33,14 +33,15 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
-| E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, unmounted until E4.5 (#35)            |
+| E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5    |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code   |
 | E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`  |
-| E3.4 sales video facade      | #28                | done — `Video.astro`, native player, unmounted until E4.5     |
+| E3.4 sales video facade      | #28                | done — `Video.astro`, native player, mounted by E4.5          |
 | E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                    |
 | E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24   |
 | E4.3 horses index, grid      | #33                | done — `HorsesGrid.astro`, `ViewSwitch.astro`, 4:3 cards      |
 | E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26   |
+| E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                 |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -330,3 +331,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   the CTA the board moves into a sticky bar, because the bar is #38's and #47's and the page
   would otherwise have no WhatsApp button but the header icon. The header over the hero is the
   homepage's `overlay` variant without its status line, so it carries the same top scrim.
+- Each video's heading row reads `m:ss · note`, and `note` is one bilingual free-text field on
+  `videos[]`, not a recording date plus a music flag (E4.5). The boards' two rows carry different
+  facts: "nagrane 12.09.2026 · bez podkładu muzycznego" on the sales video, and "jedna kamera ·
+  6.09.2026, Zakrzów, 125 cm" on the round. Structured fields would express half of one of them.
+  `npm run video` emits an empty note beside the transcript; the note defaults to empty, and then
+  the row shows only the duration. The detail page mounts the first video of each kind and the
+  gallery with every photo, the cover included because the hero crops it; each section is left
+  out when empty, a state no board draws. Two deviations. At 390 the meta wraps under the h2
+  rather than moving to a line under the player: `MobileDetail` drops the sales note and moves
+  the round one, and one place for both is simpler. The desktop round h2's "/ Full round, no
+  cuts" suffix is not built, because `MobileDetail` drops it too and the page is one language.

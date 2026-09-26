@@ -166,13 +166,16 @@ if (hero) {
     JSON.stringify({ mp4Key: keys.mp4, webmKey: keys.webm, posterKey: keys.jpg }, null, 2),
   );
 } else {
-  console.error(`Add this to ${slug}'s Videos in the admin, and fill in the transcript:`);
+  console.error(
+    `Add this to ${slug}'s Videos in the admin, and fill in the transcript and the note:`,
+  );
   const video = {
     key: keys.mp4,
     kind,
     posterKey: keys.jpg,
     durationS,
     transcript: { pl: '', en: '' },
+    note: { pl: '', en: '' },
   };
   console.log(JSON.stringify(video, null, 2));
 }

@@ -1,7 +1,8 @@
 ---
 /*
- * One horse video — the sales film or the uncut round (E3.4) — with its
- * transcripts. Not mounted yet: E4.5 (#35) places it, with the heading row.
+ * One horse video — the sales film or the uncut round (E3.4) — under its
+ * heading row, "Film sprzedażowy" and "1:48 · <note>" (E4.5), with its
+ * transcripts. The detail page mounts it.
  *
  * The facade is the browser's own: `preload="none"` downloads nothing but the
  * poster until the visitor presses play, from the first-party media host, so
@@ -51,12 +52,18 @@ const duration = [
 ]
   .filter(Boolean)
   .join(' ');
+const clock = `${minutes}:${String(seconds).padStart(2, '0')}`;
+const note = video.note[locale].trim();
 
 const transcripts = [locale, ...locales.filter((other) => other !== locale)].filter((lang) =>
   video.transcript[lang].trim(),
 );
 ---
 
+<div class="video-head">
+  <h2 class="lbl">{dict.video[video.kind]}</h2>
+  <p class="meta num">{[clock, note].filter(Boolean).join(' · ')}</p>
+</div>
 <figure class="video" data-kind={video.kind}>
   <video
     controls
@@ -87,6 +94,25 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
 </figure>
 
 <style>
+  .video-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 40px;
+    margin-bottom: 26px;
+  }
+
+  .video-head > * {
+    margin: 0;
+    font-weight: inherit;
+  }
+
+  .video-head p {
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+
   .video {
     margin: 0;
   }
@@ -115,5 +141,11 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
   details p {
     margin: 0 0 18px;
     max-width: 68ch;
+  }
+
+  @media (max-width: 720px) {
+    .video-head {
+      margin-bottom: 12px;
+    }
   }
 </style>
