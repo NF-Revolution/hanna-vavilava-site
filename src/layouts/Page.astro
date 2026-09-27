@@ -16,9 +16,19 @@ interface Props {
   headerLinks?: RouteKey[];
   /* `overlay` floats the header on a dark hero, as the horse detail boards draw it. */
   header?: 'page' | 'overlay';
+  noindex?: boolean;
 }
 
-const { locale, routeKey, slug, title, description, headerLinks, header = 'page' } = Astro.props;
+const {
+  locale,
+  routeKey,
+  slug,
+  title,
+  description,
+  headerLinks,
+  header = 'page',
+  noindex,
+} = Astro.props;
 ---
 
 <Base
@@ -28,6 +38,7 @@ const { locale, routeKey, slug, title, description, headerLinks, header = 'page'
   title={title}
   description={description}
   ground="light"
+  noindex={noindex}
 >
   <Header locale={locale} variant={header} status={false} links={headerLinks} />
   <main id="main" tabindex="-1">

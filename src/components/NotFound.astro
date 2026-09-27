@@ -1,0 +1,135 @@
+---
+/*
+ * The 404 (E4.9), drawn as `NotFound` and `MobileNotFound`: one line, then the
+ * horses on the index as a text list, one row one link. No photos — a wrong
+ * address should get a short page, not the index again.
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import { t, type Locale } from '../i18n';
+import { formatPrice } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { site } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const page = dict.pages.notFound;
+const horses = dict.pages.horses;
+---
+
+<Page locale={locale} routeKey="home" title={page.title} description={page.description} noindex>
+  <SubBar label={page.label} />
+  <section class="body">
+    <p class="copy lead">{page.lead}</p>
+    {site.horsesListed.length > 0 && (
+      <ul class="rows">
+        {site.horsesListed.map((horse) => (
+          <li>
+            <a class="row" href={path(locale, 'horse', horse.slug)}>
+              <span class="name">{horse.name}</span>
+              <span class="meta num facts">
+                {[
+                  horse.born,
+                  `${horse.heightCm} cm`,
+                  horses.sex[horse.sex],
+                  `${horse.levelCm} cm`,
+                ].join(' · ')}
+              </span>
+              <span class="num price">
+                {horse.price === null ? horses.onRequest : formatPrice(locale, horse.price)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+    <a class="all" href={path(locale, 'horses')}>
+      <span class="lbl">{page.all}</span>
+      <span aria-hidden="true">&#8594;</span>
+    </a>
+  </section>
+</Page>
+
+<style>
+  .body {
+    padding: 56px var(--gutter) 80px;
+    max-width: 960px;
+  }
+
+  .lead {
+    margin: 0 0 32px;
+  }
+
+  .rows {
+    list-style: none;
+    margin: 0 0 40px;
+    padding: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 8px 32px;
+    min-height: var(--tap);
+    padding: 18px 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .name {
+    font-size: 20px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .facts {
+    color: var(--ink-muted);
+  }
+
+  .price {
+    font-size: 16px;
+    text-align: right;
+  }
+
+  .all {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  @media (max-width: 720px) {
+    .body {
+      padding: 32px var(--gutter-mobile) 48px;
+    }
+
+    .row {
+      grid-template-columns: 1fr auto;
+      grid-template-areas: 'name price' 'facts facts';
+      padding: 14px 0;
+    }
+
+    .name {
+      grid-area: name;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+    }
+
+    .facts {
+      grid-area: facts;
+    }
+
+    .price {
+      grid-area: price;
+      font-size: 14px;
+    }
+  }
+</style>

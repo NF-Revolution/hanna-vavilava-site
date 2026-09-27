@@ -232,6 +232,13 @@
       "title": "Privacy — Hanna Vavilava",
       "description": "How personal data is processed on this site.",
       "label": "Privacy"
+    },
+    "notFound": {
+      "title": "Page not found — Hanna Vavilava",
+      "description": "There is no page at this address.",
+      "label": "404 · Page not found",
+      "lead": "There is no page at this address. The horses I am selling now:",
+      "all": "All horses"
     }
   },
   "home": {
