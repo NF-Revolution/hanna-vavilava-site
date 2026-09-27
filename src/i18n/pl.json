@@ -103,6 +103,10 @@
       "gelding": "Zapytaj o wałacha {name}"
     },
     "prefill": "Dzień dobry, piszę w sprawie konia {name}: {url}",
+    "livejumping": {
+      "link": "Wyniki na livejumping",
+      "newTab": "(livejumping.com, otwiera się w nowej karcie)"
+    },
     "infoOnRequest": "Informacja na zapytanie",
     "rows": {
       "pedigree": "Pochodzenie",

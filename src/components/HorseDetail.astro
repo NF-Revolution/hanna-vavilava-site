@@ -19,7 +19,7 @@ import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
 import { media } from '../media';
-import { site, whatsappHref } from '../site';
+import { livejumpingHref, site, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -39,15 +39,22 @@ const f = horse.facts;
 const url = new URL(path(locale, 'horse', slug), Astro.site).href;
 const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
 
-/* The board's two columns of six, each closed by one of the sale rows (#2, #3). */
-const factColumns = [
+/*
+ * The board's two columns of six, each closed by one of the sale rows (#2, #3).
+ * A third slot links the value out; only Starts has one, to livejumping (#111).
+ */
+const factColumns: [string, string, string?][][] = [
   [
     [d.rows.pedigree, horse.pedigree],
     [d.rows.breeding, f.breeding[locale]],
     [d.rows.trainingLevel, f.trainingLevel[locale]],
     [d.rows.level, `${horse.levelCm} cm`],
     [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
-    [d.rows.starts, f.starts?.[locale] ?? d.infoOnRequest],
+    [
+      d.rows.starts,
+      f.starts?.[locale] ?? d.infoOnRequest,
+      horse.livejumpingName ? livejumpingHref(horse.livejumpingName) : undefined,
+    ],
     [d.rows.price, price],
   ],
   [
@@ -145,10 +152,21 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
         <div class="cols">
           {factColumns.map((rows) => (
             <dl class="rows">
-              {rows.map(([label, value]) => (
+              {rows.map(([label, value, href]) => (
                 <div>
                   <dt class="lbl">{label}</dt>
-                  <dd class="num">{value}</dd>
+                  <dd class="num">
+                    {value}
+                    {href && (
+                      <a class="lbl fact-link" href={href} target="_blank" rel="noopener">
+                        <span>
+                          {d.livejumping.link}
+                          <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                        </span>
+                        <span aria-hidden="true">&#8599;</span>
+                      </a>
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -206,7 +224,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
                   ) : (
                     xrays.files.map((file) => (
                       <a
-                        class="lbl xray-link"
+                        class="lbl fact-link"
                         href={`${media.base}/${file.key}`}
                         download
                         data-event="xray_download"
@@ -469,7 +487,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     color: var(--ink-muted);
   }
 
-  .xray-link {
+  .fact-link {
     display: flex;
     width: fit-content;
     align-items: center;
