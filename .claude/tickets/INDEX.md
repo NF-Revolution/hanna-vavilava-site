@@ -32,6 +32,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays   |
 | E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91     |
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges |
+| E2.12 livejumping starts     | #110               | done — `refreshStarts` button + `startsWeekly`, not deployed  |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size  |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5    |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code   |

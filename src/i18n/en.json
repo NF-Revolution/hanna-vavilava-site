@@ -99,6 +99,7 @@
       "gelding": "Ask about {name}"
     },
     "prefill": "Hello, I am writing about {name}: {url}",
+    "infoOnRequest": "Information on request",
     "rows": {
       "pedigree": "Pedigree",
       "breeding": "Breeding",
@@ -340,6 +341,16 @@
     "publishBuilding": "The site is building…",
     "publishDone": "Published. The site is up to date.",
     "publishFailed": "Publishing failed. Try again.",
+    "refreshStarts": "Refresh starts",
+    "refreshStartsHint": "Pulls starts from livejumping.com for horses with a livejumping name. They reach the site on Publish.",
+    "refreshSending": "Pulling starts from livejumping…",
+    "refreshNone": "Nothing changed.",
+    "refreshChange": "{name} · {field}: {from} → {to}",
+    "refreshError": "{name}: failed ({message}). The previous value stays.",
+    "refreshFailed": "Livejumping is not answering ({message}). Nothing changed.",
+    "refreshBroken": "Refresh is not working ({message}). Nothing changed.",
+    "refreshCleared": "empty (Information on request)",
+    "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. Empty or no starts = “Information on request” on the site.",
     "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
@@ -365,6 +376,7 @@
       "seller": "Seller",
       "status": "Status",
       "headline": "Headline",
+      "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
       "facts.trainingLevel": "Training level",
       "facts.lastStart": "Last start",

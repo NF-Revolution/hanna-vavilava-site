@@ -34,6 +34,9 @@ const o = a.options as Record<string, string>;
 type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | 'xrays' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
+/* Facts only the starts sync writes (E2.12); the form never shows them. */
+const synced = ['lastStart', 'starts'];
+
 const sections: [legend: string, fields: Field[]][] = [
   [
     a.sections.basics,
@@ -56,7 +59,15 @@ const sections: [legend: string, fields: Field[]][] = [
       ['price', 'number'],
     ],
   ],
-  [a.sections.facts, Object.keys(horseSchema.shape.facts.shape).map((k) => [`facts.${k}`, 'pair'])],
+  [
+    a.sections.facts,
+    [
+      ['livejumpingName', 'text'],
+      ...Object.keys(horseSchema.shape.facts.shape)
+        .filter((k) => !synced.includes(k))
+        .map((k): Field => [`facts.${k}`, 'pair']),
+    ],
+  ],
   [
     a.sections.fit,
     [
@@ -98,7 +109,11 @@ const sections: [legend: string, fields: Field[]][] = [
   ],
 ];
 
-const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xraysHint };
+const hints: Record<string, string> = {
+  price: a.priceHint,
+  'xrays.count': a.xraysHint,
+  livejumpingName: a.livejumpingHint,
+};
 ---
 
 <!doctype html>
@@ -170,6 +185,13 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             <small>{a.publishHint}</small>
           </p>
           <p id="publish-status" role="status"></p>
+          <p>
+            <button type="button" id="refresh-starts">
+              {a.refreshStarts}
+            </button>
+            <small>{a.refreshStartsHint}</small>
+          </p>
+          <ul id="refresh-status" role="status"></ul>
         </section>
 
         <form id="editor" hidden>
@@ -729,7 +751,15 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
       editing !== null
         ? (horses[editing].order ?? 0)
         : Math.max(-1, ...Object.values(horses).map((h) => h.order ?? 0)) + 1;
-    const result = horseSchema.safeParse({ ...fromFields(fields), order });
+    const horse = fromFields(fields);
+    // The starts sync owns these two, so a Save keeps what it last wrote.
+    const stored = editing !== null ? horses[editing].facts : undefined;
+    horse.facts = {
+      ...horse.facts,
+      lastStart: stored?.lastStart ?? null,
+      starts: stored?.starts ?? null,
+    };
+    const result = horseSchema.safeParse({ ...horse, order });
     if (!result.success) {
       const issues = result.error.issues;
       fail([admin.invalid, ...issues.map((i) => `${i.path.join('.')}: ${i.message}`)]);
@@ -806,6 +836,53 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
       publishStatus.textContent = admin.publishFailed;
     } finally {
       publishButton.disabled = false;
+    }
+  });
+
+  /*
+   * Refresh starts (E2.12): the Function writes the facts that changed and names
+   * them here, with any horse livejumping failed on. Publish takes them live.
+   */
+  const refreshButton = $<HTMLButtonElement>('refresh-starts');
+  const refreshStatus = $('refresh-status');
+  type Change = { name: string; field: 'starts' | 'lastStart'; from: string; to: string };
+  const refreshCall = httpsCallable<
+    void,
+    { changes: Change[]; errors: { name: string; message: string }[] }
+  >(functions, 'refreshStarts');
+  const lines = (texts: string[]) =>
+    refreshStatus.replaceChildren(
+      ...texts.map((text) => Object.assign(document.createElement('li'), { textContent: text })),
+    );
+
+  refreshButton.addEventListener('click', async () => {
+    refreshButton.disabled = true;
+    lines([admin.refreshSending]);
+    try {
+      const { data } = await refreshCall();
+      lines([
+        ...(data.changes.length ? [] : [admin.refreshNone]),
+        ...data.changes.map((c) =>
+          admin.refreshChange
+            .replace('{name}', c.name)
+            .replace('{field}', admin.fields[`facts.${c.field}`])
+            .replace('{from}', c.from || '—')
+            .replace('{to}', c.to || admin.refreshCleared),
+        ),
+        ...data.errors.map((e) =>
+          admin.refreshError.replace('{name}', e.name).replace('{message}', e.message),
+        ),
+      ]);
+    } catch (e) {
+      // `unavailable` is the Function naming livejumping; anything else never reached it.
+      const { code, message } = e as { code?: string; message: string };
+      lines([
+        code === 'functions/unavailable'
+          ? admin.refreshFailed.replace('{message}', message)
+          : admin.refreshBroken.replace('{message}', code ?? message),
+      ]);
+    } finally {
+      refreshButton.disabled = false;
     }
   });
 
@@ -1070,7 +1147,8 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   }
   #errors:empty,
   #list-error:empty,
-  #enquiry-error:empty {
+  #enquiry-error:empty,
+  #refresh-status:empty {
     display: none;
   }
   .actions {

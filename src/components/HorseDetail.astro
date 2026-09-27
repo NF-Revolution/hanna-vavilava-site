@@ -46,8 +46,8 @@ const factColumns = [
     [d.rows.breeding, f.breeding[locale]],
     [d.rows.trainingLevel, f.trainingLevel[locale]],
     [d.rows.level, `${horse.levelCm} cm`],
-    [d.rows.lastStart, f.lastStart[locale]],
-    [d.rows.starts, f.starts[locale]],
+    [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
+    [d.rows.starts, f.starts?.[locale] ?? d.infoOnRequest],
     [d.rows.price, price],
   ],
   [

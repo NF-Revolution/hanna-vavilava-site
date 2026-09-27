@@ -51,13 +51,19 @@ export const horseSchema = z.strictObject({
   /* Decides the VAT invoice, the price label and the sale-kind line (#3). */
   seller: z.enum(['company', 'private']),
   headline: text,
+  /*
+   * The exact `s_kon` spelling on livejumping.com, e.g. `LOTUS BLUE B&C`. The starts
+   * sync (E2.12) fills `facts.starts` and `facts.lastStart` from it; empty is not synced.
+   */
+  livejumpingName: z.string().trim().default(''),
 
   /* The fact-table rows no field above already carries. Labels live in i18n. */
   facts: z.object({
     breeding: text,
     trainingLevel: text,
-    lastStart: text,
-    starts: text,
+    /* Written only by the starts sync (E2.12); `null` shows "on request" on the page. */
+    lastStart: text.nullable().default(null),
+    starts: text.nullable().default(null),
     technique: text,
     rideability: text,
     temperament: text,

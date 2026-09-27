@@ -11,6 +11,9 @@
  *   npx firebase-tools@15 functions:secrets:set R2_SECRET_ACCESS_KEY --project hanna-vavilava-site
  *   npx firebase-tools@15 deploy --only functions --project hanna-vavilava-site
  *
+ * `startsWeekly` (E2.12) is a scheduled Function, so the first deploy of it asks to
+ * enable the Cloud Scheduler API. It needs no secret of its own.
+ *
  * The panel writes X-ray PDFs to R2 from the browser (E2.10), so the bucket needs
  * the CORS rules in `r2.cors.json`, applied by hand as well:
  *
@@ -22,10 +25,13 @@
 import { initializeApp } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
 import { defineSecret } from 'firebase-functions/params';
+import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes } from 'node:crypto';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
+import { apiKey, fetchStarts, startFacts } from './starts.js';
 
 initializeApp({
   databaseURL: 'https://hanna-vavilava-site-default-rtdb.europe-west1.firebasedatabase.app',
@@ -167,33 +173,113 @@ export const xrayDelete = onCall(
   },
 );
 
+/*
+ * What Publish does, and what the Monday sync does after a change. The sold X-rays
+ * go before the build, so the page it renders and the edge already agree.
+ */
+async function release() {
+  await deleteSoldXrays(getDatabase());
+
+  // en-CA formats a date as YYYY-MM-DD, the shape the build's siteSchema parses.
+  const updated = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format();
+  await getDatabase().ref('site/updated').set(updated);
+
+  const at = Date.now();
+  const res = await fetch(
+    'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site/dispatches',
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token.value()}`,
+        'User-Agent': 'hanna-vavilava-site',
+      },
+      body: JSON.stringify({ event_type: 'publish' }),
+    },
+  );
+  if (!res.ok) throw new HttpsError('internal', `GitHub answered ${res.status}`);
+  // The panel matches the deploy run by this time, so it is the server's clock, not the browser's.
+  return { updated, at };
+}
+
 export const publish = onCall(
   { region: 'europe-central2', secrets: [token, cloudflare] },
   async (request) => {
     adminOnly(request);
+    return release();
+  },
+);
 
-    // Before the build, so the page it renders and the edge already agree.
-    await deleteSoldXrays(getDatabase());
+/*
+ * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
+ * these two facts. No `livejumpingName`, no matching rows, or no finished round
+ * leaves the fact `null`, which the page shows as "on request". A horse livejumping
+ * fails on keeps its stored facts and does not stop the others; a missing key
+ * throws for the whole run. Only a fact whose text changed is written.
+ *
+ * ponytail: a misspelt name reads as "no starts" and shows "on request"; the panel's
+ * change list is where Hanna sees it. A panel Save of a horse left open across the
+ * Monday run writes the old facts back, and the next run puts them right.
+ */
+async function syncStarts() {
+  const db = getDatabase();
+  const horses = (await db.ref('horses').get()).val() ?? {};
+  const unsold = Object.entries(horses).filter(([, horse]) => horse && horse.status !== 'sold');
+  const changes = [];
+  const errors = [];
 
-    // en-CA formats a date as YYYY-MM-DD, the shape the build's siteSchema parses.
-    const updated = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format();
-    await getDatabase().ref('site/updated').set(updated);
+  // Before any write, so a missing key changes nothing.
+  const key = unsold.some(([, horse]) => horse.livejumpingName) ? await apiKey() : undefined;
+  for (const [slug, horse] of unsold) {
+    const name = horse.name ?? slug;
+    try {
+      let facts = { starts: null, lastStart: null };
+      if (horse.livejumpingName) {
+        const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
+        if (starts.length) facts = startFacts(starts);
+      }
+      const write = {};
+      for (const field of ['starts', 'lastStart']) {
+        const to = facts[field];
+        const from = horse.facts?.[field] ?? null;
+        if (to?.pl === from?.pl && to?.en === from?.en) continue;
+        write[`horses/${slug}/facts/${field}`] = to;
+        changes.push({ name, field, from: from?.pl ?? '', to: to?.pl ?? '' });
+      }
+      if (Object.keys(write).length) await db.ref().update(write);
+    } catch (e) {
+      errors.push({ name, message: e.message });
+    }
+  }
+  return { changes, errors };
+}
 
-    const at = Date.now();
-    const res = await fetch(
-      'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site/dispatches',
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          Authorization: `Bearer ${token.value()}`,
-          'User-Agent': 'hanna-vavilava-site',
-        },
-        body: JSON.stringify({ event_type: 'publish' }),
-      },
-    );
-    if (!res.ok) throw new HttpsError('internal', `GitHub answered ${res.status}`);
-    // The panel matches the deploy run by this time, so it is the server's clock, not the browser's.
-    return { updated, at };
+/* The panel's "Refresh starts". Hanna reads what changed, then publishes as usual. */
+export const refreshStarts = onCall(
+  { region: 'europe-central2', timeoutSeconds: 300 },
+  async (request) => {
+    adminOnly(request);
+    try {
+      return await syncStarts();
+    } catch (e) {
+      throw new HttpsError('unavailable', e.message);
+    }
+  },
+);
+
+/* Monday 06:00 in Warsaw, so the weekend's shows are live before the week's first enquiries. */
+export const startsWeekly = onSchedule(
+  {
+    schedule: '0 6 * * 1',
+    timeZone: 'Europe/Warsaw',
+    region: 'europe-central2',
+    secrets: [token, cloudflare],
+    timeoutSeconds: 300,
+  },
+  async () => {
+    const { changes, errors } = await syncStarts();
+    for (const { name, message } of errors) logger.error(`starts: ${name}: ${message}`);
+    logger.info(`starts: ${changes.length} change(s)`, { changes });
+    if (changes.length) await release();
   },
 );
