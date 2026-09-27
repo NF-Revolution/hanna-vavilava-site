@@ -42,6 +42,10 @@
     "enquiry": "Enquiry",
     "privacy": "Privacy"
   },
+  "bar": {
+    "whatsapp": "Message on WhatsApp",
+    "form": "Form"
+  },
   "menu": {
     "horsesMeta": "{count} available",
     "aboutMeta": "and how buying works",

@@ -83,6 +83,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   description={dict.pages.horses.description}
   headerLinks={['horses', 'enquiry']}
   header="overlay"
+  bar={sold ? undefined : cta}
 >
   <section class="hero">
     {horse.photos[0] && (
@@ -619,6 +620,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 
     .hero-price {
       font-size: 24px;
+    }
+
+    /* MobileDetail moves the enquiry into the bottom bar (E4.8). */
+    .hero-cta {
+      display: none;
     }
 
     .band {

@@ -45,6 +45,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                 |
 | E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio         |
 | E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`   |
+| E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar          |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
@@ -331,9 +332,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   boards do not draw; the homepage reasoning applies to a photo too. The CTA reads "Zapytaj o
   klacz Cascada" / "Zapytaj o wałacha …", because the accusative of an arbitrary name cannot be
   derived, and the boards now say so. The sub-bar's right side shows only the price: the board's
-  "Ostatni start 6.09.2026" cannot be parsed out of free-text `lastStart`. At 390 the hero keeps
-  the CTA the board moves into a sticky bar, because the bar is #38's and #47's and the page
-  would otherwise have no WhatsApp button but the header icon. The header over the hero is the
+  "Ostatni start 6.09.2026" cannot be parsed out of free-text `lastStart`. At 390 the hero's CTA
+  moved into the bottom bar in E4.8, as `MobileDetail` draws it. The header over the hero is the
   homepage's `overlay` variant without its status line, so it carries the same top scrim.
 - Each video's heading row reads `m:ss · note`, and `note` is one bilingual free-text field on
   `videos[]`, not a recording date plus a music flag (E4.5). The boards' two rows carry different
@@ -363,3 +363,12 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   FAQPage JSON-LD can read. The board's `<h1>` heading is an `<h2>`, because the sub-bar label is
   the page's one h1. The dark band is now `CtaBand.astro`, shared with About. `MobileFaq` is new
   (canvas v32).
+- The 390 bottom bar is `MobileBar.astro` (E4.8): "Napisz na WhatsApp" and "Formularz", on
+  horses, grid and a live horse detail, as `MobileHorses`, `MobileHorsesGrid` and `MobileDetail`
+  draw it. A page opts in through `Page`'s `bar` prop, which carries the WhatsApp href, and the
+  detail page passes the per-horse prefilled link. A sold horse, About, Questions, the 404 and the
+  homepage video have no bar, as their boards draw. It is `position: sticky; bottom: 0` as the
+  page's last element, not `fixed`: it parks under the footer at the end, so it covers nothing and
+  needs no spacer and no JavaScript. Every route was probed at 390 × 844 with mobile emulation, and
+  none scrolls sideways. The gutter stays `--gutter-mobile` (20px), where the horses, detail and 404
+  boards draw 16px and About and Questions draw 20px.
