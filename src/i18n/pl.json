@@ -309,6 +309,7 @@
     "refreshChange": "{name} · {field}: {from} → {to}",
     "refreshError": "{name}: nie udało się ({message}). Zostaje poprzednia wartość.",
     "refreshFailed": "Livejumping nie odpowiada ({message}). Nic nie zmieniono.",
+    "refreshBroken": "Odświeżanie nie działa ({message}). Nic nie zmieniono.",
     "livejumpingHint": "Dokładnie jak na livejumping.com, np. LOTUS BLUE B&C. Puste = starty wpisujesz ręcznie.",
     "soldConfirm": "Ten koń ma zdjęcia RTG. Następna publikacja usunie je na stałe — tego nie da się cofnąć. Zapisać jako sprzedany?",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",

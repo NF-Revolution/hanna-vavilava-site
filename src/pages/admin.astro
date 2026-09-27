@@ -861,7 +861,13 @@ const hints: Record<string, string> = {
         ),
       ]);
     } catch (e) {
-      lines([admin.refreshFailed.replace('{message}', (e as Error).message)]);
+      // `unavailable` is the Function naming livejumping; anything else never reached it.
+      const { code, message } = e as { code?: string; message: string };
+      lines([
+        code === 'functions/unavailable'
+          ? admin.refreshFailed.replace('{message}', message)
+          : admin.refreshBroken.replace('{message}', code ?? message),
+      ]);
     } finally {
       refreshButton.disabled = false;
     }

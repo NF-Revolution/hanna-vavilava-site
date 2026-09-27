@@ -309,6 +309,7 @@
     "refreshChange": "{name} · {field}: {from} → {to}",
     "refreshError": "{name}: failed ({message}). The previous value stays.",
     "refreshFailed": "Livejumping is not answering ({message}). Nothing changed.",
+    "refreshBroken": "Refresh is not working ({message}). Nothing changed.",
     "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. Empty = starts are entered by hand.",
     "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
