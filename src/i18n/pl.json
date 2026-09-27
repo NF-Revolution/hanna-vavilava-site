@@ -232,6 +232,13 @@
       "title": "Prywatność — Hanna Vavilava",
       "description": "Informacja o przetwarzaniu danych osobowych.",
       "label": "Prywatność"
+    },
+    "notFound": {
+      "title": "Nie ma takiej strony — Hanna Vavilava",
+      "description": "Pod tym adresem nie ma strony.",
+      "label": "404 · Nie ma takiej strony",
+      "lead": "Pod tym adresem nie ma strony. Konie, które teraz sprzedaję:",
+      "all": "Wszystkie konie"
     }
   },
   "home": {

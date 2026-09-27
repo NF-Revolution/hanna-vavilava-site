@@ -12,9 +12,11 @@ interface Props {
   description: string;
   /* Dark is the video screens; light is every page behind the menu. */
   ground?: 'light' | 'dark';
+  /* A 404 has no canonical URL and no twin, so it drops both and asks not to be indexed. */
+  noindex?: boolean;
 }
 
-const { locale, routeKey, slug, title, description, ground = 'light' } = Astro.props;
+const { locale, routeKey, slug, title, description, ground = 'light', noindex } = Astro.props;
 const dict = t(locale);
 
 const canonical = new URL(path(locale, routeKey, slug), Astro.site);
@@ -31,17 +33,23 @@ const alternates = locales.map((l) => ({
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical.href} />
-    {alternates.map((alt) => (
-      <link rel="alternate" hreflang={htmlLang[alt.locale]} href={alt.href} />
-    ))}
-    <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <>
+        <link rel="canonical" href={canonical.href} />
+        {alternates.map((alt) => (
+          <link rel="alternate" hreflang={htmlLang[alt.locale]} href={alt.href} />
+        ))}
+        <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />
+      </>
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={dict.brand.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical.href} />
+    {!noindex && <meta property="og:url" content={canonical.href} />}
     <meta property="og:locale" content={locale === 'pl' ? 'pl_PL' : 'en_GB'} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content={ground === 'dark' ? '#0E0E0D' : '#F6F5F2'} />

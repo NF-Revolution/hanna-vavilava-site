@@ -43,6 +43,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26   |
 | E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                 |
 | E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio         |
+| E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -349,3 +350,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   photo is a repo asset (`src/assets/about/hanna.jpg`), not a database field. The band's count is
   `site.horsesAvailable` as a digit, where the board spells out "Cztery". At 390 the sub-bar drops
   the "od 2016" meta, because the bio's first line says the same. `MobileAbout` draws it.
+- The EN 404 answers 200, not 404 (E4.9). Firebase Hosting serves only the root `404.html`, so
+  `firebase.json` rewrites `/en/**` to `/en/404/index.html`, and a rewrite to a static file is a 200. Both 404 pages carry `noindex` and drop canonical, hreflang and `og:url`, so the soft 404
+  never reaches the index. The upgrade is a Cloud Function on `/en/**` that sets status 404, if
+  Search Console ever reports it. The page lists the horses as text rows, not photo cards; the
+  language switch goes to the other locale's home. `npm run preview` serves the PL 404 for every
+  miss; the EN one is at `/en/404`.
