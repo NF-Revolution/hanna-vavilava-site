@@ -34,6 +34,9 @@ const o = a.options as Record<string, string>;
 type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | 'xrays' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
+/* Facts only the starts sync writes (E2.12); the form never shows them. */
+const synced = ['lastStart', 'starts'];
+
 const sections: [legend: string, fields: Field[]][] = [
   [
     a.sections.basics,
@@ -60,7 +63,9 @@ const sections: [legend: string, fields: Field[]][] = [
     a.sections.facts,
     [
       ['livejumpingName', 'text'],
-      ...Object.keys(horseSchema.shape.facts.shape).map((k): Field => [`facts.${k}`, 'pair']),
+      ...Object.keys(horseSchema.shape.facts.shape)
+        .filter((k) => !synced.includes(k))
+        .map((k): Field => [`facts.${k}`, 'pair']),
     ],
   ],
   [
@@ -746,7 +751,15 @@ const hints: Record<string, string> = {
       editing !== null
         ? (horses[editing].order ?? 0)
         : Math.max(-1, ...Object.values(horses).map((h) => h.order ?? 0)) + 1;
-    const result = horseSchema.safeParse({ ...fromFields(fields), order });
+    const horse = fromFields(fields);
+    // The starts sync owns these two, so a Save keeps what it last wrote.
+    const stored = editing !== null ? horses[editing].facts : undefined;
+    horse.facts = {
+      ...horse.facts,
+      lastStart: stored?.lastStart ?? null,
+      starts: stored?.starts ?? null,
+    };
+    const result = horseSchema.safeParse({ ...horse, order });
     if (!result.success) {
       const issues = result.error.issues;
       fail([admin.invalid, ...issues.map((i) => `${i.path.join('.')}: ${i.message}`)]);
@@ -854,7 +867,7 @@ const hints: Record<string, string> = {
             .replace('{name}', c.name)
             .replace('{field}', admin.fields[`facts.${c.field}`])
             .replace('{from}', c.from || '—')
-            .replace('{to}', c.to),
+            .replace('{to}', c.to || admin.refreshCleared),
         ),
         ...data.errors.map((e) =>
           admin.refreshError.replace('{name}', e.name).replace('{message}', e.message),

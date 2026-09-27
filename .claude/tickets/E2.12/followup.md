@@ -10,6 +10,9 @@ Shipped 2026-09-27 — see the last `## Outcome` at the bottom.
 - trap: live livejumping probe (curl of their bundle + API) denied by auto-mode classifier. Row types + pagination unverified beyond #108; code throws on `last_page > 1` and on malformed rows
 - functions emulator ignores `startsWeekly` (no pubsub emulator) — only load is checked, not the trigger
 - secretmanager 403 lines in `npm test` output are pre-existing demo-project noise
+- reopened same day on owner feedback (PR #115): Refresh showed `internal` — `refreshStarts` not deployed (OPTIONS 404, `publish` 204). Callable SDK reports 404/CORS as `functions/internal`; panel now blames livejumping only on `functions/unavailable`
+- owner: starts facts sync-only, placeholder "Informacja na zapytanie" when none. "52 starty, 29 czystych" on site = E2.9 seed values in prod DB, not in repo
+- canvas publish refused once "not viewed latest" though sha matched — a plain `read` of the artifact url (no path) cleared it; published v33
   next: none — shipped.
 
 ## What was built — 2026-09-27
@@ -44,3 +47,24 @@ Shipped 2026-09-27 — see the last `## Outcome` at the bottom.
 **Rejected:** all-or-nothing across horses (one misspelt name blocks all); dispatch without sold-X-ray cleanup (Monday deploy could ship sold horse's films); `Intl` for EN date (`Sept`); rules `.validate` for the field (rules never check shape here).
 **Traps for next time:** Monday deploy publishes whole DB incl. unpublished saves; panel Save of a horse open across the run writes old facts back; pagination + row types unverified live — Hanna's first Refresh is the live check; emulator skips `startsWeekly`.
 **Files that mattered:** `functions/starts.js`, `functions/index.js`, `src/pages/admin.astro`, `src/horse.ts`, `tests/starts.test.mjs`
+
+## What was built — 2026-09-27 (cycle 2)
+
+**Problem:** owner wants the two starts facts gone from hand-entered data; no livejumping data → placeholder.
+
+**Steps:**
+
+1. `src/horse.ts`: `facts.lastStart` / `facts.starts` → `text.nullable().default(null)`
+2. `src/components/HorseDetail.astro`: `?? d.infoOnRequest` ("Informacja na zapytanie" / "Information on request")
+3. `src/pages/admin.astro`: `synced` list filters both out of the Facts form; submit copies stored values into the parse so a Save never drops them; change line shows `refreshCleared` when a fact goes `null`; `refreshBroken` for non-livejumping failures
+4. `functions/index.js` `syncStarts`: every unsold horse; no name / zero rows / no finished round → `null` (clears seed values); key fetched up front only if any horse is named
+5. `src/fixture.json`: seed starts removed, so the build renders the placeholder path
+6. canvas v33: `HorseDetail`, `MobileDetail` rows in synced format + placeholder note
+
+## Outcome — 2026-09-27 (cycle 2)
+
+**Approach:** `null` in the database, placeholder at render — no sentinel string stored.
+**Bugs met:** Refresh `internal` → function never deployed → deploy `functions`; misleading "Livejumping nie odpowiada" → `admin.astro` catch branches on `functions/unavailable`.
+**Rejected:** zero rows = error (cycle 1) — owner prefers placeholder; misspelt name now shows in the panel change list only. Keeping fields hand-editable — owner chose sync-only.
+**Traps for next time:** hero meta line on `HorseDetail` board still reads "Ostatni start 6.09.2026 · …" — code never rendered it; placeholder only appears after Refresh + Publish, since prod DB still holds seed text until the first sync.
+**Files that mattered:** `functions/index.js`, `src/pages/admin.astro`, `src/horse.ts`, `src/components/HorseDetail.astro`

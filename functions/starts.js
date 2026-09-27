@@ -75,7 +75,7 @@ const ordinal = (n) =>
 /*
  * Every row is a start — every rider, and withdrawn (`REZ`) or unfinished rounds too.
  * The last start is the latest round the horse finished, never a withdrawal; `null`
- * when there is none, and the stored one stays.
+ * when there is none, which the page shows as "on request".
  */
 export function startFacts(starts) {
   const seasons = {};

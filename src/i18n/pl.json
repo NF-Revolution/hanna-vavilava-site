@@ -99,6 +99,7 @@
       "gelding": "Zapytaj o wałacha {name}"
     },
     "prefill": "Dzień dobry, piszę w sprawie konia {name}: {url}",
+    "infoOnRequest": "Informacja na zapytanie",
     "rows": {
       "pedigree": "Pochodzenie",
       "breeding": "Hodowla",
@@ -310,7 +311,8 @@
     "refreshError": "{name}: nie udało się ({message}). Zostaje poprzednia wartość.",
     "refreshFailed": "Livejumping nie odpowiada ({message}). Nic nie zmieniono.",
     "refreshBroken": "Odświeżanie nie działa ({message}). Nic nie zmieniono.",
-    "livejumpingHint": "Dokładnie jak na livejumping.com, np. LOTUS BLUE B&C. Puste = starty wpisujesz ręcznie.",
+    "refreshCleared": "puste (Informacja na zapytanie)",
+    "livejumpingHint": "Dokładnie jak na livejumping.com, np. LOTUS BLUE B&C. Puste lub brak startów = na stronie „Informacja na zapytanie”.",
     "soldConfirm": "Ten koń ma zdjęcia RTG. Następna publikacja usunie je na stałe — tego nie da się cofnąć. Zapisać jako sprzedany?",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {

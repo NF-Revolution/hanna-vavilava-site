@@ -99,6 +99,7 @@
       "gelding": "Ask about {name}"
     },
     "prefill": "Hello, I am writing about {name}: {url}",
+    "infoOnRequest": "Information on request",
     "rows": {
       "pedigree": "Pedigree",
       "breeding": "Breeding",
@@ -310,7 +311,8 @@
     "refreshError": "{name}: failed ({message}). The previous value stays.",
     "refreshFailed": "Livejumping is not answering ({message}). Nothing changed.",
     "refreshBroken": "Refresh is not working ({message}). Nothing changed.",
-    "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. Empty = starts are entered by hand.",
+    "refreshCleared": "empty (Information on request)",
+    "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. Empty or no starts = “Information on request” on the site.",
     "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {

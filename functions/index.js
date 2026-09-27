@@ -211,39 +211,40 @@ export const publish = onCall(
 );
 
 /*
- * Starts from livejumping (E2.12), for every horse with a `livejumpingName` that is
- * not sold. A horse that fails keeps its stored facts and does not stop the others;
- * a missing key throws for the whole run. Zero matching rows is an error, not a
- * count of 0: it is a misspelt name far more often than a horse that never started.
- * Only a fact whose text changed is written.
+ * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
+ * these two facts. No `livejumpingName`, no matching rows, or no finished round
+ * leaves the fact `null`, which the page shows as "on request". A horse livejumping
+ * fails on keeps its stored facts and does not stop the others; a missing key
+ * throws for the whole run. Only a fact whose text changed is written.
  *
- * ponytail: a panel Save of a horse left open across the Monday run writes the old
- * facts back, and the next run puts them right. A transaction per horse is the upgrade.
+ * ponytail: a misspelt name reads as "no starts" and shows "on request"; the panel's
+ * change list is where Hanna sees it. A panel Save of a horse left open across the
+ * Monday run writes the old facts back, and the next run puts them right.
  */
 async function syncStarts() {
   const db = getDatabase();
   const horses = (await db.ref('horses').get()).val() ?? {};
-  const named = Object.entries(horses).filter(
-    ([, horse]) => horse?.livejumpingName && horse.status !== 'sold',
-  );
+  const unsold = Object.entries(horses).filter(([, horse]) => horse && horse.status !== 'sold');
   const changes = [];
   const errors = [];
-  if (named.length === 0) return { changes, errors };
 
-  const key = await apiKey();
-  for (const [slug, horse] of named) {
+  // Before any write, so a missing key changes nothing.
+  const key = unsold.some(([, horse]) => horse.livejumpingName) ? await apiKey() : undefined;
+  for (const [slug, horse] of unsold) {
     const name = horse.name ?? slug;
     try {
-      const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
-      if (starts.length === 0) throw new Error(`no starts found for "${horse.livejumpingName}"`);
-      const facts = startFacts(starts);
+      let facts = { starts: null, lastStart: null };
+      if (horse.livejumpingName) {
+        const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
+        if (starts.length) facts = startFacts(starts);
+      }
       const write = {};
       for (const field of ['starts', 'lastStart']) {
         const to = facts[field];
-        const from = horse.facts?.[field];
-        if (!to || (to.pl === from?.pl && to.en === from?.en)) continue;
+        const from = horse.facts?.[field] ?? null;
+        if (to?.pl === from?.pl && to?.en === from?.en) continue;
         write[`horses/${slug}/facts/${field}`] = to;
-        changes.push({ name, field, from: from?.pl ?? '', to: to.pl });
+        changes.push({ name, field, from: from?.pl ?? '', to: to?.pl ?? '' });
       }
       if (Object.keys(write).length) await db.ref().update(write);
     } catch (e) {

@@ -61,8 +61,9 @@ export const horseSchema = z.strictObject({
   facts: z.object({
     breeding: text,
     trainingLevel: text,
-    lastStart: text,
-    starts: text,
+    /* Written only by the starts sync (E2.12); `null` shows "on request" on the page. */
+    lastStart: text.nullable().default(null),
+    starts: text.nullable().default(null),
     technique: text,
     rideability: text,
     temperament: text,
