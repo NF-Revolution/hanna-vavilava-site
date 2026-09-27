@@ -103,6 +103,10 @@
       "gelding": "Ask about {name}"
     },
     "prefill": "Hello, I am writing about {name}: {url}",
+    "livejumping": {
+      "link": "Results on livejumping",
+      "newTab": "(livejumping.com, opens in a new tab)"
+    },
     "infoOnRequest": "Information on request",
     "rows": {
       "pedigree": "Pedigree",
