@@ -56,7 +56,13 @@ const sections: [legend: string, fields: Field[]][] = [
       ['price', 'number'],
     ],
   ],
-  [a.sections.facts, Object.keys(horseSchema.shape.facts.shape).map((k) => [`facts.${k}`, 'pair'])],
+  [
+    a.sections.facts,
+    [
+      ['livejumpingName', 'text'],
+      ...Object.keys(horseSchema.shape.facts.shape).map((k): Field => [`facts.${k}`, 'pair']),
+    ],
+  ],
   [
     a.sections.fit,
     [
@@ -98,7 +104,11 @@ const sections: [legend: string, fields: Field[]][] = [
   ],
 ];
 
-const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xraysHint };
+const hints: Record<string, string> = {
+  price: a.priceHint,
+  'xrays.count': a.xraysHint,
+  livejumpingName: a.livejumpingHint,
+};
 ---
 
 <!doctype html>
@@ -170,6 +180,13 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
             <small>{a.publishHint}</small>
           </p>
           <p id="publish-status" role="status"></p>
+          <p>
+            <button type="button" id="refresh-starts">
+              {a.refreshStarts}
+            </button>
+            <small>{a.refreshStartsHint}</small>
+          </p>
+          <ul id="refresh-status" role="status"></ul>
         </section>
 
         <form id="editor" hidden>
@@ -810,6 +827,47 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   });
 
   /*
+   * Refresh starts (E2.12): the Function writes the facts that changed and names
+   * them here, with any horse livejumping failed on. Publish takes them live.
+   */
+  const refreshButton = $<HTMLButtonElement>('refresh-starts');
+  const refreshStatus = $('refresh-status');
+  type Change = { name: string; field: 'starts' | 'lastStart'; from: string; to: string };
+  const refreshCall = httpsCallable<
+    void,
+    { changes: Change[]; errors: { name: string; message: string }[] }
+  >(functions, 'refreshStarts');
+  const lines = (texts: string[]) =>
+    refreshStatus.replaceChildren(
+      ...texts.map((text) => Object.assign(document.createElement('li'), { textContent: text })),
+    );
+
+  refreshButton.addEventListener('click', async () => {
+    refreshButton.disabled = true;
+    lines([admin.refreshSending]);
+    try {
+      const { data } = await refreshCall();
+      lines([
+        ...(data.changes.length ? [] : [admin.refreshNone]),
+        ...data.changes.map((c) =>
+          admin.refreshChange
+            .replace('{name}', c.name)
+            .replace('{field}', admin.fields[`facts.${c.field}`])
+            .replace('{from}', c.from || '—')
+            .replace('{to}', c.to),
+        ),
+        ...data.errors.map((e) =>
+          admin.refreshError.replace('{name}', e.name).replace('{message}', e.message),
+        ),
+      ]);
+    } catch (e) {
+      lines([admin.refreshFailed.replace('{message}', (e as Error).message)]);
+    } finally {
+      refreshButton.disabled = false;
+    }
+  });
+
+  /*
    * The enquiry inbox (E2.7). E5.3 writes each record with `createdAt` (ms) and
    * the form's fields; `handled` is the panel's own, `true` or absent. The values
    * are anonymous public input, so they only ever reach the page as textContent.
@@ -1070,7 +1128,8 @@ const hints: Record<string, string> = { price: a.priceHint, 'xrays.count': a.xra
   }
   #errors:empty,
   #list-error:empty,
-  #enquiry-error:empty {
+  #enquiry-error:empty,
+  #refresh-status:empty {
     display: none;
   }
   .actions {
