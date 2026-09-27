@@ -210,7 +210,38 @@
     "faq": {
       "title": "Questions — Hanna Vavilava",
       "description": "Price negotiation, the pre-purchase exam, buying without travelling to Poland, trial periods and viewing lead times — the six questions I am asked most.",
-      "label": "Questions · 06"
+      "label": "Questions · 06",
+      "meta": "Hanna answers",
+      "heading": "The questions I am asked most.",
+      "intro": "If something is missing here, just ask — I answer myself.",
+      "items": [
+        {
+          "q": "Is the price negotiable?",
+          "a": "Prices are stated exactly and are the prices the horses sell for. I do not raise the asking price only to lower it later. If the pre-purchase exam finds something I did not list on the horse's page, we talk about the price or about calling the sale off."
+        },
+        {
+          "q": "Who carries out the pre-purchase exam?",
+          "a": "A vet chosen by the buyer. I do not insist on a clinic or a vet. The buyer pays for the exam, and the horse is available at the stable on the agreed day."
+        },
+        {
+          "q": "Can I buy a horse without travelling to Poland?",
+          "a": "Yes, but not on the strength of a video alone. The order is always the same: a video call, the full uncut footage, a pre-purchase exam by a vet of your choice, and a viewing by someone you trust. The buyer makes the decision, not me."
+        },
+        {
+          "q": "What happens once I decide to buy?",
+          "a": "A written contract describing the horse, the price and its health on the day of sale, then payment and a date for collection. We arrange the collection directly, not through the site."
+        },
+        {
+          "q": "Is a trial period possible?",
+          "a": "No. Instead I offer as many rides as you like during the visit, full uncut recordings and a pre-purchase exam as thorough as you choose."
+        },
+        {
+          "q": "How long does it take to arrange a viewing?",
+          "a": "Three to five working days. The horses are in training — I need a day to prepare the horse and book a rider to present it."
+        }
+      ],
+      "band": "A question with no answer here? I reply within the hour, {hours}.",
+      "enquiry": "Enquiry form"
     },
     "enquiry": {
       "title": "Enquiry — Hanna Vavilava",

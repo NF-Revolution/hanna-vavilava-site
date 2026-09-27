@@ -8,11 +8,12 @@
 import { Picture } from 'astro:assets';
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
+import CtaBand from './CtaBand.astro';
 import portrait from '../assets/about/hanna.jpg';
 import { t, type Locale } from '../i18n';
 import { fill, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
-import { site, whatsappHref } from '../site';
+import { site } from '../site';
 
 interface Props {
   locale: Locale;
@@ -64,20 +65,12 @@ const page = dict.pages.about;
     </ol>
   </section>
 
-  <!-- ponytail: inline until a second page draws this band (E4.7, E4.8); then a component. -->
-  <section class="band dk">
-    <p class="band-line">
-      {`${plural(locale, page.band, site.horsesAvailable)} ${page.bandReply}`}
-    </p>
-    <div class="band-actions">
-      <a class="lbl btn btn-solid" href={whatsappHref()}>
-        {dict.menu.whatsapp}
-      </a>
-      <a class="lbl btn btn-outline" href={path(locale, 'horses')}>
-        {page.seeHorses}
-      </a>
-    </div>
-  </section>
+  <CtaBand
+    locale={locale}
+    line={`${plural(locale, page.band, site.horsesAvailable)} ${page.bandReply}`}
+    href={path(locale, 'horses')}
+    label={page.seeHorses}
+  />
 </Page>
 
 <style>
@@ -175,48 +168,6 @@ const page = dict.pages.about;
     color: var(--ink-muted);
   }
 
-  /* ---- The page's one inverted band ---- */
-
-  .band {
-    background: var(--ground-dark);
-    color: var(--ink-inv);
-    padding: 60px var(--gutter);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 60px;
-  }
-
-  .band-line {
-    max-width: 620px;
-    margin: 0;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-  }
-
-  .band-actions {
-    display: flex;
-    gap: 26px;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--tap);
-    padding: 19px 36px;
-    border: 1px solid var(--ink-inv);
-  }
-
-  .btn-solid {
-    background: var(--ink-inv);
-    color: var(--ground-dark);
-  }
-
-  .band a.btn-solid:hover {
-    color: var(--ink-muted);
-  }
-
   @media (max-width: 720px) {
     /* No room beside the label at 390, and the bio's first line says the same. */
     .sub-meta {
@@ -264,28 +215,6 @@ const page = dict.pages.about;
 
     .step-text {
       flex-basis: 100%;
-    }
-
-    .band {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 28px;
-      padding: 40px var(--gutter-mobile) 44px;
-    }
-
-    .band-line {
-      font-size: 21px;
-      line-height: 1.25;
-    }
-
-    .band-actions {
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn {
-      min-height: 52px;
-      padding: 0;
     }
   }
 </style>

@@ -210,7 +210,38 @@
     "faq": {
       "title": "Pytania — Hanna Vavilava",
       "description": "Negocjacje ceny, badanie przedzakupowe, zakup bez przyjazdu do Polski, okres próbny i termin oglądania — sześć pytań, na które odpowiadam najczęściej.",
-      "label": "Pytania · 06"
+      "label": "Pytania · 06",
+      "meta": "Odpowiada Hanna",
+      "heading": "Pytania, które dostaję najczęściej.",
+      "intro": "Jeśli czegoś tu brakuje, proszę zapytać wprost — odpowiadam sama.",
+      "items": [
+        {
+          "q": "Czy cena podlega negocjacji?",
+          "a": "Ceny są podane dokładnie i są cenami, za które konie są sprzedawane. Nie podnoszę ceny startowej po to, żeby ją później obniżyć. Jeśli badanie przedzakupowe wykaże coś, czego nie podałam na karcie konia, rozmawiamy o cenie albo o rezygnacji z transakcji."
+        },
+        {
+          "q": "Kto wykonuje badanie przedzakupowe?",
+          "a": "Weterynarz wybrany przez kupującego. Nie narzucam kliniki ani lekarza. Koszt badania ponosi kupujący, a koń jest dostępny w stajni w uzgodnionym dniu."
+        },
+        {
+          "q": "Czy można kupić konia bez przyjazdu do Polski?",
+          "a": "Tak, ale nie na podstawie samego filmu. Kolejność jest zawsze ta sama: rozmowa wideo, pełny materiał bez cięć, badanie przedzakupowe przez wybranego przez Państwa weterynarza i oglądanie przez zaufanego przedstawiciela. Decyzję podejmuje kupujący, nie ja."
+        },
+        {
+          "q": "Co dzieje się po decyzji o zakupie?",
+          "a": "Umowa pisemna z opisem konia, ceną i stanem zdrowia na dzień sprzedaży, następnie płatność i ustalenie terminu odbioru. Szczegóły odbioru omawiamy bezpośrednio, nie przez stronę."
+        },
+        {
+          "q": "Czy jest możliwy okres próbny?",
+          "a": "Nie. W zamian oferuję nieograniczoną liczbę przejazdów w trakcie wizyty, pełne nagrania bez cięć i badanie przedzakupowe w zakresie, który Państwo wybiorą."
+        },
+        {
+          "q": "Ile trwa umówienie oglądania?",
+          "a": "Od trzech do pięciu dni roboczych. Konie są w treningu — potrzebuję jednego dnia na przygotowanie konia i uzgodnienie jeźdźca do prezentacji."
+        }
+      ],
+      "band": "Pytanie, na które nie ma tu odpowiedzi? Odpowiadam w ciągu godziny, {hours}.",
+      "enquiry": "Formularz zapytania"
     },
     "enquiry": {
       "title": "Zapytanie — Hanna Vavilava",
