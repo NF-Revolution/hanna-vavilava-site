@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { rows, startFacts } from '../functions/starts.js';
+import { rows, searchTerm, startFacts } from '../functions/starts.js';
 
 /* Lotus Blue's 2026 rows as #108 found them, newest first, plus a decoy and a 2025 start. */
 const row = (data, s_zawodnik, klasa, wysokosc_p, miejsce, ukonczyl, s_kon = 'LOTUS BLUE B&C') => ({
@@ -50,4 +50,10 @@ test('ordinals, a missing placing, and no finished round', () => {
 test('a row livejumping never promised throws instead of counting', () => {
   assert.throws(() => rows([row('12.09.2026', 'H', 'N', 120, 2, 1)], 'LOTUS BLUE B&C'));
   assert.throws(() => rows([row('2026-09-12', 'H', 'N', 120, 2, 'yes')], 'LOTUS BLUE B&C'));
+});
+
+test('the search term stops before the first symbol, which livejumping cannot search', () => {
+  assert.equal(searchTerm('LOTUS BLUE B&C'), 'LOTUS BLUE B');
+  assert.equal(searchTerm('CASCADA'), 'CASCADA');
+  assert.equal(searchTerm('ŻAR 2'), 'ŻAR 2');
 });

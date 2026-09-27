@@ -22,12 +22,18 @@ export async function apiKey() {
   return key;
 }
 
+/*
+ * The search matches substrings but finds nothing once the term holds a symbol
+ * (`LOTUS BLUE B&C` → 0 rows, `LOTUS BLUE B` → all of them), so it is cut at the first one.
+ */
+export const searchTerm = (name) => name.split(/[^\p{L}\p{N} ]/u)[0].trim();
+
 /* One calendar year: the API takes `year` and returns that year only. */
 async function fetchYear(key, name, year) {
   const res = await fetch(`${site}/api/v1/search/horse`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json', apikey: key },
-    body: JSON.stringify({ szukaj: name, year }),
+    body: JSON.stringify({ szukaj: searchTerm(name), year }),
     signal: timeout(),
   });
   if (!res.ok) throw new Error(`livejumping answered ${res.status} for ${year}`);
