@@ -42,6 +42,10 @@
     "enquiry": "Zapytanie",
     "privacy": "Prywatność"
   },
+  "bar": {
+    "whatsapp": "Napisz na WhatsApp",
+    "form": "Formularz"
+  },
   "menu": {
     "horsesMeta": "{count} dostępne",
     "aboutMeta": "i jak przebiega zakup",

@@ -12,7 +12,7 @@ import ViewSwitch from './ViewSwitch.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice } from '../i18n/format';
 import { path } from '../i18n/routes';
-import { site } from '../site';
+import { site, whatsappHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -24,7 +24,13 @@ const horses = dict.pages.horses;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<Page locale={locale} routeKey="horsesGrid" title={page.title} description={page.description}>
+<Page
+  locale={locale}
+  routeKey="horsesGrid"
+  title={page.title}
+  description={page.description}
+  bar={whatsappHref()}
+>
   <SubBar label={`${page.label} · ${pad(site.horsesListed.length)}`}>
     <p slot="label" class="lbl as-of">
       <span aria-hidden="true">·</span>

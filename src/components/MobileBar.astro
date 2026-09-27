@@ -1,0 +1,73 @@
+---
+/*
+ * The persistent WhatsApp action at 390 (E4.8), as MobileHorses,
+ * MobileHorsesGrid and MobileDetail draw it. Never over the video, and never on
+ * a sold horse, so the page opts in through `Page`'s `bar` prop.
+ *
+ * Sticky, not fixed: as the last thing in the page it stays on the viewport's
+ * bottom edge while scrolling and parks under the footer at the end, so it
+ * never covers the footer and needs no spacer and no script.
+ */
+import WhatsApp from './icons/WhatsApp.astro';
+import { t, type Locale } from '../i18n';
+import { path } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  whatsapp: string;
+}
+const { locale, whatsapp } = Astro.props;
+const dict = t(locale);
+---
+
+<div class="mbar">
+  <a class="lbl mbar-wa" href={whatsapp}>
+    <WhatsApp size={17} />
+    {dict.bar.whatsapp}
+  </a>
+  <a class="lbl mbar-form" href={path(locale, 'enquiry')}>
+    {dict.bar.form}
+  </a>
+</div>
+
+<style>
+  .mbar {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .mbar {
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      display: flex;
+      gap: 12px;
+      padding: 12px var(--gutter-mobile) calc(16px + env(safe-area-inset-bottom));
+      background: rgba(246, 245, 242, 0.94);
+      border-top: 1px solid var(--rule);
+    }
+
+    .mbar a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      border: 1px solid var(--ink);
+    }
+
+    .mbar-wa {
+      flex-grow: 1;
+      gap: 10px;
+      background: var(--ink);
+      color: var(--ground-light);
+    }
+
+    a.mbar-wa:hover {
+      color: var(--ink-inv-muted);
+    }
+
+    .mbar-form {
+      padding: 0 18px;
+    }
+  }
+</style>
