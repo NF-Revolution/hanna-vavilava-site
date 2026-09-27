@@ -43,6 +43,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26   |
 | E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                 |
 | E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio         |
+| E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`   |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
@@ -356,3 +357,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   Search Console ever reports it. The page lists the horses as text rows, not photo cards; the
   language switch goes to the other locale's home. `npm run preview` serves the PL 404 for every
   miss; the EN one is at `/en/404`.
+- The Questions page is six native `<details>`, all closed, with the answers in the HTML, so it needs
+  no JavaScript and every answer is indexable (E4.7). The copy is `pages.faq.items[]`, which #52's
+  FAQPage JSON-LD can read. The board's `<h1>` heading is an `<h2>`, because the sub-bar label is
+  the page's one h1. The dark band is now `CtaBand.astro`, shared with About. `MobileFaq` is new
+  (canvas v32).

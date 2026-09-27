@@ -1,0 +1,154 @@
+---
+/*
+ * Questions (E4.7): six native disclosures, so the answers are in the HTML
+ * with no JavaScript, and the dark band. The icon reads + closed and − open.
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import CtaBand from './CtaBand.astro';
+import { t, type Locale } from '../i18n';
+import { fill } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { site } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const page = t(locale).pages.faq;
+---
+
+<Page locale={locale} routeKey="faq" title={page.title} description={page.description}>
+  <SubBar label={page.label}>
+    <p class="meta sub-meta">{page.meta}</p>
+  </SubBar>
+
+  <section class="faq">
+    <div class="intro">
+      <h2 class="heading">{page.heading}</h2>
+      <p class="copy intro-text">{page.intro}</p>
+    </div>
+    {page.items.map((item) => (
+      <details>
+        <summary class="lbl">
+          {item.q}
+          <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 7h12" />
+            <path class="vert" d="M7 1v12" />
+          </svg>
+        </summary>
+        <p class="copy answer">{item.a}</p>
+      </details>
+    ))}
+  </section>
+
+  <CtaBand
+    locale={locale}
+    line={fill(page.band, { hours: site.responseWindow })}
+    href={path(locale, 'enquiry')}
+    label={page.enquiry}
+  />
+</Page>
+
+<style>
+  .sub-meta {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  .faq {
+    padding: 64px var(--gutter) 72px;
+  }
+
+  .intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+    margin-bottom: 44px;
+  }
+
+  .heading {
+    max-width: 680px;
+    margin: 0;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .intro-text {
+    max-width: 340px;
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  details {
+    border-top: 1px solid var(--rule);
+  }
+
+  details:last-of-type {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    min-height: var(--tap);
+    padding: 24px 0;
+    box-sizing: border-box;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  svg {
+    flex: none;
+    stroke: var(--ink-muted);
+    stroke-width: 1;
+  }
+
+  details[open] .vert {
+    display: none;
+  }
+
+  .answer {
+    max-width: 780px;
+    margin: 0;
+    padding-bottom: 28px;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 720px) {
+    .faq {
+      padding: 36px var(--gutter-mobile) 48px;
+    }
+
+    .intro {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .heading {
+      font-size: 28px;
+    }
+
+    summary {
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .answer {
+      padding-bottom: 22px;
+    }
+  }
+</style>

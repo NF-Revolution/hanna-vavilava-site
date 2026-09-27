@@ -1,0 +1,95 @@
+---
+/*
+ * The dark band that closes About and Questions: one line on the left, the
+ * WhatsApp button and one outline link on the right.
+ */
+import { t, type Locale } from '../i18n';
+import { whatsappHref } from '../site';
+
+interface Props {
+  locale: Locale;
+  line: string;
+  href: string;
+  label: string;
+}
+const { locale, line, href, label } = Astro.props;
+const dict = t(locale);
+---
+
+<section class="band dk">
+  <p class="band-line">{line}</p>
+  <div class="band-actions">
+    <a class="lbl btn btn-solid" href={whatsappHref()}>
+      {dict.menu.whatsapp}
+    </a>
+    <a class="lbl btn btn-outline" href={href}>
+      {label}
+    </a>
+  </div>
+</section>
+
+<style>
+  .band {
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    padding: 60px var(--gutter);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+
+  .band-line {
+    max-width: 620px;
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+  }
+
+  .band-actions {
+    display: flex;
+    gap: 26px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    padding: 19px 36px;
+    border: 1px solid var(--ink-inv);
+  }
+
+  .btn-solid {
+    background: var(--ink-inv);
+    color: var(--ground-dark);
+  }
+
+  .band a.btn-solid:hover {
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 720px) {
+    .band {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 28px;
+      padding: 40px var(--gutter-mobile) 44px;
+    }
+
+    .band-line {
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .band-actions {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      min-height: 52px;
+      padding: 0;
+    }
+  }
+</style>
