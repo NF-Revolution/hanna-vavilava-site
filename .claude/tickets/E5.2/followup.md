@@ -3,6 +3,7 @@
 Shipped 2026-09-28 — see the last `## Outcome` at the bottom.
 
 Issue [#41](https://github.com/NF-Revolution/hanna-vavilava-site/issues/41) ·
+PR [#127](https://github.com/NF-Revolution/hanna-vavilava-site/pull/127) ·
 branch `41-e52-prefilled-and-secondary-forms` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 38
 
 ## 2026-09-28
