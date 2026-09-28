@@ -24,6 +24,7 @@ const alternates = locales.map((l) => ({
   locale: l,
   href: new URL(path(l, routeKey, slug), Astro.site).href,
 }));
+const ogLocale: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' };
 ---
 
 <!doctype html>
@@ -42,6 +43,11 @@ const alternates = locales.map((l) => ({
           <link rel="alternate" hreflang={htmlLang[alt.locale]} href={alt.href} />
         ))}
         <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />
+        {locales
+          .filter((l) => l !== locale)
+          .map((l) => (
+            <meta property="og:locale:alternate" content={ogLocale[l]} />
+          ))}
       </>
     )}
 
@@ -50,7 +56,7 @@ const alternates = locales.map((l) => ({
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {!noindex && <meta property="og:url" content={canonical.href} />}
-    <meta property="og:locale" content={locale === 'pl' ? 'pl_PL' : 'en_GB'} />
+    <meta property="og:locale" content={ogLocale[locale]} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content={ground === 'dark' ? '#0E0E0D' : '#F6F5F2'} />
 

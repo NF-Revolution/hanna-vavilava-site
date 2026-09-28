@@ -87,7 +87,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   routeKey="horse"
   slug={slug}
   title={`${horse.name} — ${dict.brand.name}`}
-  description={dict.pages.horses.description}
+  description={horse.headline[locale]}
   headerLinks={['horses', 'enquiry']}
   header="overlay"
   bar={sold ? undefined : cta}
