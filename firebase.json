@@ -8,7 +8,13 @@
     "cleanUrls": true,
     "trailingSlash": false,
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "/en/**", "destination": "/en/404/index.html" }],
+    "rewrites": [
+      {
+        "source": "/api/enquiry",
+        "function": { "functionId": "submitEnquiry", "region": "europe-central2" }
+      },
+      { "source": "/en/**", "destination": "/en/404/index.html" }
+    ],
     "headers": [
       {
         "source": "/fonts/**",

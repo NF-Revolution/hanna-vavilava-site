@@ -10,8 +10,10 @@
  * country field is a buyer Hanna cannot call back. `instagram` takes no pattern,
  * so a pasted profile link is not refused; the endpoint (#42) normalises it.
  *
- * ponytail: `/api/enquiry` has no Hosting rewrite yet — #42 adds it together
- * with `submitEnquiry`, since a rewrite to a missing function fails the deploy.
+ * `/api/enquiry` is rewritten to `submitEnquiry` (E5.3). `locale` picks the sent
+ * page; `website` is the honeypot, off-screen and out of the tab order; `elapsed`
+ * is the time trap, filled on submit by the one inline script, and simply absent
+ * without JavaScript.
  */
 import { t, type Locale } from '../i18n';
 import { formatPrice } from '../i18n/format';
@@ -40,6 +42,12 @@ const selects = [
 ---
 
 <form class="enquiry" method="post" action="/api/enquiry">
+  <input type="hidden" name="locale" value={locale} />
+  <input type="hidden" name="elapsed" />
+  <label class="trap" aria-hidden="true">
+    {f.trap}
+    <input name="website" type="text" tabindex="-1" autocomplete="off" />
+  </label>
   <div class="fields">
     <label class="fld">
       <span class="lbl">{f.name}</span>
@@ -116,7 +124,19 @@ const selects = [
   </div>
 </form>
 
+<script is:inline>
+  for (const form of document.querySelectorAll('form.enquiry'))
+    form.addEventListener('submit', () => {
+      form.elapsed.value = Math.round(performance.now());
+    });
+</script>
+
 <style>
+  .trap {
+    position: absolute;
+    left: -9999px;
+  }
+
   .enquiry {
     display: flex;
     flex-direction: column;
