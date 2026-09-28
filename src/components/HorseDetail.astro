@@ -3,6 +3,8 @@
  * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, sales
  * video, facts, the uncut round, suitability, health, gallery, viewing and the
  * other horses. A video or a gallery with nothing to show is left out (E4.5).
+ * The enquiry, with this horse preselected, is the page's inverted band (E5.2),
+ * and at 390 too: no script could carry the horse to the enquiry page.
  *
  * A sold horse keeps its URL for good, because WhatsApp links circulate for
  * years (E2.8). Its page is the trimmed state on `HorseDetailSold` /
@@ -16,6 +18,7 @@ import SubBar from './SubBar.astro';
 import Photo from './Photo.astro';
 import Video from './Video.astro';
 import Gallery from './Gallery.astro';
+import EnquiryForm from './EnquiryForm.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -114,6 +117,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   header="overlay"
   bar={sold ? undefined : cta}
   image={image}
+  barForm={`${path(locale, 'horse', slug)}#enquiry`}
 >
   <section class="hero">
     {horse.photos[0] && (
@@ -300,7 +304,22 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           ))}
         </div>
       </section>
-      <!-- E5.2 (#41) — the enquiry for this horse. -->
+      <section class="enquire dk" id="enquiry">
+        <div class="enquire-intro">
+          <div>
+            <h2 class="lbl enquire-label">
+              {fill(d.enquiry.heading[horse.sex], { name: horse.name })}
+            </h2>
+            <p class="enquire-lead">{d.enquiry.lead}</p>
+          </div>
+          <p class="copy num enquire-meta">
+            {[horse.name, horse.born, `${horse.heightCm} cm`, `${horse.levelCm} cm`, price].join(
+              ' · ',
+            )}
+          </p>
+        </div>
+        <EnquiryForm locale={locale} horse={slug} dark />
+      </section>
     </>
   )}
 
@@ -589,6 +608,41 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     display: none;
   }
 
+  /* ---- Enquiry: a live horse's one inverted band ---- */
+
+  .enquire {
+    background: var(--ground-dark);
+    color: var(--ink-inv);
+    padding: 84px var(--gutter) 90px;
+  }
+
+  .enquire-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 60px;
+    margin-bottom: 48px;
+  }
+
+  .enquire-label {
+    margin: 0 0 16px;
+    font-weight: inherit;
+    color: var(--ink-inv-muted);
+  }
+
+  .enquire-lead {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+  }
+
+  .enquire-meta {
+    max-width: 320px;
+    margin: 0;
+    color: var(--ink-inv-muted);
+  }
+
   /* ---- Sold: the page's one inverted band ---- */
 
   .sold {
@@ -764,6 +818,25 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     .card-arrow {
       display: block;
       font-size: 11px;
+    }
+
+    .enquire {
+      padding: 30px var(--gutter-mobile) 34px;
+    }
+
+    .enquire-intro {
+      display: block;
+      margin-bottom: 32px;
+    }
+
+    .enquire-label {
+      margin-bottom: 10px;
+    }
+
+    .enquire-lead {
+      margin-bottom: 16px;
+      font-size: 21px;
+      line-height: 1.25;
     }
 
     .sold {

@@ -85,6 +85,7 @@
       "browsing": "Looking around"
     },
     "horse": "Horse of interest",
+    "horseSelected": "Horse — selected",
     "undecided": "Not decided yet",
     "note": "Message — optional",
     "submit": "Send enquiry",
@@ -183,7 +184,14 @@
       "download": "Download",
       "downloadDate": "X-rays from {date},"
     },
-    "vetNote": "The pre-purchase exam is done by a vet the buyer chooses, at the buyer's cost, to the scope the buyer sets. The horse is at the stable on the day of the exam."
+    "vetNote": "The pre-purchase exam is done by a vet the buyer chooses, at the buyer's cost, to the scope the buyer sets. The horse is at the stable on the day of the exam.",
+    "enquiry": {
+      "heading": {
+        "mare": "Enquiry about {name}",
+        "gelding": "Enquiry about {name}"
+      },
+      "lead": "Hanna replies within the hour."
+    }
   },
   "pages": {
     "home": {
@@ -294,7 +302,27 @@
       "label": "Enquiry",
       "meta": "Reply within 1 hour · {hours}",
       "heading": "You are writing directly to Hanna.",
-      "lead": "I reply within one hour, {hours}. If you would rather talk, send a WhatsApp message."
+      "lead": "I reply within one hour, {hours}. If you would rather talk, send a WhatsApp message.",
+      "search": {
+        "heading": "Looking for something else?",
+        "lead": {
+          "one": "The one horse on this site is the stable as it stands. Tell me what you need — I search to a brief and get in touch when I have a horse that meets it.",
+          "few": "The {count} horses on this site are the stable as it stands. Tell me what you need — I search to a brief and get in touch when I have a horse that meets it.",
+          "many": "The {count} horses on this site are the stable as it stands. Tell me what you need — I search to a brief and get in touch when I have a horse that meets it.",
+          "other": "The {count} horses on this site are the stable as it stands. Tell me what you need — I search to a brief and get in touch when I have a horse that meets it."
+        },
+        "level": "Level",
+        "levelPlaceholder": "e.g. 115 cm",
+        "budget": "Budget",
+        "budgetPlaceholder": "e.g. EUR 25,000",
+        "height": "Height",
+        "heightPlaceholder": "e.g. 165–170 cm",
+        "age": "Age",
+        "agePlaceholder": "e.g. 7–10 years",
+        "when": "Timeframe",
+        "whenPlaceholder": "e.g. by January",
+        "submit": "Send my brief"
+      }
     },
     "enquirySent": {
       "title": "Enquiry sent — Hanna Vavilava",

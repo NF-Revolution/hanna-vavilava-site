@@ -50,6 +50,7 @@
   --rule: #d8d6d0;
   --rule-hair: #e4e2dc;
   --rule-field: #8f8d87; /* was #c9c7c0, 1.55:1 — see below */
+  --rule-field-inv: #807f7d; /* the boards' 50% --ink-inv on --ground-dark */
   --rule-inv: #262622;
   --rule-inv-soft: #3a3a36;
 

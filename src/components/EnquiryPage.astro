@@ -1,18 +1,38 @@
 ---
-/* The enquiry page (E5.1): the heading, the reply promise and the nine-field form. */
+/*
+ * The enquiry page (E5.1): the heading, the reply promise and the nine-field
+ * form. Under it the lighter search form (E5.2), for a buyer none of the listed
+ * horses fits: free-text wishes and a WhatsApp number to write back to. It
+ * posts `kind=search`, because `level` and `budget` here are free text, not
+ * the main form's codes.
+ *
+ * ponytail: `submitEnquiry` does not accept `kind=search` yet, and the form
+ * lacks E5.3's locale, honeypot and time trap. #126 adds all of them together.
+ */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import EnquiryForm from './EnquiryForm.astro';
 import { t, type Locale } from '../i18n';
-import { fill } from '../i18n/format';
+import { fill, plural } from '../i18n/format';
 import { site } from '../site';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const page = t(locale).pages.enquiry;
+const dict = t(locale);
+const page = dict.pages.enquiry;
+const s = page.search;
+const f = dict.enquiryForm;
 const hours = { hours: site.responseWindow };
+
+const searchFields: [string, string, string, boolean?][] = [
+  ['level', s.level, s.levelPlaceholder],
+  ['budget', s.budget, s.budgetPlaceholder, true],
+  ['height', s.height, s.heightPlaceholder, true],
+  ['age', s.age, s.agePlaceholder, true],
+  ['when', s.when, s.whenPlaceholder],
+];
 ---
 
 <Page locale={locale} routeKey="enquiry" title={page.title} description={page.description}>
@@ -26,6 +46,47 @@ const hours = { hours: site.responseWindow };
       <p class="copy lead">{fill(page.lead, hours)}</p>
     </div>
     <EnquiryForm locale={locale} />
+  </section>
+
+  <section class="search">
+    <div class="intro search-intro">
+      <h2 class="search-heading">{s.heading}</h2>
+      <p class="copy lead search-lead">{plural(locale, s.lead, site.horsesListed.length)}</p>
+    </div>
+    <form class="search-form" method="post" action="/api/enquiry">
+      <input type="hidden" name="kind" value="search" />
+      <div class="search-fields">
+        {searchFields.map(([name, label, placeholder, num]) => (
+          <label class="fld">
+            <span class="lbl">{label}</span>
+            <input
+              class:list={['und', num && 'num']}
+              name={name}
+              type="text"
+              maxlength="100"
+              placeholder={placeholder}
+            />
+          </label>
+        ))}
+        <label class="fld">
+          <span class="lbl">{f.whatsapp}</span>
+          <input
+            class="und num"
+            name="whatsapp"
+            type="tel"
+            required
+            maxlength="30"
+            pattern="\+\d[\d\s\-]{5,}\d"
+            title={f.whatsappFormat}
+            placeholder={f.whatsappPlaceholder}
+            autocomplete="tel"
+          />
+        </label>
+      </div>
+      <button class="lbl search-send" type="submit">
+        {s.submit}
+      </button>
+    </form>
   </section>
 </Page>
 
@@ -62,9 +123,97 @@ const hours = { hours: site.responseWindow };
     color: var(--ink-muted);
   }
 
+  /* ---- The search form ---- */
+
+  .search {
+    padding: 72px var(--gutter) 80px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .search-intro {
+    margin-bottom: 44px;
+  }
+
+  .search-heading {
+    max-width: 620px;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .search-lead {
+    max-width: 460px;
+  }
+
+  .search-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 36px;
+  }
+
+  .search-fields {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 44px;
+  }
+
+  /*
+   * ponytail: the field styles repeat EnquiryForm's, scoped here. A shared
+   * stylesheet once a third form needs them.
+   */
+  .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fld > .lbl {
+    color: var(--ink-muted);
+  }
+
+  .und {
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--rule-field);
+    padding: 9px 0 11px;
+    font-size: 15px;
+  }
+
+  .search-send {
+    min-height: var(--tap);
+    padding: 18px 40px;
+    box-sizing: border-box;
+    border: 1px solid var(--ink);
+  }
+
   @media (max-width: 720px) {
     .enquiry-page {
       padding: 36px var(--gutter-mobile) 48px;
+    }
+
+    .search {
+      padding: 36px var(--gutter-mobile) 48px;
+    }
+
+    .search-intro {
+      margin-bottom: 36px;
+    }
+
+    .search-heading {
+      font-size: 24px;
+    }
+
+    .search-fields {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .search-send {
+      align-self: stretch;
+      text-align: center;
     }
 
     .intro {
