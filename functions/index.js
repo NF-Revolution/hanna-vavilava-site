@@ -27,6 +27,13 @@
  *   npx firebase-tools@15 functions:secrets:set TELEGRAM_TOKEN --project hanna-vavilava-site
  *   npx firebase-tools@15 functions:secrets:set TELEGRAM_CHAT --project hanna-vavilava-site
  *
+ * Since E5.6 it also needs the Turnstile widget's secret, and it goes out only after
+ * a hosting deploy whose `turnstileSitekey` in `src/site.ts` is the real key, not the
+ * PLACEHOLDER. Until then no form sends a valid token, and every real enquiry would be
+ * refused. The old Function drops the unknown token field, so hosting can go first.
+ *
+ *   npx firebase-tools@15 functions:secrets:set TURNSTILE_SECRET --project hanna-vavilava-site
+ *
  * The panel writes X-ray PDFs to R2 from the browser (E2.10), so the bucket needs
  * the CORS rules in `r2.cors.json`, applied by hand as well:
  *
@@ -309,12 +316,21 @@ export const startsWeekly = onSchedule(
  * same 303 and writes nothing, so it learns nothing. `elapsed` is set by an inline
  * script on submit; without JavaScript it is absent and the trap is skipped.
  *
- * ponytail: the per-IP limit is an in-memory window on the one instance
- * `maxInstances` allows. A cold start resets it, and a caller of the direct function
- * URL can forge the forwarded IP. #45 adds Turnstile; a counter in the database is
- * the upgrade if the limit itself has to hold. No IP is ever stored.
+ * Nothing is written without a Turnstile token that Cloudflare's siteverify accepts
+ * (E5.6), so the direct function URL cannot skip it, and no JavaScript means no
+ * token: the form's `<noscript>` line sends that buyer to WhatsApp.
+ *
+ * Two in-memory limits on the one instance `maxInstances` allows. Per address: 5
+ * posts an hour, which a caller of the direct URL escapes by forging the forwarded
+ * IP. Overall: 20 verified posts an hour, whatever address they claim, which is what
+ * keeps Hanna's phone quiet. It counts only posts that passed Turnstile, so junk
+ * cannot use it up and lock real buyers out.
+ * ponytail: a cold start resets both, after ~15 idle minutes, so a patient flood gets
+ * a few times 20 an hour, each post with a solved token. A counter in the database is
+ * the upgrade if that is not enough. No IP is ever stored.
  */
 const perHour = 5;
+const allPerHour = 20;
 const telegramToken = defineSecret('TELEGRAM_TOKEN');
 const telegramChat = defineSecret('TELEGRAM_CHAT');
 
@@ -349,10 +365,32 @@ async function notify(record) {
   }
 }
 const hits = new Map();
+let verified = 0;
 let windowStart = Date.now();
 
+const turnstile = defineSecret('TURNSTILE_SECRET');
+
+/* A network error or a slow Cloudflare fails closed: the buyer is told to use WhatsApp. */
+async function human(token) {
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: new URLSearchParams({ secret: turnstile.value(), response: token }),
+      signal: AbortSignal.timeout(5000),
+    });
+    return (await res.json()).success === true;
+  } catch (e) {
+    logger.error(`turnstile: ${e.message}`);
+    return false;
+  }
+}
+
 export const submitEnquiry = onRequest(
-  { region: 'europe-central2', maxInstances: 1, secrets: [telegramToken, telegramChat] },
+  {
+    region: 'europe-central2',
+    maxInstances: 1,
+    secrets: [telegramToken, telegramChat, turnstile],
+  },
   async (req, res) => {
     if (req.method !== 'POST') {
       res.set('Allow', 'POST').status(405).send('POST only');
@@ -361,6 +399,7 @@ export const submitEnquiry = onRequest(
 
     if (Date.now() - windowStart > 60 * 60 * 1000) {
       hits.clear();
+      verified = 0;
       windowStart = Date.now();
     }
     // Hosting passes the visitor's address on; the first X-Forwarded-For entry is the fallback.
@@ -382,6 +421,15 @@ export const submitEnquiry = onRequest(
     const record = parseEnquiry(body);
     if (!record) {
       res.status(400).send('The enquiry could not be read. Please message on WhatsApp.');
+      return;
+    }
+    const token = body['cf-turnstile-response'];
+    if (typeof token !== 'string' || !token || !(await human(token))) {
+      res.status(403).send('The enquiry could not be verified. Please message on WhatsApp.');
+      return;
+    }
+    if (++verified > allPerHour) {
+      res.status(429).send('Too many enquiries right now. Please message on WhatsApp.');
       return;
     }
     try {

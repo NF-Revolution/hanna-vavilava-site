@@ -35,6 +35,14 @@ export const site = {
 export const whatsappHref = (text?: string): string =>
   `https://wa.me/${site.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 
+/*
+ * The invisible Turnstile widget's public key (E5.6). `npm run dev` uses Cloudflare's
+ * invisible always-pass test key, whose dummy token only the test secret accepts.
+ */
+export const turnstileSitekey = import.meta.env.DEV
+  ? '1x00000000000000000000BB'
+  : 'PLACEHOLDER-turnstile-sitekey';
+
 export const telegramHref = `https://t.me/${site.telegram}`;
 export const emailHref = `mailto:${site.email}`;
 export const phoneHref = `tel:${site.phone.replace(/[^\d+]/g, '')}`;

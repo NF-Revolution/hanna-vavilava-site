@@ -90,7 +90,8 @@
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
     "orWhatsapp": "Albo napisz na WhatsApp",
-    "trap": "Proszę zostawić to pole puste"
+    "trap": "Proszę zostawić to pole puste",
+    "noscript": "Formularz wymaga JavaScriptu. Prosimy napisać na WhatsApp."
   },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",
