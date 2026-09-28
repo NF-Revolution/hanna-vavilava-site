@@ -55,6 +55,39 @@
     "telegram": "Telegram",
     "email": "E-mail"
   },
+  "enquiryForm": {
+    "name": "Imię i nazwisko",
+    "country": "Kraj",
+    "messenger": "WhatsApp lub Telegram",
+    "messengerPlaceholder": "+48 000 000 000",
+    "messengerFormat": "Numer z kierunkowym kraju, zaczynający się od +, np. +48 600 100 200.",
+    "level": "Poziom jeźdźca",
+    "levels": {
+      "junior": "Junior z trenerem",
+      "amateur110": "Amator, parkury do 110 cm",
+      "amateur125": "Amator, parkury 110–125 cm",
+      "pro": "Zawodowo, od 130 cm"
+    },
+    "budget": "Budżet",
+    "budgets": {
+      "15-20": "15 000 – 20 000 EUR",
+      "20-30": "20 000 – 30 000 EUR",
+      "30-40": "30 000 – 40 000 EUR",
+      "40plus": "Powyżej 40 000 EUR"
+    },
+    "timeframe": "Termin zakupu",
+    "timeframes": {
+      "month": "W tym miesiącu",
+      "quarter": "W ciągu trzech miesięcy",
+      "season": "W tym sezonie",
+      "browsing": "Rozglądam się"
+    },
+    "horse": "Koń",
+    "undecided": "Jeszcze nie wiem",
+    "note": "Wiadomość — opcjonalnie",
+    "submit": "Wyślij zapytanie",
+    "whatsapp": "Albo napisz na WhatsApp"
+  },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",
     "placeholder": "adres e-mail",
@@ -255,7 +288,10 @@
     "enquiry": {
       "title": "Zapytanie — Hanna Vavilava",
       "description": "Zapytanie trafia bezpośrednio do Hanny. Odpowiedź w ciągu godziny, 8:00–21:00 CET.",
-      "label": "Zapytanie"
+      "label": "Zapytanie",
+      "meta": "Odpowiedź w ciągu 1 godziny · {hours}",
+      "heading": "Piszą Państwo bezpośrednio do Hanny.",
+      "lead": "Odpowiadam sama, w ciągu godziny, {hours}. Zapytania wysłane później odbieram rano."
     },
     "enquirySent": {
       "title": "Zapytanie wysłane — Hanna Vavilava",
