@@ -37,6 +37,8 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # The one pull-request build with real photos, so the card size is checked here.
+      - run: npm run links
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

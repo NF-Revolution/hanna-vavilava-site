@@ -4,7 +4,7 @@ import '../styles/base.css';
 import { locales, htmlLang, t, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
 
-interface Props {
+export interface Props {
   locale: Locale;
   routeKey: RouteKey;
   slug?: string;
@@ -14,9 +14,20 @@ interface Props {
   ground?: 'light' | 'dark';
   /* A 404 has no canonical URL and no twin, so it drops both and asks not to be indexed. */
   noindex?: boolean;
+  /* The link preview card (E6.2): an absolute URL to a JPEG, 1200 × 630 unless the photo is smaller. */
+  image?: { src: string; width: number; height: number; alt: string };
 }
 
-const { locale, routeKey, slug, title, description, ground = 'light', noindex } = Astro.props;
+const {
+  locale,
+  routeKey,
+  slug,
+  title,
+  description,
+  ground = 'light',
+  noindex,
+  image,
+} = Astro.props;
 const dict = t(locale);
 
 const canonical = new URL(path(locale, routeKey, slug), Astro.site);
@@ -57,6 +68,14 @@ const ogLocale: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' };
     <meta property="og:description" content={description} />
     {!noindex && <meta property="og:url" content={canonical.href} />}
     <meta property="og:locale" content={ogLocale[locale]} />
+    {image && (
+      <>
+        <meta property="og:image" content={image.src} />
+        <meta property="og:image:width" content={String(image.width)} />
+        <meta property="og:image:height" content={String(image.height)} />
+        <meta property="og:image:alt" content={image.alt} />
+      </>
+    )}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content={ground === 'dark' ? '#0E0E0D' : '#F6F5F2'} />
 
