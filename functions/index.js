@@ -20,6 +20,13 @@
  *
  *   npx firebase-tools@15 deploy --only functions:submitEnquiry --project hanna-vavilava-site
  *
+ * It tells Hanna on Telegram (#43), and deploys only once both secrets exist. Make a bot
+ * with @BotFather, which gives the token. Have Hanna (or a group she is in) send the bot
+ * a message, then read the chat id from https://api.telegram.org/bot<token>/getUpdates:
+ *
+ *   npx firebase-tools@15 functions:secrets:set TELEGRAM_TOKEN --project hanna-vavilava-site
+ *   npx firebase-tools@15 functions:secrets:set TELEGRAM_CHAT --project hanna-vavilava-site
+ *
  * The panel writes X-ray PDFs to R2 from the browser (E2.10), so the bucket needs
  * the CORS rules in `r2.cors.json`, applied by hand as well:
  *
@@ -36,6 +43,7 @@ import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes } from 'node:crypto';
 import { parseEnquiry, sentPath } from './enquiry.js';
+import { telegramMessage } from './notify.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
 import { apiKey, fetchStarts, startFacts } from './starts.js';
@@ -307,11 +315,44 @@ export const startsWeekly = onSchedule(
  * the upgrade if the limit itself has to hold. No IP is ever stored.
  */
 const perHour = 5;
+const telegramToken = defineSecret('TELEGRAM_TOKEN');
+const telegramChat = defineSecret('TELEGRAM_CHAT');
+
+/*
+ * One message to Hanna (#43). A failure is logged and goes no further: the enquiry is
+ * already stored and in the inbox, and a 500 would only make the buyer send it again.
+ * #44 adds email as the second channel; #49 watches for this error.
+ */
+async function notify(record) {
+  try {
+    // A failed read still sends, with the slug in place of the name.
+    const horseName =
+      record.horse === 'undecided'
+        ? undefined
+        : ((await getDatabase()
+            .ref(`horses/${record.horse}/name`)
+            .get()
+            .then((s) => s.val())
+            .catch(() => null)) ?? record.horse);
+    const res = await fetch(`https://api.telegram.org/bot${telegramToken.value()}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: telegramChat.value(),
+        ...telegramMessage(record, horseName),
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) throw new Error(`Telegram answered ${res.status}: ${await res.text()}`);
+  } catch (e) {
+    logger.error(`enquiry telegram: ${e.message}`);
+  }
+}
 const hits = new Map();
 let windowStart = Date.now();
 
 export const submitEnquiry = onRequest(
-  { region: 'europe-central2', maxInstances: 1 },
+  { region: 'europe-central2', maxInstances: 1, secrets: [telegramToken, telegramChat] },
   async (req, res) => {
     if (req.method !== 'POST') {
       res.set('Allow', 'POST').status(405).send('POST only');
@@ -352,6 +393,8 @@ export const submitEnquiry = onRequest(
       res.status(500).send('The enquiry was not sent. Please message on WhatsApp.');
       return;
     }
+    // Awaited: a v2 Function loses its CPU once it has answered.
+    await notify(record);
     res.redirect(303, sentPath[record.locale]);
   },
 );

@@ -13,7 +13,8 @@
  * `/api/enquiry` is rewritten to `submitEnquiry` (E5.3). `locale` picks the sent
  * page; `website` is the honeypot, off-screen and out of the tab order; `elapsed`
  * is the time trap, filled on submit by the one inline script, and simply absent
- * without JavaScript.
+ * without JavaScript. The same script sends `page` and `ref`, the page and the one
+ * before it, which the Telegram message (#43) shows with the campaign read from them.
  *
  * `horse` preselects that horse, as the horse page does (E5.2); `dark` is that
  * page's inverted band, four columns wide where there is room. The parent
@@ -54,6 +55,8 @@ const selects = [
 <form class:list={['enquiry', dark && 'dark']} method="post" action="/api/enquiry">
   <input type="hidden" name="locale" value={locale} />
   <input type="hidden" name="elapsed" />
+  <input type="hidden" name="page" />
+  <input type="hidden" name="ref" />
   <label class="trap" aria-hidden="true">
     {f.trap}
     <input name="website" type="text" tabindex="-1" autocomplete="off" />
@@ -140,6 +143,8 @@ const selects = [
   for (const form of document.querySelectorAll('form.enquiry'))
     form.addEventListener('submit', () => {
       form.elapsed.value = Math.round(performance.now());
+      form.page.value = location.href;
+      form.ref.value = document.referrer;
     });
 </script>
 
