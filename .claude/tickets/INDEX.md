@@ -47,6 +47,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`   |
 | E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar          |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
+| E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone    |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |

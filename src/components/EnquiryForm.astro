@@ -1,0 +1,219 @@
+---
+/*
+ * The nine-field enquiry (E5.1): a plain POST with native validation and no
+ * JavaScript. Select values are language-neutral codes — a horse slug or
+ * `undecided` for the horse — so the endpoint and the inbox never depend on
+ * the language the buyer used. The option text lives in the dictionaries,
+ * keyed by those codes.
+ *
+ * `whatsapp` must start with + and a country code: a local number next to a
+ * country field is a buyer Hanna cannot call back. `instagram` takes no pattern,
+ * so a pasted profile link is not refused; the endpoint (#42) normalises it.
+ *
+ * ponytail: `/api/enquiry` has no Hosting rewrite yet — #42 adds it together
+ * with `submitEnquiry`, since a rewrite to a missing function fails the deploy.
+ */
+import { t, type Locale } from '../i18n';
+import { formatPrice } from '../i18n/format';
+import { site, whatsappHref } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const f = t(locale).enquiryForm;
+
+const horses = [
+  ...site.horsesListed.map((h) => ({
+    value: h.slug,
+    text: h.price === null ? h.name : `${h.name} — ${formatPrice(locale, h.price)}`,
+  })),
+  { value: 'undecided', text: f.undecided },
+];
+
+const selects = [
+  { name: 'level', label: f.level, options: Object.entries(f.levels) },
+  { name: 'budget', label: f.budget, options: Object.entries(f.budgets), num: true },
+  { name: 'timeframe', label: f.timeframe, options: Object.entries(f.timeframes) },
+  { name: 'horse', label: f.horse, options: horses.map((h) => [h.value, h.text]) },
+];
+---
+
+<form class="enquiry" method="post" action="/api/enquiry">
+  <div class="fields">
+    <label class="fld">
+      <span class="lbl">{f.name}</span>
+      <input class="und" name="name" type="text" required maxlength="100" autocomplete="name" />
+    </label>
+    <label class="fld">
+      <span class="lbl">{f.country}</span>
+      <input
+        class="und"
+        name="country"
+        type="text"
+        required
+        maxlength="60"
+        autocomplete="country-name"
+      />
+    </label>
+    <label class="fld">
+      <span class="lbl">{f.whatsapp}</span>
+      <input
+        class="und num"
+        name="whatsapp"
+        type="tel"
+        required
+        maxlength="30"
+        pattern="\+\d[\d\s\-]{5,}\d"
+        title={f.whatsappFormat}
+        placeholder={f.whatsappPlaceholder}
+        autocomplete="tel"
+      />
+    </label>
+    <label class="fld">
+      <span class="lbl">{f.instagram}</span>
+      <input
+        class="und"
+        name="instagram"
+        type="text"
+        maxlength="100"
+        placeholder={f.instagramPlaceholder}
+        autocomplete="off"
+      />
+    </label>
+    {selects.map((s) => (
+      <label class="fld">
+        <span class="lbl">{s.label}</span>
+        <span class="pick">
+          <select class:list={['und', s.num && 'num']} name={s.name} required>
+            {/* A blank first option, so `required` forces a real choice. */}
+            <option value="" />
+            {s.options.map(([value, text]) => (
+              <option value={value}>{text}</option>
+            ))}
+          </select>
+          <svg width="11" height="7" viewBox="0 0 11 7" aria-hidden="true">
+            <path d="M1 1l4.5 4.5L10 1" />
+          </svg>
+        </span>
+      </label>
+    ))}
+    <!-- Nine fields: the message takes the last row whole. -->
+    <label class="fld wide">
+      <span class="lbl">{f.note}</span>
+      <input class="und" name="note" type="text" maxlength="2000" />
+    </label>
+  </div>
+
+  <div class="actions">
+    <button class="lbl send" type="submit">
+      {f.submit}
+    </button>
+    <a class="lbl wa" href={whatsappHref()}>
+      {f.orWhatsapp}
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</form>
+
+<style>
+  .enquiry {
+    display: flex;
+    flex-direction: column;
+    gap: 42px;
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 42px 60px;
+  }
+
+  .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+
+  .fld > .lbl {
+    color: var(--ink-muted);
+  }
+
+  .und {
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--rule-field);
+    padding: 9px 0 11px;
+    font-size: 15px;
+  }
+
+  .pick {
+    position: relative;
+  }
+
+  .pick select {
+    padding-right: 24px;
+    cursor: pointer;
+  }
+
+  .pick svg {
+    position: absolute;
+    right: 0;
+    top: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    pointer-events: none;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .send {
+    min-height: var(--tap);
+    padding: 19px 44px;
+    box-sizing: border-box;
+    background: var(--ink);
+    color: var(--ink-inv);
+    text-align: center;
+  }
+
+  .wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .wa span {
+    font-size: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .fields {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+    }
+
+    .wa {
+      align-self: flex-start;
+    }
+  }
+</style>
