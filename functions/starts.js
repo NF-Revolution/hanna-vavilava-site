@@ -51,13 +51,17 @@ export function rows(raw, name) {
     .map((row) => {
       const date = String(row.data ?? '').match(/^(\d{4})-(\d{2})-(\d{2})/);
       const finished = Number(row.ukonczyl);
+      // A string, one height per phase: `"120"`, or `"120/120"` for a two-phase round.
+      const phases = String(row.wysokosc_p ?? '').trim();
       if (!date || (finished !== 0 && finished !== 1))
         throw new Error(`unexpected livejumping row: ${JSON.stringify(row)}`);
       return {
         date: date[0],
         finished: finished === 1,
         klasa: String(row.klasa ?? '').trim(),
-        height: Number(row.wysokosc_p) || null,
+        height: /^[1-9]\d*(\/[1-9]\d*)*$/.test(phases)
+          ? [...new Set(phases.split('/'))].join('/')
+          : null,
         place: Number(row.miejsce) || null,
       };
     });
@@ -81,30 +85,44 @@ const ordinal = (n) =>
 /*
  * Every row is a start — every rider, and withdrawn (`REZ`) or unfinished rounds too.
  * The last start is the latest round the horse finished, never a withdrawal; `null`
- * when there is none, which the page shows as "on request".
+ * when there is none, which the page shows as "on request". One season reads as a
+ * sentence, since `7 · 2026: 7` says the same number twice.
  */
 export function startFacts(starts) {
   const seasons = {};
   for (const { date } of starts) seasons[date.slice(0, 4)] = (seasons[date.slice(0, 4)] ?? 0) + 1;
-  const count = [
-    starts.length,
-    ...Object.keys(seasons)
-      .sort()
-      .reverse()
-      .map((year) => `${year}: ${seasons[year]}`),
-  ].join(' · ');
+  const years = Object.keys(seasons).sort().reverse();
+  const n = starts.length;
+  let count;
+  if (years.length === 1) {
+    const pl = { one: 'start', few: 'starty', many: 'startów' }[
+      new Intl.PluralRules('pl').select(n)
+    ];
+    count = {
+      pl: `${n} ${pl} w sezonie ${years[0]}`,
+      en: `${n} start${n === 1 ? '' : 's'} in the ${years[0]} season`,
+    };
+  } else {
+    const line = [n, ...years.map((year) => `${year}: ${seasons[year]}`)].join(' · ');
+    count = { pl: line, en: line };
+  }
 
   // A stable sort: two rounds on one day keep the API's order, newest first.
   const last = starts.filter((s) => s.finished).sort((a, b) => b.date.localeCompare(a.date))[0];
   let lastStart = null;
   if (last) {
     const [y, m, d] = last.date.split('-');
-    const round = [last.klasa, last.height && `${last.height} cm`].filter(Boolean).join(' ');
+    // Some classes already carry the height (`L 100`), which is not printed twice.
+    const klasa =
+      last.height && last.klasa.endsWith(` ${last.height}`)
+        ? last.klasa.slice(0, -last.height.length - 1)
+        : last.klasa;
+    const round = [klasa, last.height && `${last.height} cm`].filter(Boolean).join(' ');
     const line = (date, place) => [date, round, place].filter(Boolean).join(' · ');
     lastStart = {
       pl: line(`${d}.${m}.${y}`, last.place && `${last.place}. miejsce`),
       en: line(`${Number(d)} ${months[m - 1]} ${y}`, last.place && `${ordinal(last.place)} place`),
     };
   }
-  return { starts: { pl: count, en: count }, lastStart };
+  return { starts: count, lastStart };
 }
