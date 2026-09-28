@@ -58,9 +58,11 @@
   "enquiryForm": {
     "name": "Imię i nazwisko",
     "country": "Kraj",
-    "messenger": "WhatsApp lub Telegram",
-    "messengerPlaceholder": "+48 000 000 000",
-    "messengerFormat": "Numer z kierunkowym kraju, zaczynający się od +, np. +48 600 100 200.",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "+48 000 000 000",
+    "whatsappFormat": "Numer z kierunkowym kraju, zaczynający się od +, np. +48 600 100 200.",
+    "instagram": "Instagram — opcjonalnie",
+    "instagramPlaceholder": "@",
     "level": "Poziom jeźdźca",
     "levels": {
       "junior": "Junior z trenerem",
@@ -86,7 +88,7 @@
     "undecided": "Jeszcze nie wiem",
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
-    "whatsapp": "Albo napisz na WhatsApp"
+    "orWhatsapp": "Albo napisz na WhatsApp"
   },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",

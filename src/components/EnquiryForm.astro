@@ -1,13 +1,14 @@
 ---
 /*
- * The eight-field enquiry (E5.1): a plain POST with native validation and no
+ * The nine-field enquiry (E5.1): a plain POST with native validation and no
  * JavaScript. Select values are language-neutral codes — a horse slug or
  * `undecided` for the horse — so the endpoint and the inbox never depend on
  * the language the buyer used. The option text lives in the dictionaries,
  * keyed by those codes.
  *
- * `messenger` must start with + and a country code: a local number next to a
- * country field is a buyer Hanna cannot call back.
+ * `whatsapp` must start with + and a country code: a local number next to a
+ * country field is a buyer Hanna cannot call back. `instagram` takes no pattern,
+ * so a pasted profile link is not refused; the endpoint (#42) normalises it.
  *
  * ponytail: `/api/enquiry` has no Hosting rewrite yet — #42 adds it together
  * with `submitEnquiry`, since a rewrite to a missing function fails the deploy.
@@ -56,17 +57,28 @@ const selects = [
       />
     </label>
     <label class="fld">
-      <span class="lbl">{f.messenger}</span>
+      <span class="lbl">{f.whatsapp}</span>
       <input
         class="und num"
-        name="messenger"
+        name="whatsapp"
         type="tel"
         required
         maxlength="30"
         pattern="\+\d[\d\s\-]{5,}\d"
-        title={f.messengerFormat}
-        placeholder={f.messengerPlaceholder}
+        title={f.whatsappFormat}
+        placeholder={f.whatsappPlaceholder}
         autocomplete="tel"
+      />
+    </label>
+    <label class="fld">
+      <span class="lbl">{f.instagram}</span>
+      <input
+        class="und"
+        name="instagram"
+        type="text"
+        maxlength="100"
+        placeholder={f.instagramPlaceholder}
+        autocomplete="off"
       />
     </label>
     {selects.map((s) => (
@@ -86,7 +98,8 @@ const selects = [
         </span>
       </label>
     ))}
-    <label class="fld">
+    <!-- Nine fields: the message takes the last row whole. -->
+    <label class="fld wide">
       <span class="lbl">{f.note}</span>
       <input class="und" name="note" type="text" maxlength="2000" />
     </label>
@@ -97,7 +110,7 @@ const selects = [
       {f.submit}
     </button>
     <a class="lbl wa" href={whatsappHref()}>
-      {f.whatsapp}
+      {f.orWhatsapp}
       <span aria-hidden="true">→</span>
     </a>
   </div>
@@ -120,6 +133,10 @@ const selects = [
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+
+  .wide {
+    grid-column: 1 / -1;
   }
 
   .fld > .lbl {

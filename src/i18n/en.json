@@ -58,9 +58,11 @@
   "enquiryForm": {
     "name": "Name",
     "country": "Country",
-    "messenger": "WhatsApp or Telegram",
-    "messengerPlaceholder": "+48 000 000 000",
-    "messengerFormat": "A number with its country code, starting with +, e.g. +44 7700 900123.",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "+48 000 000 000",
+    "whatsappFormat": "A number with its country code, starting with +, e.g. +44 7700 900123.",
+    "instagram": "Instagram — optional",
+    "instagramPlaceholder": "@",
     "level": "Rider level",
     "levels": {
       "junior": "Junior, riding with a trainer",
@@ -86,7 +88,7 @@
     "undecided": "Not decided yet",
     "note": "Message — optional",
     "submit": "Send enquiry",
-    "whatsapp": "Or message on WhatsApp"
+    "orWhatsapp": "Or message on WhatsApp"
   },
   "notify": {
     "label": "Tell me when a new horse arrives",

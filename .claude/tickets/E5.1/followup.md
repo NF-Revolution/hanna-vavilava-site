@@ -1,6 +1,6 @@
 # E5.1 — followup
 
-Shipped 2026-09-28 — see the last `## Outcome` at the bottom.
+Reopened 2026-09-28 — WhatsApp-only contact field, optional Instagram (owner decision).
 
 Issue [#40](https://github.com/NF-Revolution/hanna-vavilava-site/issues/40) ·
 branch `40-e51-enquiry-form-markup` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 35
