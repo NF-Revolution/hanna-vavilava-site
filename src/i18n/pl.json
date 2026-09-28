@@ -88,7 +88,8 @@
     "undecided": "Jeszcze nie wiem",
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
-    "orWhatsapp": "Albo napisz na WhatsApp"
+    "orWhatsapp": "Albo napisz na WhatsApp",
+    "trap": "Proszę zostawić to pole puste"
   },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",

@@ -14,6 +14,12 @@
  * `startsWeekly` (E2.12) is a scheduled Function, so the first deploy of it asks to
  * enable the Cloud Scheduler API. It needs no secret of its own.
  *
+ * `submitEnquiry` (E5.3) sits behind the Hosting rewrite `/api/enquiry`, and a
+ * hosting deploy fails while the rewrite points at a Function that does not exist.
+ * Deploy it before any hosting deploy that carries the rewrite:
+ *
+ *   npx firebase-tools@15 deploy --only functions:submitEnquiry --project hanna-vavilava-site
+ *
  * The panel writes X-ray PDFs to R2 from the browser (E2.10), so the bucket needs
  * the CORS rules in `r2.cors.json`, applied by hand as well:
  *
@@ -23,12 +29,13 @@
  * upload. #63 adds the real origin.
  */
 import { initializeApp } from 'firebase-admin/app';
-import { getDatabase } from 'firebase-admin/database';
+import { getDatabase, ServerValue } from 'firebase-admin/database';
 import { defineSecret } from 'firebase-functions/params';
 import * as logger from 'firebase-functions/logger';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes } from 'node:crypto';
+import { parseEnquiry, sentPath } from './enquiry.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
 import { apiKey, fetchStarts, startFacts } from './starts.js';
@@ -281,5 +288,70 @@ export const startsWeekly = onSchedule(
     for (const { name, message } of errors) logger.error(`starts: ${name}: ${message}`);
     logger.info(`starts: ${changes.length} change(s)`, { changes });
     if (changes.length) await release();
+  },
+);
+
+/*
+ * The enquiry form's endpoint (E5.3): a plain form POST, answered with a 303 to the
+ * sent page, so the no-JavaScript path is the only path. The record goes under
+ * `/enquiries` in the inbox's contract (E2.7): `push()`, `createdAt` in ms, and
+ * never `handled`, which only the panel sets.
+ *
+ * A bot that fills the honeypot or posts within 3 s of the page loading gets the
+ * same 303 and writes nothing, so it learns nothing. `elapsed` is set by an inline
+ * script on submit; without JavaScript it is absent and the trap is skipped.
+ *
+ * ponytail: the per-IP limit is an in-memory window on the one instance
+ * `maxInstances` allows. A cold start resets it, and a caller of the direct function
+ * URL can forge the forwarded IP. #45 adds Turnstile; a counter in the database is
+ * the upgrade if the limit itself has to hold. No IP is ever stored.
+ */
+const perHour = 5;
+const hits = new Map();
+let windowStart = Date.now();
+
+export const submitEnquiry = onRequest(
+  { region: 'europe-central2', maxInstances: 1 },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.set('Allow', 'POST').status(405).send('POST only');
+      return;
+    }
+
+    if (Date.now() - windowStart > 60 * 60 * 1000) {
+      hits.clear();
+      windowStart = Date.now();
+    }
+    // Hosting passes the visitor's address on; the first X-Forwarded-For entry is the fallback.
+    const ip =
+      req.get('fastly-client-ip') ?? req.get('x-forwarded-for')?.split(',')[0].trim() ?? req.ip;
+    const count = (hits.get(ip) ?? 0) + 1;
+    hits.set(ip, count);
+    if (count > perHour) {
+      res.status(429).send('Too many enquiries from this address. Please message on WhatsApp.');
+      return;
+    }
+
+    const body = req.body ?? {};
+    if (body.website || (body.elapsed && Number(body.elapsed) < 3000)) {
+      res.redirect(303, sentPath[body.locale === 'en' ? 'en' : 'pl']);
+      return;
+    }
+
+    const record = parseEnquiry(body);
+    if (!record) {
+      res.status(400).send('The enquiry could not be read. Please message on WhatsApp.');
+      return;
+    }
+    try {
+      await getDatabase()
+        .ref('enquiries')
+        .push({ ...record, createdAt: ServerValue.TIMESTAMP });
+    } catch (e) {
+      logger.error(`enquiry: ${e.message}`);
+      res.status(500).send('The enquiry was not sent. Please message on WhatsApp.');
+      return;
+    }
+    res.redirect(303, sentPath[record.locale]);
   },
 );

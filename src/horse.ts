@@ -4,8 +4,7 @@
  * (E2.4) both parse through this; the database rules only decide who may
  * write, never what.
  *
- * ponytail: zod comes from Astro's own copy. The submitEnquiry Function (E5.3)
- * runs outside Astro and adds `zod` itself when it imports this.
+ * ponytail: zod comes from Astro's own copy.
  */
 import { z } from 'astro/zod';
 
