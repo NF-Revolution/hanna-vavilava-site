@@ -7,8 +7,12 @@
  * pass above never sees them. Every indexable page has one title, one
  * description and one canonical inside its own hreflang set, and every twin
  * it names exists and names the same set back.
+ *
+ * Then the link preview cards (E6.2): every og:image is absolute HTTPS, is in
+ * dist/, and is under the ~300 KB WhatsApp silently drops. The CI fixture has
+ * no photos, so this bites on the preview and deploy builds, which read live data.
  */
-import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const DIST = 'dist';
@@ -61,6 +65,18 @@ for (const page of pages) {
     if (!existsSync(twin)) broken.push(`${page} -> hreflang ${href}`);
     else if (alternatesOf(readFileSync(twin, 'utf8')) !== own)
       broken.push(`${page} -> hreflang ${href}: return tags differ`);
+  }
+}
+
+const CARD_BYTES = 300_000;
+for (const page of pages) {
+  const html = readFileSync(page, 'utf8');
+  for (const [, src] of html.matchAll(/property="og:image" content="([^"]+)"/g)) {
+    if (!src.startsWith('https://')) broken.push(`${page}: og:image not absolute HTTPS: ${src}`);
+    const file = join(DIST, new URL(src, 'https://x').pathname);
+    if (!existsSync(file)) broken.push(`${page} -> og:image ${src}`);
+    else if (statSync(file).size > CARD_BYTES)
+      broken.push(`${page}: og:image is ${statSync(file).size} bytes, over ${CARD_BYTES}`);
   }
 }
 

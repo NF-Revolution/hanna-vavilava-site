@@ -50,6 +50,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone    |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
+| E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -381,3 +382,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   description, one canonical that is in its own hreflang set, and matching return tags on every
   twin. It is regex like the link pass. `og:image` and the `image` prop arrive with E6.2 (#51),
   and a default share card for the other pages is not designed yet.
+- The link preview card is the cover photo only, centre-cropped by Astro's own sharp to a
+  1200 × 630 JPEG at quality 80 (E6.2). The owner chose it over a designed card with the name
+  and price on it: WhatsApp prints og:title beside the image, and the hero boards draw a clean
+  photo with its text in HTML, so no board was added. sharp never upscales, so a cover under
+  1200 × 630 gets a smaller card of the same shape, and the size tags say what was built.
+  `npm run links` fails any og:image over 300 000 bytes or not on HTTPS. The CI fixture has no
+  photos, so the gate bites on the preview and deploy builds, and `preview.yml` now runs it.
