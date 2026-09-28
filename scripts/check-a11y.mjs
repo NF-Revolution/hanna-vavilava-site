@@ -55,7 +55,10 @@ const TEXT_PAIRS = [
   ['--ink-inv-muted', '--ground-dark'],
   ['--ink-inv-faint', '--ground-dark'],
 ];
-const UI_PAIRS = [['--rule-field', '--ground-light']];
+const UI_PAIRS = [
+  ['--rule-field', '--ground-light'],
+  ['--rule-field-inv', '--ground-dark'],
+];
 const SCRIMS = [
   ['--scrim', ['--ink-inv']],
   ['--scrim-strong', ['--ink-inv', '--ink-inv-muted']],

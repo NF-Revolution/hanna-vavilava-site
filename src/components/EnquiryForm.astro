@@ -14,6 +14,10 @@
  * page; `website` is the honeypot, off-screen and out of the tab order; `elapsed`
  * is the time trap, filled on submit by the one inline script, and simply absent
  * without JavaScript.
+ *
+ * `horse` preselects that horse, as the horse page does (E5.2); `dark` is that
+ * page's inverted band, four columns wide where there is room. The parent
+ * carries `.dk`, which sets the dark placeholder and hover colours.
  */
 import { t, type Locale } from '../i18n';
 import { formatPrice } from '../i18n/format';
@@ -21,8 +25,10 @@ import { site, whatsappHref } from '../site';
 
 interface Props {
   locale: Locale;
+  horse?: string;
+  dark?: boolean;
 }
-const { locale } = Astro.props;
+const { locale, horse, dark } = Astro.props;
 const f = t(locale).enquiryForm;
 
 const horses = [
@@ -37,11 +43,15 @@ const selects = [
   { name: 'level', label: f.level, options: Object.entries(f.levels) },
   { name: 'budget', label: f.budget, options: Object.entries(f.budgets), num: true },
   { name: 'timeframe', label: f.timeframe, options: Object.entries(f.timeframes) },
-  { name: 'horse', label: f.horse, options: horses.map((h) => [h.value, h.text]) },
+  {
+    name: 'horse',
+    label: horse ? f.horseSelected : f.horse,
+    options: horses.map((h) => [h.value, h.text]),
+  },
 ];
 ---
 
-<form class="enquiry" method="post" action="/api/enquiry">
+<form class:list={['enquiry', dark && 'dark']} method="post" action="/api/enquiry">
   <input type="hidden" name="locale" value={locale} />
   <input type="hidden" name="elapsed" />
   <label class="trap" aria-hidden="true">
@@ -97,7 +107,9 @@ const selects = [
             {/* A blank first option, so `required` forces a real choice. */}
             <option value="" />
             {s.options.map(([value, text]) => (
-              <option value={value}>{text}</option>
+              <option value={value} selected={value === horse}>
+                {text}
+              </option>
             ))}
           </select>
           <svg width="11" height="7" viewBox="0 0 11 7" aria-hidden="true">
@@ -218,6 +230,37 @@ const selects = [
 
   .wa span {
     font-size: 12px;
+  }
+
+  /* ---- The horse page's inverted band ---- */
+
+  .dark .fld > .lbl {
+    color: var(--ink-inv-muted);
+  }
+
+  .dark .und {
+    border-color: var(--rule-field-inv);
+  }
+
+  /* The open list is the browser's own, on a light ground. */
+  .dark option {
+    color: var(--ink);
+  }
+
+  .dark .send {
+    background: var(--ink-inv);
+    color: var(--ground-dark);
+  }
+
+  .dark .wa {
+    border-color: var(--ink-inv);
+  }
+
+  @media (min-width: 1101px) {
+    .dark .fields {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 40px 50px;
+    }
   }
 
   @media (max-width: 720px) {

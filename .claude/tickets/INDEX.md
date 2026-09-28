@@ -49,6 +49,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar          |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone    |
+| E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38     |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed   |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`  |
@@ -390,3 +391,16 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   1200 × 630 gets a smaller card of the same shape, and the size tags say what was built.
   `npm run links` fails any og:image over 300 000 bytes or not on HTTPS. The CI fixture has no
   photos, so the gate bites on the preview and deploy builds, and `preview.yml` now runs it.
+- The horse page's enquiry is `EnquiryForm` with `horse` and `dark` (E5.2): the page's one
+  inverted band after Viewing, with the horse preselected and its label reading "Koń — wybrany".
+  A sold horse gets no form. At 390 the whole form is inline, in one column. `MobileDetail`
+  drew a teaser that linked to the enquiry page, but carrying the horse to another page needs
+  a script, so the owner chose the inline form (canvas v38). The bottom bar's "Formularz" on a
+  horse page goes to `#enquiry` through `Page`'s `barForm`. The heading reads "Zapytanie o
+  klacz Cascada" / "o wałacha …" for the same reason as the CTA: the board's "o Cascadę" needs
+  an accusative. The inverted field rule is `--rule-field-inv` `#807f7d`, the board's 50%
+  `--ink-inv`, which is checked at 3:1. The enquiry page's search form, "Szukają Państwo czegoś
+  innego?", posts `kind=search` with five optional free-text fields and a **required WhatsApp
+  number**. The board drew no contact field, and Hanna could not have replied. The owner added
+  it, so the grid is 3 × 2 where the board drew five in a row. Its lead count is
+  `site.horsesListed` as a digit, where the board spells out "Cztery".

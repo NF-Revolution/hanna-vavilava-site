@@ -85,6 +85,7 @@
       "browsing": "Rozglądam się"
     },
     "horse": "Koń",
+    "horseSelected": "Koń — wybrany",
     "undecided": "Jeszcze nie wiem",
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
@@ -183,7 +184,14 @@
       "download": "Pobierz",
       "downloadDate": "zdjęcia RTG z {date},"
     },
-    "vetNote": "Badanie przedzakupowe wykonuje weterynarz wybrany przez kupującego, na koszt kupującego, w zakresie ustalonym przez kupującego. Koń jest dostępny w stajni w dniu badania."
+    "vetNote": "Badanie przedzakupowe wykonuje weterynarz wybrany przez kupującego, na koszt kupującego, w zakresie ustalonym przez kupującego. Koń jest dostępny w stajni w dniu badania.",
+    "enquiry": {
+      "heading": {
+        "mare": "Zapytanie o klacz {name}",
+        "gelding": "Zapytanie o wałacha {name}"
+      },
+      "lead": "Odpowiada Hanna, w ciągu godziny."
+    }
   },
   "pages": {
     "home": {
@@ -294,7 +302,27 @@
       "label": "Zapytanie",
       "meta": "Odpowiedź w ciągu 1 godziny · {hours}",
       "heading": "Piszą Państwo bezpośrednio do Hanny.",
-      "lead": "Odpowiadam sama, w ciągu godziny, {hours}. Zapytania wysłane później odbieram rano."
+      "lead": "Odpowiadam sama, w ciągu godziny, {hours}. Zapytania wysłane później odbieram rano.",
+      "search": {
+        "heading": "Szukają Państwo czegoś innego?",
+        "lead": {
+          "one": "Jeden koń na stronie to aktualny stan stajni. Proszę podać parametry — szukam pod konkretne wymagania i odzywam się, kiedy mam konia, który je spełnia.",
+          "few": "{count} konie na stronie to aktualny stan stajni. Proszę podać parametry — szukam pod konkretne wymagania i odzywam się, kiedy mam konia, który je spełnia.",
+          "many": "{count} koni na stronie to aktualny stan stajni. Proszę podać parametry — szukam pod konkretne wymagania i odzywam się, kiedy mam konia, który je spełnia.",
+          "other": "{count} konia na stronie to aktualny stan stajni. Proszę podać parametry — szukam pod konkretne wymagania i odzywam się, kiedy mam konia, który je spełnia."
+        },
+        "level": "Poziom",
+        "levelPlaceholder": "np. 115 cm",
+        "budget": "Budżet",
+        "budgetPlaceholder": "np. 25 000 EUR",
+        "height": "Wzrost",
+        "heightPlaceholder": "np. 165–170 cm",
+        "age": "Wiek",
+        "agePlaceholder": "np. 7–10 lat",
+        "when": "Termin",
+        "whenPlaceholder": "np. do stycznia",
+        "submit": "Zgłoś wymagania"
+      }
     },
     "enquirySent": {
       "title": "Zapytanie wysłane — Hanna Vavilava",

@@ -15,8 +15,9 @@ import { path } from '../i18n/routes';
 interface Props {
   locale: Locale;
   whatsapp: string;
+  form?: string;
 }
-const { locale, whatsapp } = Astro.props;
+const { locale, whatsapp, form = path(locale, 'enquiry') } = Astro.props;
 const dict = t(locale);
 ---
 
@@ -25,7 +26,7 @@ const dict = t(locale);
     <WhatsApp size={17} />
     {dict.bar.whatsapp}
   </a>
-  <a class="lbl mbar-form" href={path(locale, 'enquiry')}>
+  <a class="lbl mbar-form" href={form}>
     {dict.bar.form}
   </a>
 </div>

@@ -21,6 +21,8 @@ interface Props {
   /* The WhatsApp href of the 390 bottom bar; without it the page has no bar. */
   bar?: string;
   image?: BaseProps['image'];
+  /* Where the bar's "Formularz" goes; the enquiry page unless the page has its own form. */
+  barForm?: string;
 }
 
 const {
@@ -34,6 +36,7 @@ const {
   noindex,
   bar,
   image,
+  barForm,
 } = Astro.props;
 ---
 
@@ -52,6 +55,6 @@ const {
     <slot />
   </main>
   <Footer locale={locale} routeKey={routeKey} slug={slug} />
-  {bar && <MobileBar locale={locale} whatsapp={bar} />}
+  {bar && <MobileBar locale={locale} whatsapp={bar} form={barForm} />}
   <MenuDrawer locale={locale} routeKey={routeKey} slug={slug} />
 </Base>
