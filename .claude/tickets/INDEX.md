@@ -47,6 +47,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`   |
 | E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar          |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`       |
+| E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61               |
@@ -372,3 +373,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   needs no spacer and no JavaScript. Every route was probed at 390 × 844 with mobile emulation, and
   none scrolls sideways. The gutter stays `--gutter-mobile` (20px), where the horses, detail and 404
   boards draw 16px and About and Questions draw 20px.
+- `Base.astro` is the head component (E6.1). No `Head.astro` was split out: every public page
+  already reaches it through `Page.astro`. A horse page's description is its `headline`, not the
+  index blurb. `npm run links` now checks the head of every indexable page: one title, one
+  description, one canonical that is in its own hreflang set, and matching return tags on every
+  twin. It is regex like the link pass. `og:image` and the `image` prop arrive with E6.2 (#51),
+  and a default share card for the other pages is not designed yet.
