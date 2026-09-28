@@ -1,9 +1,10 @@
 # E5.1 — followup
 
-Reopened 2026-09-28 — WhatsApp-only contact field, optional Instagram (owner decision).
+Shipped 2026-09-28 — see the last `## Outcome` at the bottom.
 
 Issue [#40](https://github.com/NF-Revolution/hanna-vavilava-site/issues/40) ·
-branch `40-e51-enquiry-form-markup` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 35
+PR [#121](https://github.com/NF-Revolution/hanna-vavilava-site/pull/121) ·
+branch `40-e51-enquiry-form-markup` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 36
 
 ## 2026-09-28
 
@@ -44,3 +45,25 @@ branch `40-e51-enquiry-form-markup` · canvas `F7qeoBwkyu2Dau5p1iLg2n` version 3
 - Admin inbox still shows raw keys (E2.7); Polish labels for these eight fields are open.
 - Canvas scratch root must be under the working directory — `$CLAUDE_JOB_DIR/tmp` is
   refused as a publish `root`. Used a throwaway `.canvas-tmp/` and deleted it.
+
+## What was built — 2026-09-28 (reopen: WhatsApp only, optional Instagram)
+
+- Owner decision on #40: the contact field is WhatsApp only, and a ninth field, Instagram,
+  is optional. The #40 body was edited to nine fields before building, and the #42
+  contract comment was edited in place.
+- `messenger` → `whatsapp` (same `+` pattern). New `instagram`: text, ≤100, no pattern,
+  `autocomplete="off"`, placeholder `@`. `note` spans the whole last row (`.wide`).
+- Strings: `enquiryForm.messenger*` → `whatsapp*`; the old link key `whatsapp` →
+  `orWhatsapp`; added `instagram`, `instagramPlaceholder`.
+- Canvas v36: `Enquiry`, `EN-Enquiry`, `MobileEnquiry`, `HorseDetail` redrawn. Each board
+  gained a row (heights 1770 / 870 / 2030 / 7215). Moved `HorseDetailSold` y→3290,
+  `Footer` y→4300, `FooterMobile` y→4730, and the six bottom stickies y→8740.
+  `HorseDetail` was already 13px over them before this change.
+
+## Outcome — 2026-09-28 (reopen)
+
+- `ticket-reviewer`: clear. `npm run ci` green.
+- **Trap for #41:** the `HorseDetail` board's form is 4 columns wide. Nine fields make it
+  two full rows plus the note spanning the whole third row.
+- **Trap for #42:** `instagram` arrives as `@handle`, `handle` or an `instagram.com/…`
+  link. Normalise it on the server; the form does not.
