@@ -51,6 +51,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone    |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38     |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed   |
+| E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`  |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
