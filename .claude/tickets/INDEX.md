@@ -407,7 +407,7 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   it, so the grid is 3 × 2 where the board drew five in a row. Its lead count is
   `site.horsesListed` as a digit, where the board spells out "Cztery".
 - Turnstile is the one exception to the 1 KB public-JS budget (E5.6). Our own inline JS stays
-  under it, at 875 bytes on a horse page. Cloudflare's `api.js` is appended only the first time
+  under it, at 956 bytes on a horse page with the Telegram fields. Cloudflare's `api.js` is appended only the first time
   a visitor focuses a field of a form, so browsing a horse page loads nothing third-party. The
   widget runs in the Invisible mode and draws nothing. Without JavaScript there is no token and
   `submitEnquiry` writes nothing. A `<noscript>` line above the actions sends the buyer to
