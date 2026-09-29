@@ -16,13 +16,22 @@
  * without JavaScript. The same script sends `page` and `ref`, the page and the one
  * before it, which the Telegram message (#43) shows with the campaign read from them.
  *
+ * The `cf-turnstile` div is the invisible Turnstile (E5.6). The same script
+ * appends Cloudflare's the first time a visitor focuses a field of a form that
+ * holds the widget, never the gallery's or the menu's dialog form. So browsing
+ * loads nothing third-party, and the enquiry page's search form is covered too.
+ * Cloudflare's script renders the widget and adds the
+ * `cf-turnstile-response` field the endpoint verifies. Without JavaScript there
+ * is no token and the endpoint writes nothing, so the `<noscript>` line sends
+ * the buyer to WhatsApp instead.
+ *
  * `horse` preselects that horse, as the horse page does (E5.2); `dark` is that
  * page's inverted band, four columns wide where there is room. The parent
  * carries `.dk`, which sets the dark placeholder and hover colours.
  */
 import { t, type Locale } from '../i18n';
 import { formatPrice } from '../i18n/format';
-import { site, whatsappHref } from '../site';
+import { site, turnstileSitekey, whatsappHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -128,6 +137,11 @@ const selects = [
     </label>
   </div>
 
+  <div class="cf-turnstile" data-sitekey={turnstileSitekey}></div>
+  <noscript>
+    <p class="lbl nojs">{f.noscript}</p>
+  </noscript>
+
   <div class="actions">
     <button class="lbl send" type="submit">
       {f.submit}
@@ -146,12 +160,32 @@ const selects = [
       form.page.value = location.href;
       form.ref.value = document.referrer;
     });
+  document.addEventListener('focusin', function load(e) {
+    if (!e.target.form?.querySelector('.cf-turnstile')) return;
+    document.removeEventListener('focusin', load);
+    const src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    document.head.append(Object.assign(document.createElement('script'), { src }));
+  });
 </script>
 
 <style>
   .trap {
     position: absolute;
     left: -9999px;
+  }
+
+  /* Out of flow, so the empty widget adds no gap; the invisible mode draws nothing. */
+  .cf-turnstile {
+    position: absolute;
+  }
+
+  .nojs {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  .dark .nojs {
+    color: var(--ink-inv-muted);
   }
 
   .enquiry {

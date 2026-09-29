@@ -1,6 +1,9 @@
 /*
  * The enquiry schema against the form's dictionaries, then `submitEnquiry` itself on
  * the Functions emulator, writing to the database emulator (E5.3).
+ *
+ * The emulator reads `TURNSTILE_SECRET` from `functions/.secret.local`: Cloudflare's
+ * public always-pass test secret, which accepts only the dummy token below (E5.6).
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -65,17 +68,18 @@ const enquiries = () =>
   fetch(`http://${host}/enquiries.json?ns=hanna-vavilava-site-default-rtdb`, {
     headers: { Authorization: 'Bearer owner' },
   }).then((r) => r.json());
-const post = (fields, method = 'POST') =>
+const human = { 'cf-turnstile-response': 'XXXX.DUMMY.TOKEN.XXXX' };
+const post = (fields, method = 'POST', ip = '203.0.113.1') =>
   fetch('http://127.0.0.1:5001/demo-hv/europe-central2/submitEnquiry', {
     method,
     redirect: 'manual',
     ...(method === 'POST' && {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(fields),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Fastly-Client-IP': ip },
+      body: new URLSearchParams({ ...human, ...fields }),
     }),
   });
 
-// One file, in order: every post below counts against the same address's limit of 5.
+// One file, in order: the posts below share one address's limit of 5 and the hour's 20.
 test('the endpoint stores a real enquiry, drops a bot silently and limits an address', async () => {
   const before = Object.keys((await enquiries()) ?? {}).length;
 
@@ -99,6 +103,19 @@ test('the endpoint stores a real enquiry, drops a bot silently and limits an add
   assert.equal((await post({ ...valid, whatsapp: '600' })).status, 400);
   assert.equal((await post({}, 'GET')).status, 405);
 
-  assert.equal((await post(valid)).status, 303);
+  // No token, as without JavaScript: refused, not faked as sent, and nothing written.
+  assert.equal((await post({ ...valid, 'cf-turnstile-response': '' })).status, 403);
+  assert.equal(Object.keys(await enquiries()).length, before + 1);
+
   assert.equal((await post(valid)).status, 429);
+});
+
+// One verified post so far. A caller of the direct URL forging a new address each time
+// escapes the per-address limit, and still stops at 20 verified posts in the hour.
+test('a flood from forged addresses stops at the hourly cap', async () => {
+  const before = Object.keys(await enquiries()).length;
+  for (let i = 2; i <= 20; i++)
+    assert.equal((await post(valid, 'POST', `198.51.100.${i}`)).status, 303);
+  assert.equal((await post(valid, 'POST', '198.51.100.99')).status, 429);
+  assert.equal(Object.keys(await enquiries()).length, before + 19);
 });

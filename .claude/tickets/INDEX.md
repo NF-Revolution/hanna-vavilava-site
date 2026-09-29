@@ -52,6 +52,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38     |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed   |
 | E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`  |
+| E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39     |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`  |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                         |
@@ -405,3 +406,15 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   number**. The board drew no contact field, and Hanna could not have replied. The owner added
   it, so the grid is 3 × 2 where the board drew five in a row. Its lead count is
   `site.horsesListed` as a digit, where the board spells out "Cztery".
+- Turnstile is the one exception to the 1 KB public-JS budget (E5.6). Our own inline JS stays
+  under it, at 956 bytes on a horse page with the Telegram fields. Cloudflare's `api.js` is appended only the first time
+  a visitor focuses a field of a form, so browsing a horse page loads nothing third-party. The
+  widget runs in the Invisible mode and draws nothing. Without JavaScript there is no token and
+  `submitEnquiry` writes nothing. A `<noscript>` line above the actions sends the buyer to
+  WhatsApp, and the boards draw it behind a `noJs` tweak (canvas v39).
+- The rate limit against a forged address is a global cap, not a better guess at the address
+  (E5.6). Anyone calling the direct function URL can set `fastly-client-ip`, and no documented
+  contract says which `X-Forwarded-For` entry Google's front end adds. So on top of 5 posts per
+  address an hour, `submitEnquiry` takes at most 20 verified posts an hour overall. It counts
+  only posts that passed Turnstile, so tokenless junk cannot use the cap up and lock buyers
+  out. The upgrade is a counter in the database.

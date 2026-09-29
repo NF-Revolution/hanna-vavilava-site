@@ -14,7 +14,7 @@ import SubBar from './SubBar.astro';
 import EnquiryForm from './EnquiryForm.astro';
 import { t, type Locale } from '../i18n';
 import { fill, plural } from '../i18n/format';
-import { site } from '../site';
+import { site, turnstileSitekey } from '../site';
 
 interface Props {
   locale: Locale;
@@ -83,6 +83,10 @@ const searchFields: [string, string, string, boolean?][] = [
           />
         </label>
       </div>
+      <div class="cf-turnstile" data-sitekey={turnstileSitekey}></div>
+      <noscript>
+        <p class="lbl nojs">{f.noscript}</p>
+      </noscript>
       <button class="lbl search-send" type="submit">
         {s.submit}
       </button>
@@ -182,6 +186,15 @@ const searchFields: [string, string, string, boolean?][] = [
     font-size: 15px;
   }
 
+  .cf-turnstile {
+    position: absolute;
+  }
+
+  .nojs {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
   .search-send {
     min-height: var(--tap);
     padding: 18px 40px;
@@ -209,6 +222,15 @@ const searchFields: [string, string, string, boolean?][] = [
     .search-fields {
       grid-template-columns: minmax(0, 1fr);
       gap: 28px;
+    }
+
+    .cf-turnstile {
+      position: absolute;
+    }
+
+    .nojs {
+      margin: 0;
+      color: var(--ink-muted);
     }
 
     .search-send {

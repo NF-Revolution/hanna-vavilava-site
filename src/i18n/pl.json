@@ -90,7 +90,8 @@
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
     "orWhatsapp": "Albo napisz na WhatsApp",
-    "trap": "Proszę zostawić to pole puste"
+    "trap": "Proszę zostawić to pole puste",
+    "noscript": "Formularz wymaga JavaScriptu. Prosimy napisać na WhatsApp."
   },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",
@@ -338,7 +339,9 @@
     "privacy": {
       "title": "Prywatność — Hanna Vavilava",
       "description": "Informacja o przetwarzaniu danych osobowych.",
-      "label": "Prywatność"
+      "label": "Prywatność",
+      "turnstile": "Formularze zapytań są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",
+      "turnstileLink": "Informacja Cloudflare o prywatności w Turnstile"
     },
     "notFound": {
       "title": "Nie ma takiej strony — Hanna Vavilava",
