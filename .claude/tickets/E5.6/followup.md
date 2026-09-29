@@ -20,6 +20,7 @@ branch `45-e56-turnstile`
 - `ticket-reviewer` found two high findings, and both were real:
   - Gating the loader on `e.target.form` also fired it for the gallery's and the menu's `<form method="dialog">` close buttons. The loader now checks for `.cf-turnstile` in the form.
   - The deploy note did not say that the real sitekey has to be live before the Function deploys. It says so now.
+- Invisible mode requires the privacy policy to link Cloudflare's Turnstile Privacy Addendum, and the privacy page was a stub. On 2026-09-29 an interim paragraph went onto `/prywatnosc` and `/en/privacy`: `pages.privacy.turnstile` plus the link, `turnstilePrivacyHref` in `src/site.ts`. No board draws the privacy page, so there was nothing to redraw. #59 must keep the link.
 - #59 (the RODO notice) gains a checklist line: name Turnstile as a Cloudflare role separate from the media one.
 
 ## What was built — 2026-09-28
@@ -28,7 +29,7 @@ branch `45-e56-turnstile`
   - a `cf-turnstile` div, which implicit render fills with `cf-turnstile-response`;
   - a `<noscript>` line, `enquiryForm.noscript`, in both dictionaries.
 - **Loader.** The one inline script appends `challenges.cloudflare.com/turnstile/v0/api.js` on the first `focusin` inside a form that holds the widget.
-- **Sitekey.** `turnstileSitekey` is in `src/site.ts`. `npm run dev` uses the invisible test key `1x00000000000000000000BB`. The build still uses `PLACEHOLDER-turnstile-sitekey`.
+- **Sitekey.** `turnstileSitekey` is in `src/site.ts`. `npm run dev` uses the invisible test key `1x00000000000000000000BB`. The build uses the owner's Invisible widget, `0x4AAAAAAFJbzp2taQ6gAIa0`, on the `web.app` and `firebaseapp.com` hostnames.
 - **Function.** `submitEnquiry` runs these checks in order:
   1. 405 for anything but POST.
   2. The limit of 5 posts per IP an hour.
@@ -48,7 +49,8 @@ branch `45-e56-turnstile`
   - Guessing the real IP from the `X-Forwarded-For` order: nothing documents which entry is trustworthy.
   - A counter in the database: it costs a write per request. It stays the upgrade path.
 - **Traps for next time:**
-  - The PLACEHOLDER sitekey has to be replaced, and that hosting has to deploy, **before** `submitEnquiry` deploys with `TURNSTILE_SECRET`. The other order gives every real enquiry a 403.
+  - Hosting with the real sitekey has to deploy **before** `submitEnquiry` deploys with `TURNSTILE_SECRET`. The other order gives every real enquiry a 403.
+  - Invisible mode is conditional on the privacy page linking Cloudflare's Turnstile Privacy Addendum. When #59 replaces the stub, the link must stay.
   - Preview channel hostnames are not on the widget, so a preview form cannot send once the Function is live.
   - The test secret accepts only the dummy token, and a real secret rejects it. `npm test` reaches Cloudflare over the network.
   - A new `<form method="dialog">` is safe. A new form that holds `.cf-turnstile` triggers the loader.

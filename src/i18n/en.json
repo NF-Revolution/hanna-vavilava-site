@@ -339,7 +339,9 @@
     "privacy": {
       "title": "Privacy — Hanna Vavilava",
       "description": "How personal data is processed on this site.",
-      "label": "Privacy"
+      "label": "Privacy",
+      "turnstile": "The enquiry forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",
+      "turnstileLink": "Cloudflare’s Turnstile Privacy Addendum"
     },
     "notFound": {
       "title": "Page not found — Hanna Vavilava",

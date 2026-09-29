@@ -41,7 +41,10 @@ export const whatsappHref = (text?: string): string =>
  */
 export const turnstileSitekey = import.meta.env.DEV
   ? '1x00000000000000000000BB'
-  : 'PLACEHOLDER-turnstile-sitekey';
+  : '0x4AAAAAAFJbzp2taQ6gAIa0';
+
+/* Invisible mode's condition: the privacy notice links this (E5.6, #59). */
+export const turnstilePrivacyHref = 'https://www.cloudflare.com/turnstile-privacy-policy/';
 
 export const telegramHref = `https://t.me/${site.telegram}`;
 export const emailHref = `mailto:${site.email}`;

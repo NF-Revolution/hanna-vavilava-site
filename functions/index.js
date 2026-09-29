@@ -28,9 +28,8 @@
  *   npx firebase-tools@15 functions:secrets:set TELEGRAM_CHAT --project hanna-vavilava-site
  *
  * Since E5.6 it also needs the Turnstile widget's secret, and it goes out only after
- * a hosting deploy whose `turnstileSitekey` in `src/site.ts` is the real key, not the
- * PLACEHOLDER. Until then no form sends a valid token, and every real enquiry would be
- * refused. The old Function drops the unknown token field, so hosting can go first.
+ * the hosting deploy that carries the widget's real `turnstileSitekey` (`src/site.ts`).
+ * Until then no form sends a valid token, and every real enquiry would be refused. The old Function drops the unknown token field, so hosting can go first.
  *
  *   npx firebase-tools@15 functions:secrets:set TURNSTILE_SECRET --project hanna-vavilava-site
  *
