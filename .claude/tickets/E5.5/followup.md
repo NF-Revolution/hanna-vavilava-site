@@ -15,7 +15,7 @@ branch `44-e55-email-sink`
 
 - `enquiryEmail(record)` in `functions/enquiry.js` builds the email: plain Polish text, subject
   `Zapytanie: <horse | bez konia> — <name>, <country>`, one `label: value` line per field that
-  is set, a `wa.me` link and an Instagram link. Select values go out as codes (`ponytail:`).
+  is set, a `wa.me` link and an Instagram link. Rebased onto E5.4 and E5.6, it reuses `labels` and `waReply` from `notify.js`: Polish option text, the greeting, `page` and `source`.
 - `sendEnquiryEmail` in `functions/index.js`: a `POST` to `https://api.resend.com/emails` with the
   `RESEND_API_KEY` secret and a 10 s timeout, from `formularz@nfrevolution.com` to
   `kontakt@nfrevolution.com`. It throws on a missing key or a non-2xx response.
