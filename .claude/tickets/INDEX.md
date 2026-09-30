@@ -52,6 +52,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38     |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed   |
 | E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`  |
+| E5.5 email sink              | #44                | done — Resend beside the DB write, 303 if either sink worked  |
 | E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39     |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI  |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`  |

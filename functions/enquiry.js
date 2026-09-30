@@ -4,6 +4,7 @@
  * this schema and both dictionaries to the same codes, so neither drifts alone.
  */
 import { z } from 'zod';
+import { labels, waReply } from './notify.js';
 
 const text = (max) => z.string().trim().max(max);
 
@@ -65,6 +66,36 @@ export function parseEnquiry(body) {
   const { ref, ...data } = parsed.data;
   data.source = campaign(data.page, ref);
   return Object.fromEntries(Object.entries(data).filter(([, v]) => v));
+}
+
+/*
+ * The email the second sink sends (E5.5), plain Polish text for the shared mailbox.
+ * The buyer leaves no address, so the way back is the wa.me link with Telegram's
+ * greeting (#43), less the horse's name, which would cost this sink a database read.
+ */
+export function enquiryEmail(r) {
+  const horse = r.horse === 'undecided' ? 'bez konia' : r.horse;
+  const lines = [
+    ['Imię', r.name],
+    ['Kraj', r.country],
+    ['WhatsApp', `${r.whatsapp} ${waReply(r)}`],
+    ['Instagram', r.instagram && `https://instagram.com/${r.instagram}`],
+    ['Poziom', labels.levels[r.level]],
+    ['Budżet', labels.budgets[r.budget]],
+    ['Termin', labels.timeframes[r.timeframe]],
+    ['Koń', horse],
+    ['Język', r.locale],
+    ['Strona', r.page],
+    ['Źródło', r.source],
+    ['Wiadomość', r.note],
+  ];
+  return {
+    subject: `Zapytanie: ${horse} — ${r.name}, ${r.country}`,
+    text: lines
+      .filter(([, v]) => v)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('\n'),
+  };
 }
 
 /*

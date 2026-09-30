@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { enquirySchema, parseEnquiry } from '../functions/enquiry.js';
+import { enquiryEmail, enquirySchema, parseEnquiry } from '../functions/enquiry.js';
 import en from '../src/i18n/en.json' with { type: 'json' };
 import pl from '../src/i18n/pl.json' with { type: 'json' };
 
@@ -49,6 +49,19 @@ test('a number without its country code, an unknown code or a missing name fails
 test('Instagram is cut down to the handle however it was typed', () => {
   for (const typed of ['@hv.stable', 'hv.stable', 'https://www.instagram.com/hv.stable/?igsh=x'])
     assert.equal(parseEnquiry({ ...valid, instagram: typed }).instagram, 'hv.stable');
+});
+
+test('the email names the horse, links back on WhatsApp and skips empty fields', () => {
+  const { subject, text } = enquiryEmail(parseEnquiry({ ...valid, horse: 'cascada' }));
+  assert.equal(subject, 'Zapytanie: cascada — Anna Kowalska, Poland');
+  assert.match(text, /^WhatsApp: \+48600123456 https:\/\/wa\.me\/48600123456\?text=/m);
+  assert.match(text, /^Budżet: 20 000 – 30 000 EUR$/m);
+  assert.doesNotMatch(text, /Instagram|Wiadomość/);
+  assert.match(enquiryEmail(parseEnquiry(valid)).subject, /^Zapytanie: bez konia — /);
+  assert.match(
+    enquiryEmail(parseEnquiry({ ...valid, instagram: '@hv.stable' })).text,
+    /^Instagram: https:\/\/instagram\.com\/hv\.stable$/m,
+  );
 });
 
 test('the schema and both dictionaries offer the same select codes', () => {

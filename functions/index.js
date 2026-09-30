@@ -9,6 +9,7 @@
  *   npx firebase-tools@15 functions:secrets:set CLOUDFLARE_TOKEN --project hanna-vavilava-site
  *   npx firebase-tools@15 functions:secrets:set R2_ACCESS_KEY_ID --project hanna-vavilava-site
  *   npx firebase-tools@15 functions:secrets:set R2_SECRET_ACCESS_KEY --project hanna-vavilava-site
+ *   npx firebase-tools@15 functions:secrets:set RESEND_API_KEY --project hanna-vavilava-site
  *   npx firebase-tools@15 deploy --only functions --project hanna-vavilava-site
  *
  * `startsWeekly` (E2.12) is a scheduled Function, so the first deploy of it asks to
@@ -48,7 +49,7 @@ import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes } from 'node:crypto';
-import { parseEnquiry, sentPath } from './enquiry.js';
+import { enquiryEmail, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
@@ -335,8 +336,8 @@ const telegramChat = defineSecret('TELEGRAM_CHAT');
 
 /*
  * One message to Hanna (#43). A failure is logged and goes no further: the enquiry is
- * already stored and in the inbox, and a 500 would only make the buyer send it again.
- * #44 adds email as the second channel; #49 watches for this error.
+ * already stored or emailed (#44), and a 500 would only make the buyer send it again.
+ * #49 watches for this error.
  */
 async function notify(record) {
   try {
@@ -384,11 +385,39 @@ async function human(token) {
   }
 }
 
+/*
+ * The second sink (E5.5): every enquiry also lands in the shared mailbox through
+ * Resend's HTTP API, so it survives the database. A sending-only API key on the
+ * `nfrevolution.com` domain, EU region; bounces use `send.nfrevolution.com`, so the
+ * root SPF record takes no new lookup (#64 publishes the records).
+ * ponytail: both addresses mirror `/site/email`, because `functions/` cannot import
+ * `src/`. #63 changes the domain.
+ */
+const resendKey = defineSecret('RESEND_API_KEY');
+
+async function sendEnquiryEmail(record) {
+  if (!resendKey.value()) throw new Error('RESEND_API_KEY is not set');
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendKey.value()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Formularz <formularz@nfrevolution.com>',
+      to: 'kontakt@nfrevolution.com',
+      ...enquiryEmail(record),
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+}
+
 export const submitEnquiry = onRequest(
   {
     region: 'europe-central2',
     maxInstances: 1,
-    secrets: [telegramToken, telegramChat, turnstile],
+    secrets: [telegramToken, telegramChat, turnstile, resendKey],
   },
   async (req, res) => {
     if (req.method !== 'POST') {
@@ -431,12 +460,18 @@ export const submitEnquiry = onRequest(
       res.status(429).send('Too many enquiries right now. Please message on WhatsApp.');
       return;
     }
-    try {
-      await getDatabase()
+    // Independent sinks: the enquiry is delivered if any one of them took it.
+    const results = await Promise.allSettled([
+      getDatabase()
         .ref('enquiries')
-        .push({ ...record, createdAt: ServerValue.TIMESTAMP });
-    } catch (e) {
-      logger.error(`enquiry: ${e.message}`);
+        .push({ ...record, createdAt: ServerValue.TIMESTAMP }),
+      sendEnquiryEmail(record),
+    ]);
+    ['db', 'email'].forEach((sink, i) => {
+      if (results[i].status === 'rejected')
+        logger.error(`enquiry: ${sink}: ${results[i].reason?.message}`);
+    });
+    if (results.every((r) => r.status === 'rejected')) {
       res.status(500).send('The enquiry was not sent. Please message on WhatsApp.');
       return;
     }
