@@ -1,0 +1,86 @@
+---
+/*
+ * The other ways to write, beside every form's send button (E5.8): the board's
+ * WhatsApp link, then a quiet row of Telegram, e-mail and phone. With `prefill`
+ * the first three open a draft naming the horse, as the hero CTA does; `tel:`
+ * carries no text. The inverted band is the parent form's `.dark`.
+ */
+import { t, type Locale } from '../i18n';
+import { fill } from '../i18n/format';
+import { emailHref, phoneHref, telegramHref, whatsappHref } from '../site';
+
+interface Props {
+  locale: Locale;
+  prefill?: { name: string; url: string };
+}
+const { locale, prefill } = Astro.props;
+const dict = t(locale);
+const text = prefill && fill(dict.detail.prefill, prefill);
+const subject = prefill && fill(dict.enquiryForm.mailSubject, prefill);
+
+const more = [
+  { href: telegramHref(text), label: dict.menu.telegram },
+  { href: emailHref(subject, text), label: dict.menu.email },
+  { href: phoneHref, label: dict.footer.phone },
+];
+---
+
+<div class="contact">
+  <a class="lbl wa" href={whatsappHref(text)}>
+    {dict.enquiryForm.orWhatsapp}
+    <span aria-hidden="true">→</span>
+  </a>
+  <p class="lbl more">
+    {more.map((m, i) => (
+      <>
+        {i > 0 && <span aria-hidden="true">·</span>}
+        <a href={m.href}>{m.label}</a>
+      </>
+    ))}
+  </p>
+</div>
+
+<style>
+  .contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .wa span {
+    font-size: 12px;
+  }
+
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 12px;
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  .more a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  :global(.dark) .wa {
+    border-color: var(--ink-inv);
+  }
+
+  :global(.dark) .more {
+    color: var(--ink-inv-muted);
+  }
+</style>

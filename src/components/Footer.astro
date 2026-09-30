@@ -21,9 +21,9 @@ const other = locale === 'pl' ? 'en' : 'pl';
 const pages: RouteKey[] = ['horses', 'about', 'faq', 'enquiry'];
 const contacts = [
   { href: whatsappHref(), label: `${dict.menu.whatsapp} ${site.phone}` },
-  { href: telegramHref, label: `${dict.menu.telegram} @${site.telegram}` },
+  { href: telegramHref(), label: `${dict.menu.telegram} @${site.telegram}` },
   { href: phoneHref, label: `${dict.footer.phone} ${site.phone}` },
-  { href: emailHref, label: site.email, lower: true },
+  { href: emailHref(), label: site.email, lower: true },
 ];
 ---
 

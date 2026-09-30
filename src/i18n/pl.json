@@ -90,6 +90,7 @@
     "note": "Wiadomość — opcjonalnie",
     "submit": "Wyślij zapytanie",
     "orWhatsapp": "Albo napisz na WhatsApp",
+    "mailSubject": "Zapytanie o konia {name}",
     "trap": "Proszę zostawić to pole puste",
     "noscript": "Formularz wymaga JavaScriptu. Prosimy napisać na WhatsApp."
   },
