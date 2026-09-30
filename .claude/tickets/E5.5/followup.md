@@ -35,8 +35,12 @@ Shipped as planned. Traps:
 is not set`. That is expected: the DB sink still answers 303, and the existing endpoint test
   depends on exactly this. Do not add a `.secret.local` with a real key, or `npm test` sends real
   mail.
-- Before deploying `submitEnquiry`, set up the Resend domain `nfrevolution.com` in the EU region
-  and set the secret. #64 publishes the DNS records: DKIM `resend._domainkey`, plus MX and SPF on
-  `send.`. The root SPF stays unchanged.
-- Until #64 publishes DKIM and DMARC, the email may land in Junk.
+- The Resend domain `nfrevolution.com` (eu-west-1) was verified on 2026-09-30. Its records in
+  Cloudflare are TXT `resend._domainkey`, plus the CNAMEs `rsend` and `send`, both DNS only, not
+  MX and SPF as first planned. `_dmarc` is `p=none` with `rua` to `kontakt@`. The root SPF is
+  unchanged.
+- `kontakt@` must be a shared mailbox, as #5 decided. A Microsoft 365 group rejects external
+  senders by default, so Resend showed `Bounced`, while the older `contact@` group had external
+  senders allowed.
+- Until #64 enables DKIM in Microsoft 365, keep DMARC at `p=none`.
 - The addresses mirror `/site/email`. #63 changes the domain in `functions/index.js` as well.
