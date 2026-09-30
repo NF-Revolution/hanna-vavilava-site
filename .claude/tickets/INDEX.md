@@ -54,6 +54,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`     |
 | E5.5 email sink              | #44                | done — Resend beside the DB write, 303 if either sink worked     |
 | E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39        |
+| E5.7 confirmation, failure   | #46                | done — `EnquiryDone.astro`, 303 to not-sent, number in `#`       |
 | E5.8 contact links           | #47                | done — `ContactLinks.astro` by every form, prefilled, canvas v41 |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI     |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`     |
@@ -420,3 +421,19 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   address an hour, `submitEnquiry` takes at most 20 verified posts an hour overall. It counts
   only posts that passed Turnstile, so tokenless junk cannot use the cap up and lock buyers
   out. The upgrade is a counter in the database.
+- Every refusal and failure of `submitEnquiry` is a 303 to a static not-sent page (E5.7): a
+  parse failure, no Turnstile token, either rate limit, or both sinks down. The pages are
+  `/zapytanie/niewyslane` and `/en/enquiry/not-sent`, and they put WhatsApp first. Before this
+  the buyer got a bare English text body. The HTTP status is lost, and nobody read it: #49
+  watches `logger.error`. A 405 for a non-POST stays plain. The typed fields are not kept.
+  Keeping them needs a `fetch` submit, and the horse page's inline JS is already at 956 of
+  1024 bytes.
+- The sent page reads the stored number back from the redirect's fragment,
+  `/zapytanie/wyslane#+48600123456` (E5.7). A fragment never reaches a server log or a
+  referrer. A query string would reach both. An inline script shows the number only if it is
+  `+` and digits, and only as `textContent`. There is no length cap, because a number of the wrong
+  length is exactly what the line is there to catch. A trapped bot's bare redirect hides the
+  line. The board's sub-bar timestamp "19.09.2026, 14:07" is not built, because a static
+  page has no send time, and a reload would show the wrong one. The label sits in the
+  sub-bar as every page's h1. `Confirmation` and the new `MobileConfirmation` draw both
+  states behind a `failed` tweak (canvas v42). Both pages are `noindex`.

@@ -92,13 +92,20 @@ const post = (fields, method = 'POST', ip = '203.0.113.1') =>
     }),
   });
 
+// A refusal is a 303 to the failure page, never to the sent one (E5.7).
+const failed = async (fields, ip) => {
+  const res = await post(fields, 'POST', ip);
+  assert.equal(res.status, 303);
+  return res.headers.get('location');
+};
+
 // One file, in order: the posts below share one address's limit of 5 and the hour's 20.
 test('the endpoint stores a real enquiry, drops a bot silently and limits an address', async () => {
   const before = Object.keys((await enquiries()) ?? {}).length;
 
   const sent = await post({ ...valid, elapsed: '9000' });
   assert.equal(sent.status, 303);
-  assert.equal(sent.headers.get('location'), '/en/enquiry/sent');
+  assert.equal(sent.headers.get('location'), '/en/enquiry/sent#+48600123456');
   const stored = Object.values(await enquiries());
   assert.equal(stored.length, before + 1);
   const record = stored.find((r) => r.name === 'Anna Kowalska');
@@ -113,14 +120,19 @@ test('the endpoint stores a real enquiry, drops a bot silently and limits an add
   assert.equal((await post({ ...valid, elapsed: '800' })).status, 303);
   assert.equal(Object.keys(await enquiries()).length, before + 1);
 
-  assert.equal((await post({ ...valid, whatsapp: '600' })).status, 400);
+  assert.equal(await failed({ ...valid, whatsapp: '600' }), '/en/enquiry/not-sent');
+  // Its own address, so the count below still reaches the limit on the fifth post.
+  assert.equal(
+    await failed({ ...valid, whatsapp: '600', locale: 'pl' }, '203.0.113.2'),
+    '/zapytanie/niewyslane',
+  );
   assert.equal((await post({}, 'GET')).status, 405);
 
   // No token, as without JavaScript: refused, not faked as sent, and nothing written.
-  assert.equal((await post({ ...valid, 'cf-turnstile-response': '' })).status, 403);
+  assert.equal(await failed({ ...valid, 'cf-turnstile-response': '' }), '/en/enquiry/not-sent');
   assert.equal(Object.keys(await enquiries()).length, before + 1);
 
-  assert.equal((await post(valid)).status, 429);
+  assert.equal(await failed(valid), '/en/enquiry/not-sent');
 });
 
 // One verified post so far. A caller of the direct URL forging a new address each time
@@ -129,6 +141,6 @@ test('a flood from forged addresses stops at the hourly cap', async () => {
   const before = Object.keys(await enquiries()).length;
   for (let i = 2; i <= 20; i++)
     assert.equal((await post(valid, 'POST', `198.51.100.${i}`)).status, 303);
-  assert.equal((await post(valid, 'POST', '198.51.100.99')).status, 429);
+  assert.equal(await failed(valid, '198.51.100.99'), '/en/enquiry/not-sent');
   assert.equal(Object.keys(await enquiries()).length, before + 19);
 });

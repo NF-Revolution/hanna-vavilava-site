@@ -14,6 +14,7 @@ export const routes = {
   faq: { pl: '/pytania', en: '/en/questions' },
   enquiry: { pl: '/zapytanie', en: '/en/enquiry' },
   enquirySent: { pl: '/zapytanie/wyslane', en: '/en/enquiry/sent' },
+  enquiryFailed: { pl: '/zapytanie/niewyslane', en: '/en/enquiry/not-sent' },
   menu: { pl: '/menu', en: '/en/menu' },
   privacy: { pl: '/prywatnosc', en: '/en/privacy' },
 } as const;

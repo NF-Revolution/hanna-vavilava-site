@@ -105,3 +105,6 @@ export function enquiryEmail(r) {
  * its own and cannot import `src/`.
  */
 export const sentPath = { pl: '/zapytanie/wyslane', en: '/en/enquiry/sent' };
+
+/* Where a refused or failed post lands (E5.7); the same mirror, of `enquiryFailed`. */
+export const failedPath = { pl: '/zapytanie/niewyslane', en: '/en/enquiry/not-sent' };
