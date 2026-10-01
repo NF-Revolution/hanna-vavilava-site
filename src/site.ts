@@ -32,6 +32,16 @@ export const site = {
     .map((h) => ({ slug: h.id, ...h.data })),
 };
 
+/*
+ * Whether search engines may index this build (E6.4). Only the live deploy on
+ * the real domain: a preview channel and the `.web.app` host before #63 are full
+ * copies of the site on a throwaway host. Fail-closed — only `deploy.yml` sets
+ * the channel, and #63 changing `SITE_URL` flips it with no second switch.
+ */
+export const indexable =
+  process.env.HOSTING_CHANNEL === 'live' &&
+  !/\.(web\.app|firebaseapp\.com)$/.test(new URL(import.meta.env.SITE).hostname);
+
 export const whatsappHref = (text?: string): string =>
   `https://wa.me/${site.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 
