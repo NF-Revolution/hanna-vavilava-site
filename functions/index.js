@@ -377,9 +377,9 @@ const telegramChat = defineSecret('TELEGRAM_CHAT');
  */
 async function notify(record, probe) {
   try {
-    // A failed read still sends, with the slug in place of the name.
+    // A failed read still sends, with the slug in place of the name. A search names none.
     const horseName =
-      record.horse === 'undecided'
+      !record.horse || record.horse === 'undecided'
         ? undefined
         : ((await getDatabase()
             .ref(`horses/${record.horse}/name`)

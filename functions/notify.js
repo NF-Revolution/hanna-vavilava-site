@@ -30,14 +30,24 @@ export const labels = {
   },
 };
 
+/* The search form's free-text wishes (#126), in the order it asks for them. */
+export const wishes = [
+  ['level', 'Poziom'],
+  ['budget', 'Budżet'],
+  ['height', 'Wzrost'],
+  ['age', 'Wiek'],
+  ['when', 'Kiedy'],
+];
+export const searchHeading = 'Szukają konia spoza listy';
+
 /* Telegram's HTML mode needs only these three escaped. */
 export const escape = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-/* `horseName` is `undefined` for `undecided`. */
+/* `horseName` is `undefined` for `undecided`. The search form asks no name. */
 const greetings = {
   en: (r, horse) =>
-    `Hello ${r.name.split(/\s/)[0]}, this is Hanna Vavilava. Thank you for your enquiry` +
+    `Hello${r.name ? ` ${r.name.split(/\s/)[0]}` : ''}, this is Hanna Vavilava. Thank you for your enquiry` +
     (horse ? ` about ${horse}.` : '.'),
   // No name: the vocative would need the buyer's gender.
   pl: (r, horse) =>
@@ -53,10 +63,11 @@ export const waReply = (record, horseName) =>
 /* The `sendMessage` body, less `chat_id`. */
 export function telegramMessage(record, horseName) {
   const r = Object.fromEntries(Object.entries(record).map(([k, v]) => [k, escape(v)]));
+  const search = record.kind === 'search';
   const horse = horseName ? `<b>${escape(horseName)}</b>` : 'konia jeszcze nie wybrano';
   const lines = [
-    `Zapytanie: ${horse} · ${record.locale.toUpperCase()}`,
-    `${r.name}, ${r.country}`,
+    `${search ? searchHeading : `Zapytanie: ${horse}`} · ${record.locale.toUpperCase()}`,
+    !search && `${r.name}, ${r.country}`,
     `WhatsApp ${r.whatsapp}` +
       (!r.instagram
         ? ''
@@ -64,11 +75,16 @@ export function telegramMessage(record, horseName) {
           /^[\w.]+$/.test(record.instagram)
           ? ` · Instagram <a href="https://instagram.com/${r.instagram}">@${r.instagram}</a>`
           : ` · Instagram ${r.instagram}`),
-    [
-      labels.levels[record.level],
-      labels.budgets[record.budget],
-      labels.timeframes[record.timeframe],
-    ].join(' · '),
+    search
+      ? wishes
+          .filter(([key]) => r[key])
+          .map(([key, label]) => `${label}: ${r[key]}`)
+          .join(' · ')
+      : [
+          labels.levels[record.level],
+          labels.budgets[record.budget],
+          labels.timeframes[record.timeframe],
+        ].join(' · '),
     r.note && `„${r.note}”`,
     r.page && `Strona: ${r.page}`,
     `Źródło: ${r.source ?? 'brak'}`,

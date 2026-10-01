@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { enquiryEmail, enquirySchema, parseEnquiry } from '../functions/enquiry.js';
+import { telegramMessage } from '../functions/notify.js';
 import en from '../src/i18n/en.json' with { type: 'json' };
 import pl from '../src/i18n/pl.json' with { type: 'json' };
 
@@ -44,6 +45,49 @@ test('a number without its country code, an unknown code or a missing name fails
   assert.equal(parseEnquiry({ ...valid, name: '  ' }), null);
   assert.equal(parseEnquiry({ ...valid, locale: 'de' }), null);
   assert.equal(parseEnquiry(undefined), null);
+});
+
+const search = {
+  kind: 'search',
+  level: ' amator, 120 cm ',
+  budget: '',
+  height: '168+',
+  age: '',
+  when: 'wiosna',
+  whatsapp: '+48 600-123 456',
+  locale: 'en',
+};
+
+test('a search post parses with its kind, free-text wishes and a bare number', () => {
+  assert.deepEqual(parseEnquiry({ ...search, website: '', elapsed: '9000' }), {
+    kind: 'search',
+    level: 'amator, 120 cm',
+    height: '168+',
+    when: 'wiosna',
+    whatsapp: '+48600123456',
+    locale: 'en',
+  });
+  assert.equal(parseEnquiry({ ...search, whatsapp: '' }), null);
+  assert.equal(parseEnquiry({ ...search, whatsapp: undefined }), null);
+  assert.equal(parseEnquiry({ ...search, when: 'x'.repeat(101) }), null);
+  // Free text is the search form's only; the main form still takes codes alone.
+  assert.equal(parseEnquiry({ ...valid, level: 'amator, 120 cm' }), null);
+});
+
+test('a search reaches the email and Telegram with its wishes and no name', () => {
+  const record = parseEnquiry(search);
+  const { subject, text } = enquiryEmail(record);
+  assert.equal(subject, 'Szukają konia spoza listy — +48600123456');
+  assert.match(text, /^Poziom: amator, 120 cm$/m);
+  assert.match(text, /^Kiedy: wiosna$/m);
+  assert.doesNotMatch(text, /Imię|Kraj|Koń|Budżet|undefined/);
+  assert.match(text, /wa\.me\/48600123456\?text=Hello%2C%20this%20is/);
+  const message = telegramMessage(record, undefined);
+  assert.equal(
+    message.text.split('\n').slice(0, 3).join('\n'),
+    'Szukają konia spoza listy · EN\nWhatsApp +48600123456\nPoziom: amator, 120 cm · Wzrost: 168+ · Kiedy: wiosna',
+  );
+  assert.doesNotMatch(message.text, /undefined/);
 });
 
 test('Instagram is cut down to the handle however it was typed', () => {
@@ -112,13 +156,22 @@ test('the endpoint stores a real enquiry, drops a bot silently and limits an add
   assert.equal(typeof record.createdAt, 'number');
   assert.equal(record.handled, undefined);
   assert.equal(record.website, undefined);
+  assert.equal(record.kind, undefined);
+
+  // The search form, from its own address, so this one's count of 5 stays as it was.
+  const looked = await post({ ...search, locale: 'pl', elapsed: '9000' }, 'POST', '203.0.113.3');
+  assert.equal(looked.headers.get('location'), '/zapytanie/wyslane#+48600123456');
+  const wishes = Object.values(await enquiries()).find((r) => r.kind === 'search');
+  assert.equal(wishes.when, 'wiosna');
+  assert.equal(typeof wishes.createdAt, 'number');
+  assert.equal(await failed({ ...search, whatsapp: '' }, '203.0.113.3'), '/en/enquiry/not-sent');
 
   // A filled honeypot and a too-fast submit both look sent, and write nothing.
   const trapped = await post({ ...valid, locale: 'pl', website: 'x' });
   assert.equal(trapped.status, 303);
   assert.equal(trapped.headers.get('location'), '/zapytanie/wyslane');
   assert.equal((await post({ ...valid, elapsed: '800' })).status, 303);
-  assert.equal(Object.keys(await enquiries()).length, before + 1);
+  assert.equal(Object.keys(await enquiries()).length, before + 2);
 
   assert.equal(await failed({ ...valid, whatsapp: '600' }), '/en/enquiry/not-sent');
   // Its own address, so the count below still reaches the limit on the fifth post.
@@ -130,19 +183,19 @@ test('the endpoint stores a real enquiry, drops a bot silently and limits an add
 
   // No token, as without JavaScript: refused, not faked as sent, and nothing written.
   assert.equal(await failed({ ...valid, 'cf-turnstile-response': '' }), '/en/enquiry/not-sent');
-  assert.equal(Object.keys(await enquiries()).length, before + 1);
+  assert.equal(Object.keys(await enquiries()).length, before + 2);
 
   assert.equal(await failed(valid), '/en/enquiry/not-sent');
 });
 
-// One verified post so far. A caller of the direct URL forging a new address each time
+// Two verified posts so far. A caller of the direct URL forging a new address each time
 // escapes the per-address limit, and still stops at 20 verified posts in the hour.
 test('a flood from forged addresses stops at the hourly cap', async () => {
   const before = Object.keys(await enquiries()).length;
-  for (let i = 2; i <= 20; i++)
+  for (let i = 3; i <= 20; i++)
     assert.equal((await post(valid, 'POST', `198.51.100.${i}`)).status, 303);
   assert.equal(await failed(valid, '198.51.100.99'), '/en/enquiry/not-sent');
-  assert.equal(Object.keys(await enquiries()).length, before + 19);
+  assert.equal(Object.keys(await enquiries()).length, before + 18);
 });
 
 // The hour's 20 are used up. A wrong probe secret is a buyer like any other and meets the

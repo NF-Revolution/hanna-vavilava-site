@@ -160,12 +160,13 @@ const selects = [
 </form>
 
 <script is:inline>
-  for (const form of document.querySelectorAll('form.enquiry'))
-    form.addEventListener('submit', () => {
-      form.elapsed.value = Math.round(performance.now());
-      form.page.value = location.href;
-      form.ref.value = document.referrer;
-    });
+  // Delegated: the search form (#126) sits below this script, not yet parsed when it runs.
+  document.addEventListener('submit', ({ target: form }) => {
+    if (!form.elapsed) return;
+    form.elapsed.value = Math.round(performance.now());
+    form.page.value = location.href;
+    form.ref.value = document.referrer;
+  });
   document.addEventListener('focusin', function load(e) {
     if (!e.target.form?.querySelector('.cf-turnstile')) return;
     document.removeEventListener('focusin', load);

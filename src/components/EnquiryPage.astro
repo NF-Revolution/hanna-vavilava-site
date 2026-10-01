@@ -4,10 +4,8 @@
  * form. Under it the lighter search form (E5.2), for a buyer none of the listed
  * horses fits: free-text wishes and a WhatsApp number to write back to. It
  * posts `kind=search`, because `level` and `budget` here are free text, not
- * the main form's codes.
- *
- * ponytail: `submitEnquiry` does not accept `kind=search` yet, and the form
- * lacks E5.3's locale, honeypot and time trap. #126 adds all of them together.
+ * the main form's codes. It carries the same hidden fields and honeypot as
+ * `EnquiryForm`, whose inline script fills them on submit (#126).
  */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
@@ -56,6 +54,14 @@ const searchFields: [string, string, string, boolean?][] = [
     </div>
     <form class="search-form" method="post" action="/api/enquiry">
       <input type="hidden" name="kind" value="search" />
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="elapsed" />
+      <input type="hidden" name="page" />
+      <input type="hidden" name="ref" />
+      <label class="trap" aria-hidden="true">
+        {f.trap}
+        <input name="website" type="text" tabindex="-1" autocomplete="off" />
+      </label>
       <div class="search-fields">
         {searchFields.map(([name, label, placeholder, num]) => (
           <label class="fld">
@@ -106,6 +112,12 @@ const searchFields: [string, string, string, boolean?][] = [
 
   .enquiry-page {
     padding: 72px var(--gutter) 80px;
+  }
+
+  /* ponytail: copied from `EnquiryForm`, whose styles are scoped. */
+  .trap {
+    position: absolute;
+    left: -9999px;
   }
 
   .intro {
