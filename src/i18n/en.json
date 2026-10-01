@@ -90,6 +90,7 @@
     "note": "Message — optional",
     "submit": "Send enquiry",
     "orWhatsapp": "Or message on WhatsApp",
+    "mailSubject": "Enquiry about {name}",
     "trap": "Leave this field empty",
     "noscript": "The form needs JavaScript. Please message on WhatsApp instead."
   },

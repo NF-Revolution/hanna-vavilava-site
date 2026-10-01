@@ -46,8 +46,12 @@ export const turnstileSitekey = import.meta.env.DEV
 /* Invisible mode's condition: the privacy notice links this (E5.6, #59). */
 export const turnstilePrivacyHref = 'https://www.cloudflare.com/turnstile-privacy-policy/';
 
-export const telegramHref = `https://t.me/${site.telegram}`;
-export const emailHref = `mailto:${site.email}`;
+/* `t.me/<user>?text=` pre-enters the draft (core.telegram.org/api/links), as wa.me does. */
+export const telegramHref = (text?: string): string =>
+  `https://t.me/${site.telegram}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+/* encodeURIComponent, not URLSearchParams: mail clients print its `+` for a space as-is. */
+export const emailHref = (subject?: string, body?: string): string =>
+  `mailto:${site.email}${subject ? `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body ?? '')}` : ''}`;
 export const phoneHref = `tel:${site.phone.replace(/[^\d+]/g, '')}`;
 
 /*

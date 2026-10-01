@@ -12,6 +12,7 @@
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import EnquiryForm from './EnquiryForm.astro';
+import ContactLinks from './ContactLinks.astro';
 import { t, type Locale } from '../i18n';
 import { fill, plural } from '../i18n/format';
 import { site, turnstileSitekey } from '../site';
@@ -87,9 +88,12 @@ const searchFields: [string, string, string, boolean?][] = [
       <noscript>
         <p class="lbl nojs">{f.noscript}</p>
       </noscript>
-      <button class="lbl search-send" type="submit">
-        {s.submit}
-      </button>
+      <div class="search-actions">
+        <button class="lbl search-send" type="submit">
+          {s.submit}
+        </button>
+        <ContactLinks locale={locale} />
+      </div>
     </form>
   </section>
 </Page>
@@ -195,6 +199,13 @@ const searchFields: [string, string, string, boolean?][] = [
     color: var(--ink-muted);
   }
 
+  .search-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 32px;
+  }
+
   .search-send {
     min-height: var(--tap);
     padding: 18px 40px;
@@ -231,6 +242,13 @@ const searchFields: [string, string, string, boolean?][] = [
     .nojs {
       margin: 0;
       color: var(--ink-muted);
+    }
+
+    .search-actions {
+      align-self: stretch;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
     }
 
     .search-send {

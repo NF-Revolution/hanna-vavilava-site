@@ -27,11 +27,15 @@
  *
  * `horse` preselects that horse, as the horse page does (E5.2); `dark` is that
  * page's inverted band, four columns wide where there is room. The parent
- * carries `.dk`, which sets the dark placeholder and hover colours.
+ * carries `.dk`, which sets the dark placeholder and hover colours. Beside the
+ * send button, `ContactLinks` offers the other ways to write, prefilled with
+ * that horse (E5.8).
  */
 import { t, type Locale } from '../i18n';
 import { formatPrice } from '../i18n/format';
-import { site, turnstileSitekey, whatsappHref } from '../site';
+import { path } from '../i18n/routes';
+import { site, turnstileSitekey } from '../site';
+import ContactLinks from './ContactLinks.astro';
 
 interface Props {
   locale: Locale;
@@ -40,6 +44,11 @@ interface Props {
 }
 const { locale, horse, dark } = Astro.props;
 const f = t(locale).enquiryForm;
+const chosen = site.horsesListed.find((h) => h.slug === horse);
+const prefill = chosen && {
+  name: chosen.name,
+  url: new URL(path(locale, 'horse', chosen.slug), Astro.site).href,
+};
 
 const horses = [
   ...site.horsesListed.map((h) => ({
@@ -146,10 +155,7 @@ const selects = [
     <button class="lbl send" type="submit">
       {f.submit}
     </button>
-    <a class="lbl wa" href={whatsappHref()}>
-      {f.orWhatsapp}
-      <span aria-hidden="true">→</span>
-    </a>
+    <ContactLinks locale={locale} prefill={prefill} />
   </div>
 </form>
 
@@ -241,10 +247,11 @@ const selects = [
     pointer-events: none;
   }
 
+  /* Top-aligned: the WhatsApp link sits level with the button, the quiet row under it. */
   .actions {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     gap: 32px;
   }
 
@@ -255,20 +262,6 @@ const selects = [
     background: var(--ink);
     color: var(--ink-inv);
     text-align: center;
-  }
-
-  .wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    min-height: var(--tap);
-    box-sizing: border-box;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--ink);
-  }
-
-  .wa span {
-    font-size: 12px;
   }
 
   /* ---- The horse page's inverted band ---- */
@@ -291,10 +284,6 @@ const selects = [
     color: var(--ground-dark);
   }
 
-  .dark .wa {
-    border-color: var(--ink-inv);
-  }
-
   @media (min-width: 1101px) {
     .dark .fields {
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -312,10 +301,6 @@ const selects = [
       flex-direction: column;
       align-items: stretch;
       gap: 20px;
-    }
-
-    .wa {
-      align-self: flex-start;
     }
   }
 </style>
