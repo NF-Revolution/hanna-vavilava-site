@@ -18,10 +18,11 @@ import { Picture, inferRemoteSize } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
 import MenuDrawer from './MenuDrawer.astro';
+import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
 import { path } from '../i18n/routes';
 import { formatPrice, plural } from '../i18n/format';
-import { site } from '../site';
+import { site, telegramHref } from '../site';
 import { hero, media } from '../media';
 
 interface Props {
@@ -45,6 +46,23 @@ const horseFacts =
     .filter((part) => part !== null)
     .join(' · ');
 
+/*
+ * The business behind the site (E6.3), what wins the branded search. Both home
+ * pages carry it under one id, the Polish one, and each horse's Offer names it.
+ */
+const home = new URL(path('pl', 'home'), Astro.site).href;
+const business = {
+  '@type': 'LocalBusiness',
+  '@id': `${home}#business`,
+  name: dict.brand.name,
+  url: home,
+  telephone: site.phone,
+  email: site.email,
+  sameAs: [site.instagram, telegramHref()],
+  // PLACEHOLDER: street and locality from the registered seller details (E7.5).
+  address: { '@type': 'PostalAddress', addressCountry: 'PL' },
+};
+
 const posterSrc = hero && `${media.base}/${hero.posterKey}`;
 const poster = posterSrc && (await inferRemoteSize(posterSrc));
 ---
@@ -60,6 +78,7 @@ const poster = posterSrc && (await inferRemoteSize(posterSrc));
     The page is a video, so the text a crawler and a screen reader need is in
     the chrome, not in a hidden block bolted on beside it.
   -->
+  <JsonLd data={business} />
   <Header locale={locale} variant="overlay" links={['horses']} />
 
   <main id="main" tabindex="-1" class="screen">

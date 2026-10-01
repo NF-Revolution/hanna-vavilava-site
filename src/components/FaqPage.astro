@@ -2,10 +2,12 @@
 /*
  * Questions (E4.7): six native disclosures, so the answers are in the HTML
  * with no JavaScript, and the dark band. The icon reads + closed and − open.
+ * The same items feed the FAQPage block (E6.3).
  */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import CtaBand from './CtaBand.astro';
+import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
 import { fill } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -16,9 +18,18 @@ interface Props {
 }
 const { locale } = Astro.props;
 const page = t(locale).pages.faq;
+const faq = {
+  '@type': 'FAQPage',
+  mainEntity: page.items.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
 ---
 
 <Page locale={locale} routeKey="faq" title={page.title} description={page.description}>
+  <JsonLd data={faq} />
   <SubBar label={page.label}>
     <p class="meta sub-meta">{page.meta}</p>
   </SubBar>

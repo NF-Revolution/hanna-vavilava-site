@@ -1,0 +1,14 @@
+---
+/*
+ * One schema.org block (E6.3). Data, not script, so it costs nothing against the
+ * 1 KB JavaScript budget, and Google reads it anywhere in the page. `<` is escaped
+ * because horse text and transcripts come from the database: a `</script>` in
+ * one would otherwise end the block and put the rest into the page.
+ */
+interface Props {
+  data: Record<string, unknown>;
+}
+const json = JSON.stringify({ '@context': 'https://schema.org', ...Astro.props.data });
+---
+
+<script type="application/ld+json" set:html={json.replace(/</g, '\\u003c')}></script>

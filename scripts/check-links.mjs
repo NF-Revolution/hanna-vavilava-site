@@ -11,6 +11,10 @@
  * Then the link preview cards (E6.2): every og:image is absolute HTTPS, is in
  * dist/, and is under the ~300 KB WhatsApp silently drops. The CI fixture has
  * no photos, so this bites on the preview and deploy builds, which read live data.
+ *
+ * Then the structured data (E6.3): every JSON-LD block parses, every Product has
+ * an Offer and every Offer a price and a currency, because Search Console reports
+ * either one missing as an error. The fixture's priced horse carries an Offer.
  */
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
@@ -77,6 +81,23 @@ for (const page of pages) {
     if (!existsSync(file)) broken.push(`${page} -> og:image ${src}`);
     else if (statSync(file).size > CARD_BYTES)
       broken.push(`${page}: og:image is ${statSync(file).size} bytes, over ${CARD_BYTES}`);
+  }
+}
+
+for (const page of pages) {
+  const html = readFileSync(page, 'utf8');
+  for (const [, json] of html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) {
+    let data;
+    try {
+      data = JSON.parse(json);
+    } catch {
+      broken.push(`${page}: JSON-LD does not parse`);
+      continue;
+    }
+    if (data['@type'] === 'Product' && !data.offers) broken.push(`${page}: Product without Offer`);
+    const offer = data.offers;
+    if (offer && !(typeof offer.price === 'number' && offer.priceCurrency))
+      broken.push(`${page}: Offer without price or currency`);
   }
 }
 
