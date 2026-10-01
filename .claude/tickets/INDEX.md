@@ -56,6 +56,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39        |
 | E5.7 confirmation, failure   | #46                | done — `EnquiryDone.astro`, 303 to not-sent, number in `#`       |
 | E5.8 contact links           | #47                | done — `ContactLinks.astro` by every form, prefilled, canvas v41 |
+| E5.10 endpoint monitor       | #49                | done — daily `enquiryProbe`, uptime check, alerts by hand        |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI     |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`     |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                            |
@@ -71,7 +72,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 - Realtime Database, not Firestore (owner's call). Content is read once at build
   time, so Firestore's per-document read model bought nothing, and one JSON tree
   priced on bandwidth is the predictable number. Paths: `/horses`, `/enquiries`,
-  `/subscribers`, `/site`.
+  `/subscribers`, `/site`, and `/monitor`, which only the enquiry probe (#49) writes.
 - Three colours deviate from the artboards, and E1.10 repainted the boards to
   match rather than the other way round. The tertiary greys `#8D8B83` (3.13:1)
   and `#6E6D68` (3.73:1) fail WCAG AA at the 10–11px sizes they are drawn at,

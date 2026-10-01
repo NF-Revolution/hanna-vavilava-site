@@ -1,0 +1,28 @@
+{
+  "displayName": "Enquiry endpoint down",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "GET /api/enquiry is not answering 405",
+      "conditionThreshold": {
+        "filter": "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" AND resource.type=\"uptime_url\" AND resource.label.host=\"hanna-vavilava-site.web.app\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "1200s",
+            "perSeriesAligner": "ALIGN_NEXT_OLDER",
+            "crossSeriesReducer": "REDUCE_COUNT_FALSE",
+            "groupByFields": ["resource.label.project_id", "resource.label.host"]
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 1,
+        "duration": "60s",
+        "trigger": { "count": 1 }
+      }
+    }
+  ],
+  "documentation": {
+    "mimeType": "text/markdown",
+    "content": "More than one region cannot reach `/api/enquiry` on Hosting. Buyers' enquiries are failing. See the deploy notes at the top of `functions/index.js` (#49)."
+  }
+}

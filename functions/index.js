@@ -34,6 +34,32 @@
  *
  *   npx firebase-tools@15 functions:secrets:set TURNSTILE_SECRET --project hanna-vavilava-site
  *
+ * Since E5.10 (#49) it also needs `PROBE_TOKEN`, which `enquiryProbe` shares, so set it
+ * before either one deploys. Any long random string will do (`openssl rand -hex 32`):
+ *
+ *   npx firebase-tools@15 functions:secrets:set PROBE_TOKEN --project hanna-vavilava-site
+ *
+ * Cloud Monitoring watches both of them, and it mails the developer, never Hanna. It
+ * needs one email channel, an uptime check (a 405 on GET counts as up), and the two
+ * policies in `monitoring/`. <CHANNEL> is the `name` that the first command prints:
+ *
+ *   gcloud beta monitoring channels create --project hanna-vavilava-site --type email \
+ *     --display-name Developer --channel-labels email_address=<developer email>
+ *   gcloud monitoring uptime create "Enquiry endpoint" --project hanna-vavilava-site \
+ *     --resource-type uptime-url \
+ *     --resource-labels host=hanna-vavilava-site.web.app,project_id=hanna-vavilava-site \
+ *     --protocol https --path /api/enquiry --status-codes 405 --period 15
+ *   gcloud monitoring policies create --project hanna-vavilava-site \
+ *     --policy-from-file monitoring/uptime.policy.json --notification-channels <CHANNEL>
+ *   gcloud monitoring policies create --project hanna-vavilava-site \
+ *     --policy-from-file monitoring/errors.policy.json --notification-channels <CHANNEL>
+ *
+ * To check it, run the probe once. `/monitor/enquiry` should get a new `createdAt`,
+ * and no mail should arrive:
+ *
+ *   gcloud scheduler jobs run firebase-schedule-enquiryProbe-europe-central2 \
+ *     --location europe-central2 --project hanna-vavilava-site
+ *
  * The panel writes X-ray PDFs to R2 from the browser (E2.10), so the bucket needs
  * the CORS rules in `r2.cors.json`, applied by hand as well:
  *
@@ -48,7 +74,7 @@ import { defineSecret } from 'firebase-functions/params';
 import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { enquiryEmail, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import { presign } from './presign.js';
@@ -332,18 +358,24 @@ export const startsWeekly = onSchedule(
  * ponytail: a cold start resets both, after ~15 idle minutes, so a patient flood gets
  * a few times 20 an hour, each post with a solved token. A counter in the database is
  * the upgrade if that is not enough. No IP is ever stored.
+ *
+ * The daily probe (#49) posts with `X-Probe`, the `PROBE_TOKEN` secret. It runs the
+ * same path, skips only the Turnstile verdict and the overall limit, and its sinks go
+ * where nobody reads them: `/monitor/enquiry`, Resend's test inbox, Telegram's `getChat`.
  */
 const perHour = 5;
 const allPerHour = 20;
+const probeToken = defineSecret('PROBE_TOKEN');
 const telegramToken = defineSecret('TELEGRAM_TOKEN');
 const telegramChat = defineSecret('TELEGRAM_CHAT');
 
 /*
  * One message to Hanna (#43). A failure is logged and goes no further: the enquiry is
  * already stored or emailed (#44), and a 500 would only make the buyer send it again.
- * #49 watches for this error.
+ * #49 watches for this error. The probe asks `getChat` instead: the same token and chat
+ * are proven, and Hanna gets nothing.
  */
-async function notify(record) {
+async function notify(record, probe) {
   try {
     // A failed read still sends, with the slug in place of the name.
     const horseName =
@@ -354,27 +386,38 @@ async function notify(record) {
             .get()
             .then((s) => s.val())
             .catch(() => null)) ?? record.horse);
-    const res = await fetch(`https://api.telegram.org/bot${telegramToken.value()}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: telegramChat.value(),
-        ...telegramMessage(record, horseName),
-      }),
-      signal: AbortSignal.timeout(5000),
-    });
+    const res = await fetch(
+      `https://api.telegram.org/bot${telegramToken.value()}/${probe ? 'getChat' : 'sendMessage'}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: telegramChat.value(),
+          ...telegramMessage(record, horseName),
+        }),
+        signal: AbortSignal.timeout(5000),
+      },
+    );
     if (!res.ok) throw new Error(`Telegram answered ${res.status}: ${await res.text()}`);
   } catch (e) {
     logger.error(`enquiry telegram: ${e.message}`);
   }
 }
+
+const isProbe = (req) => {
+  const [got, want] = [req.get('x-probe') ?? '', probeToken.value()].map((s) => Buffer.from(s));
+  return want.length > 0 && got.length === want.length && timingSafeEqual(got, want);
+};
 const hits = new Map();
 let verified = 0;
 let windowStart = Date.now();
 
 const turnstile = defineSecret('TURNSTILE_SECRET');
 
-/* A network error or a slow Cloudflare fails closed: the buyer is told to use WhatsApp. */
+/*
+ * A network error or a slow Cloudflare fails closed: the buyer is told to use WhatsApp.
+ * A rejected secret is logged, because it refuses every buyer in silence (#49).
+ */
 async function human(token) {
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -382,7 +425,10 @@ async function human(token) {
       body: new URLSearchParams({ secret: turnstile.value(), response: token }),
       signal: AbortSignal.timeout(5000),
     });
-    return (await res.json()).success === true;
+    const { success, 'error-codes': codes = [] } = await res.json();
+    if (codes.some((c) => c.endsWith('-input-secret')))
+      logger.error(`turnstile: ${codes.join(', ')}`);
+    return success === true;
   } catch (e) {
     logger.error(`turnstile: ${e.message}`);
     return false;
@@ -399,7 +445,7 @@ async function human(token) {
  */
 const resendKey = defineSecret('RESEND_API_KEY');
 
-async function sendEnquiryEmail(record) {
+async function sendEnquiryEmail(record, probe) {
   if (!resendKey.value()) throw new Error('RESEND_API_KEY is not set');
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -409,7 +455,8 @@ async function sendEnquiryEmail(record) {
     },
     body: JSON.stringify({
       from: 'Formularz <formularz@nfrevolution.com>',
-      to: 'kontakt@nfrevolution.com',
+      // Resend's test inbox: the key and the domain are proven, the mailbox stays clean.
+      to: probe ? 'delivered@resend.dev' : 'kontakt@nfrevolution.com',
       ...enquiryEmail(record),
     }),
     signal: AbortSignal.timeout(10_000),
@@ -421,7 +468,7 @@ export const submitEnquiry = onRequest(
   {
     region: 'europe-central2',
     maxInstances: 1,
-    secrets: [telegramToken, telegramChat, turnstile, resendKey],
+    secrets: [telegramToken, telegramChat, turnstile, resendKey, probeToken],
   },
   async (req, res) => {
     if (req.method !== 'POST') {
@@ -456,21 +503,25 @@ export const submitEnquiry = onRequest(
       res.redirect(303, failed);
       return;
     }
+    const probe = isProbe(req);
+    // The probe's token always fails, but the call still proves the secret.
     const token = body['cf-turnstile-response'];
-    if (typeof token !== 'string' || !token || !(await human(token))) {
+    const passed = typeof token === 'string' && token && (await human(token));
+    if (!passed && !probe) {
       res.redirect(303, failed);
       return;
     }
-    if (++verified > allPerHour) {
+    if (!probe && ++verified > allPerHour) {
       res.redirect(303, failed);
       return;
     }
     // Independent sinks: the enquiry is delivered if any one of them took it.
+    const entry = { ...record, createdAt: ServerValue.TIMESTAMP };
     const results = await Promise.allSettled([
-      getDatabase()
-        .ref('enquiries')
-        .push({ ...record, createdAt: ServerValue.TIMESTAMP }),
-      sendEnquiryEmail(record),
+      probe
+        ? getDatabase().ref('monitor/enquiry').set(entry)
+        : getDatabase().ref('enquiries').push(entry),
+      sendEnquiryEmail(record, probe),
     ]);
     ['db', 'email'].forEach((sink, i) => {
       if (results[i].status === 'rejected')
@@ -481,7 +532,50 @@ export const submitEnquiry = onRequest(
       return;
     }
     // Awaited: a v2 Function loses its CPU once it has answered.
-    await notify(record);
+    await notify(record, probe);
     res.redirect(303, `${sentPath[record.locale]}#${record.whatsapp}`);
+  },
+);
+
+/*
+ * The synthetic enquiry (#49): once a day, through the Hosting rewrite like a buyer's.
+ * Anything but the sent page is an error: since E5.7 a refusal is a 303 too, to the
+ * not-sent page, and a trap's 303 carries no `#number`. Cloud Monitoring mails every error from this
+ * Function and from `submitEnquiry` (`monitoring/errors.policy.json`).
+ * ponytail: the probe cannot solve a real challenge, so a sitekey or hostname mismatch
+ * (E5.6) stays invisible; only a rejected secret is caught, in `human()`.
+ */
+export const enquiryProbe = onSchedule(
+  {
+    schedule: '0 7 * * *',
+    timeZone: 'Europe/Warsaw',
+    region: 'europe-central2',
+    secrets: [probeToken],
+  },
+  async () => {
+    try {
+      const res = await fetch('https://hanna-vavilava-site.web.app/api/enquiry', {
+        method: 'POST',
+        redirect: 'manual',
+        headers: { 'X-Probe': probeToken.value() },
+        body: new URLSearchParams({
+          name: 'Probe',
+          country: 'Monitor',
+          whatsapp: '+48000000000',
+          level: 'pro',
+          budget: '40plus',
+          timeframe: 'browsing',
+          horse: 'undecided',
+          locale: 'pl',
+          'cf-turnstile-response': 'probe',
+        }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      const to = res.headers.get('location') ?? '';
+      if (res.status !== 303 || !to.startsWith(`${sentPath.pl}#`))
+        throw new Error(`answered ${res.status} ${to}`);
+    } catch (e) {
+      logger.error(`probe: /api/enquiry ${e.message}`);
+    }
   },
 );

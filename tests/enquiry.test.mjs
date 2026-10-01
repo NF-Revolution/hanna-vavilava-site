@@ -144,3 +144,32 @@ test('a flood from forged addresses stops at the hourly cap', async () => {
   assert.equal(await failed(valid, '198.51.100.99'), '/en/enquiry/not-sent');
   assert.equal(Object.keys(await enquiries()).length, before + 19);
 });
+
+// The hour's 20 are used up. A wrong probe secret is a buyer like any other and meets the
+// cap. The emulator's always-pass secret passes any non-empty token, so Turnstile is not
+// what stops it here. The daily probe (#49) gets through with the right secret and writes
+// `/monitor/enquiry`, never the inbox.
+test('the probe skips Turnstile and the cap, and stays out of the inbox', async () => {
+  const before = Object.keys(await enquiries()).length;
+  const probe = (secret, token = 'probe') =>
+    fetch('http://127.0.0.1:5001/demo-hv/europe-central2/submitEnquiry', {
+      method: 'POST',
+      redirect: 'manual',
+      headers: { 'Fastly-Client-IP': '203.0.113.9', 'X-Probe': secret },
+      body: new URLSearchParams({ ...valid, 'cf-turnstile-response': token }),
+    });
+  const to = async (...args) => (await probe(...args)).headers.get('location');
+  assert.equal(await to('emulator-probe-tokeX'), '/en/enquiry/not-sent');
+  assert.match(await to('emulator-probe-token'), /^\/en\/enquiry\/sent#/);
+  // No token at all, which a buyer is refused for: the probe does not need one.
+  assert.match(await to('emulator-probe-token', ''), /^\/en\/enquiry\/sent#/);
+  const last = await fetch(
+    `http://${host}/monitor/enquiry.json?ns=hanna-vavilava-site-default-rtdb`,
+    {
+      headers: { Authorization: 'Bearer owner' },
+    },
+  ).then((r) => r.json());
+  assert.equal(last.name, 'Anna Kowalska');
+  assert.equal(typeof last.createdAt, 'number');
+  assert.equal(Object.keys(await enquiries()).length, before);
+});
