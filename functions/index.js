@@ -49,7 +49,7 @@ import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes } from 'node:crypto';
-import { enquiryEmail, parseEnquiry, sentPath } from './enquiry.js';
+import { enquiryEmail, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
@@ -308,7 +308,11 @@ export const startsWeekly = onSchedule(
 
 /*
  * The enquiry form's endpoint (E5.3): a plain form POST, answered with a 303 to the
- * sent page, so the no-JavaScript path is the only path. The record goes under
+ * sent page, so the no-JavaScript path is the only path. Every refusal and failure is
+ * a 303 to the failure page instead (E5.7), which offers WhatsApp: a buyer never sees
+ * success for a send that did not happen, nor a bare error body. The sent page's
+ * fragment carries the stored number back, so a typo shows; a fragment reaches no
+ * server log and no referrer. The record goes under
  * `/enquiries` in the inbox's contract (E2.7): `push()`, `createdAt` in ms, and
  * never `handled`, which only the panel sets.
  *
@@ -431,16 +435,17 @@ export const submitEnquiry = onRequest(
       windowStart = Date.now();
     }
     // Hosting passes the visitor's address on; the first X-Forwarded-For entry is the fallback.
+    const body = req.body ?? {};
+    const failed = failedPath[body.locale === 'en' ? 'en' : 'pl'];
     const ip =
       req.get('fastly-client-ip') ?? req.get('x-forwarded-for')?.split(',')[0].trim() ?? req.ip;
     const count = (hits.get(ip) ?? 0) + 1;
     hits.set(ip, count);
     if (count > perHour) {
-      res.status(429).send('Too many enquiries from this address. Please message on WhatsApp.');
+      res.redirect(303, failed);
       return;
     }
 
-    const body = req.body ?? {};
     if (body.website || (body.elapsed && Number(body.elapsed) < 3000)) {
       res.redirect(303, sentPath[body.locale === 'en' ? 'en' : 'pl']);
       return;
@@ -448,16 +453,16 @@ export const submitEnquiry = onRequest(
 
     const record = parseEnquiry(body);
     if (!record) {
-      res.status(400).send('The enquiry could not be read. Please message on WhatsApp.');
+      res.redirect(303, failed);
       return;
     }
     const token = body['cf-turnstile-response'];
     if (typeof token !== 'string' || !token || !(await human(token))) {
-      res.status(403).send('The enquiry could not be verified. Please message on WhatsApp.');
+      res.redirect(303, failed);
       return;
     }
     if (++verified > allPerHour) {
-      res.status(429).send('Too many enquiries right now. Please message on WhatsApp.');
+      res.redirect(303, failed);
       return;
     }
     // Independent sinks: the enquiry is delivered if any one of them took it.
@@ -472,11 +477,11 @@ export const submitEnquiry = onRequest(
         logger.error(`enquiry: ${sink}: ${results[i].reason?.message}`);
     });
     if (results.every((r) => r.status === 'rejected')) {
-      res.status(500).send('The enquiry was not sent. Please message on WhatsApp.');
+      res.redirect(303, failed);
       return;
     }
     // Awaited: a v2 Function loses its CPU once it has answered.
     await notify(record);
-    res.redirect(303, sentPath[record.locale]);
+    res.redirect(303, `${sentPath[record.locale]}#${record.whatsapp}`);
   },
 );

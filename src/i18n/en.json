@@ -329,7 +329,34 @@
     "enquirySent": {
       "title": "Enquiry sent — Hanna Vavilava",
       "description": "Enquiry sent.",
-      "label": "Enquiry sent"
+      "label": "Enquiry sent",
+      "heading": "Thank you. I reply personally within an hour.",
+      "body": "I reply between {hours}. Enquiries sent later are answered the next morning. If I have not replied within an hour in those hours, please message me directly on WhatsApp.",
+      "echo": "I will reply to {number}. If there is a mistake in it, please message me on WhatsApp — otherwise my reply cannot reach you.",
+      "steps": [
+        {
+          "title": "Confirmation on WhatsApp",
+          "text": "I write from {phone} and confirm which horse it is about."
+        },
+        {
+          "title": "Video call",
+          "text": "Twenty minutes, at a time you choose — usually within 48 hours."
+        },
+        {
+          "title": "Full material",
+          "text": "An uncut round, flatwork and the X-rays — by link, after the call."
+        }
+      ],
+      "whatsapp": "Message me on WhatsApp now",
+      "back": "Back to the horses"
+    },
+    "enquiryFailed": {
+      "title": "Enquiry not sent — Hanna Vavilava",
+      "description": "The enquiry was not sent.",
+      "label": "Enquiry not sent",
+      "heading": "Your enquiry was not sent.",
+      "body": "Nothing reached me. Please message me on WhatsApp — I reply just as fast, {hours} — or try again in a few minutes.",
+      "retry": "Try again"
     },
     "menu": {
       "title": "Menu — Hanna Vavilava",

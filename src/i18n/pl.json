@@ -329,7 +329,34 @@
     "enquirySent": {
       "title": "Zapytanie wysłane — Hanna Vavilava",
       "description": "Zapytanie wysłane.",
-      "label": "Zapytanie wysłane"
+      "label": "Zapytanie wysłane",
+      "heading": "Dziękuję. Odpowiadam osobiście w ciągu godziny.",
+      "body": "Odpisuję w godzinach {hours}. Zapytania wysłane później odbieram następnego dnia rano. Jeśli nie odezwę się w ciągu godziny w tych godzinach, proszę napisać bezpośrednio na WhatsApp.",
+      "echo": "Odpiszę na numer {number}. Jeśli jest w nim błąd, proszę napisać do mnie na WhatsApp — inaczej odpowiedź nie dotrze.",
+      "steps": [
+        {
+          "title": "Potwierdzenie na WhatsApp",
+          "text": "Piszę z numeru {phone} i potwierdzam, o którego konia chodzi."
+        },
+        {
+          "title": "Rozmowa wideo",
+          "text": "Dwadzieścia minut, w terminie, który Państwo wybiorą — najczęściej w ciągu 48 godzin."
+        },
+        {
+          "title": "Pełny materiał",
+          "text": "Przejazd bez cięć, praca na płaskim i zdjęcia RTG — linkiem, po rozmowie."
+        }
+      ],
+      "whatsapp": "Napisz teraz na WhatsApp",
+      "back": "Wróć do koni"
+    },
+    "enquiryFailed": {
+      "title": "Zapytanie niewysłane — Hanna Vavilava",
+      "description": "Zapytanie nie zostało wysłane.",
+      "label": "Zapytanie niewysłane",
+      "heading": "Zapytanie nie zostało wysłane.",
+      "body": "Nic do mnie nie dotarło. Proszę napisać na WhatsApp — odpowiadam tak samo szybko, {hours} — albo spróbować ponownie za kilka minut.",
+      "retry": "Spróbuj ponownie"
     },
     "menu": {
       "title": "Menu — Hanna Vavilava",
