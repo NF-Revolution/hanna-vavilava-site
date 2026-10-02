@@ -15,6 +15,8 @@
  * Then the structured data (E6.3): every JSON-LD block parses, every Product has
  * an Offer and every Offer a price and a currency, because Search Console reports
  * either one missing as an error. The fixture's priced horse carries an Offer.
+ *
+ * Then the sitemap (E6.4): every URL it lists is a built, indexable page.
  */
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
@@ -54,7 +56,10 @@ const alternatesOf = (html) =>
 
 for (const page of pages) {
   const html = readFileSync(page, 'utf8');
-  if (html.includes('name="robots" content="noindex')) continue;
+  // A page-level noindex drops its canonical; a build that is not indexable (E6.4)
+  // puts noindex on every page but keeps the head, so that head is still checked.
+  if (html.includes('name="robots" content="noindex') && !html.includes('rel="canonical"'))
+    continue;
   const count = (re) => html.match(re)?.length ?? 0;
   if (count(/<title>/g) !== 1) broken.push(`${page}: not exactly one <title>`);
   if (count(/<meta name="description"/g) !== 1) broken.push(`${page}: not exactly one description`);
@@ -99,6 +104,15 @@ for (const page of pages) {
     if (offer && !(typeof offer.price === 'number' && offer.priceCurrency))
       broken.push(`${page}: Offer without price or currency`);
   }
+}
+
+// The sitemap (E6.4): every URL and alternate is a built page with a canonical.
+const sitemap = readFileSync(join(DIST, 'sitemap.xml'), 'utf8');
+for (const [, href] of sitemap.matchAll(/(?:<loc>|href=")([^<"]+)/g)) {
+  const page = pageOf(href);
+  if (!existsSync(page)) broken.push(`sitemap.xml -> ${href}`);
+  else if (!readFileSync(page, 'utf8').includes('rel="canonical"'))
+    broken.push(`sitemap.xml -> ${href}: page is noindex`);
 }
 
 if (broken.length) {

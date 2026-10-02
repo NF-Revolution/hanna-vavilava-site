@@ -61,6 +61,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI        |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`        |
 | E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate       |
+| E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                               |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                      |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                     |
@@ -185,9 +186,9 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
   because repository variables _are_ readable from fork pull requests and only secrets are
   withheld. The trigger stays `pull_request`, never `pull_request_target` — fork code must not
   run with secrets. Preview channel URLs are public and reachable from the bot's pull-request
-  comment, and what keeps them out of the index is the absolute `<link rel="canonical">` in
-  `Base.astro`, which points at production. `robots.txt` still has to be `Disallow: /` on a
-  preview build when E6.4 writes one (#9, #53).
+  comment. What keeps them out of the index is the `noindex` on every page of a build that is
+  not `site.indexable` (E6.4, #53), backed by the absolute `<link rel="canonical">` in
+  `Base.astro`, which points at production (#9).
 - The media bucket is `hanna-vavilava-media`, location hint `eeur`, served only through the
   custom domain `hv-media.nfrevolution.com` with minimum TLS 1.2 — the `.r2.dev` URL stays
   disabled (E1.11). No EU jurisdiction: the assets are public and hold no personal data, and
@@ -448,3 +449,18 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   page has no send time, and a reload would show the wrong one. The label sits in the
   sub-bar as every page's h1. `Confirmation` and the new `MobileConfirmation` draw both
   states behind a `failed` tweak (canvas v42). Both pages are `noindex`.
+- Only the live deploy on the real domain may be indexed (E6.4). `site.indexable` is true when
+  `deploy.yml` sets `HOSTING_CHANNEL=live` and the `SITE_URL` host is not `.web.app` or
+  `.firebaseapp.com`. It fails closed: preview, CI and local builds are never indexable, and #63
+  changing `SITE_URL` turns indexing on with no second switch to remember. A build that is not
+  indexable puts `noindex` on every page and keeps the rest of the head. Its robots.txt keeps
+  `Disallow: /admin` and drops only the `Sitemap:` line. The owner chose this over the
+  `Disallow: /` that #53's comment asked for, because a crawler cannot read a `noindex` on a
+  page robots.txt blocks. The sitemap is our own endpoint and not `@astrojs/sitemap`, whose
+  filter sees only URLs and so cannot tell that a horse is sold. Each locale gets its own
+  `<url>` with pl, en and x-default alternates, the same set the head names. It leaves out the
+  menu, the enquiry result pages and sold horses (`horsesListed`), and `npm run links` checks
+  that every URL in it is a built page with a canonical. The link check's head pass now skips a
+  page only when it has `noindex` and no canonical, because otherwise the site-wide `noindex`
+  would turn it off on every CI build. Search Console and Bing are #63's job: a Domain property
+  verified by DNS TXT, then Bing imported from Search Console.

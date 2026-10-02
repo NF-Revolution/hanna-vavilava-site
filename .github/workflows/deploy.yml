@@ -38,6 +38,8 @@ jobs:
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL }}
+          # The one build that may be indexed, and only on the real domain (E6.4).
+          HOSTING_CHANNEL: live
           # Service account with Realtime Database read access, used by the
           # build-time content loader (ticket 2.2).
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
