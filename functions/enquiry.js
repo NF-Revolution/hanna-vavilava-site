@@ -4,7 +4,7 @@
  * this schema and both dictionaries to the same codes, so neither drifts alone.
  */
 import { z } from 'zod';
-import { labels, waReply } from './notify.js';
+import { labels, searchHeading, waReply, wishes } from './notify.js';
 
 const text = (max) => z.string().trim().max(max);
 
@@ -15,13 +15,15 @@ const handle = (s) =>
     .replace(/^@/, '')
     .split(/[/?#]/)[0];
 
+// The form's own pattern, re-checked; stored bare, the shape a wa.me link wants (#43).
+const whatsapp = text(30)
+  .regex(/^\+\d[\d\s-]{5,}\d$/)
+  .transform((s) => s.replace(/[\s-]/g, ''));
+
 export const enquirySchema = z.object({
   name: text(100).min(1),
   country: text(60).min(1),
-  // The form's own pattern, re-checked; stored bare, the shape a wa.me link wants (#43).
-  whatsapp: text(30)
-    .regex(/^\+\d[\d\s-]{5,}\d$/)
-    .transform((s) => s.replace(/[\s-]/g, '')),
+  whatsapp,
   instagram: text(100).transform(handle).optional(),
   level: z.enum(['junior', 'amateur110', 'amateur125', 'pro']),
   budget: z.enum(['15-20', '20-30', '30-40', '40plus']),
@@ -31,6 +33,24 @@ export const enquirySchema = z.object({
   note: text(2000).optional(),
   locale: z.enum(['pl', 'en']),
   // `location.href` and `document.referrer` at submit (#43); only ever shown as text.
+  page: text(500).optional(),
+  ref: text(500).optional(),
+});
+
+/*
+ * The enquiry page's search form (E5.2, #126), for a buyer none of the listed horses
+ * fits: free-text wishes and a number to write back to. It keeps `kind`, so the inbox
+ * and both messages tell it from an enquiry about a horse, which carries no `kind`.
+ */
+export const searchSchema = z.object({
+  kind: z.literal('search'),
+  level: text(100).optional(),
+  budget: text(100).optional(),
+  height: text(100).optional(),
+  age: text(100).optional(),
+  when: text(100).optional(),
+  whatsapp,
+  locale: z.enum(['pl', 'en']),
   page: text(500).optional(),
   ref: text(500).optional(),
 });
@@ -61,7 +81,9 @@ export function campaign(page, ref) {
  * The raw referrer is not kept, only the source read from it.
  */
 export function parseEnquiry(body) {
-  const parsed = enquirySchema.safeParse(body ?? {});
+  // The union, discriminated by hand: a main-form post sends no `kind` at all.
+  const schema = body?.kind === 'search' ? searchSchema : enquirySchema;
+  const parsed = schema.safeParse(body ?? {});
   if (!parsed.success) return null;
   const { ref, ...data } = parsed.data;
   data.source = campaign(data.page, ref);
@@ -74,15 +96,20 @@ export function parseEnquiry(body) {
  * greeting (#43), less the horse's name, which would cost this sink a database read.
  */
 export function enquiryEmail(r) {
+  const search = r.kind === 'search';
   const horse = r.horse === 'undecided' ? 'bez konia' : r.horse;
   const lines = [
     ['Imię', r.name],
     ['Kraj', r.country],
     ['WhatsApp', `${r.whatsapp} ${waReply(r)}`],
     ['Instagram', r.instagram && `https://instagram.com/${r.instagram}`],
-    ['Poziom', labels.levels[r.level]],
-    ['Budżet', labels.budgets[r.budget]],
-    ['Termin', labels.timeframes[r.timeframe]],
+    ...(search
+      ? wishes.map(([key, label]) => [label, r[key]])
+      : [
+          ['Poziom', labels.levels[r.level]],
+          ['Budżet', labels.budgets[r.budget]],
+          ['Termin', labels.timeframes[r.timeframe]],
+        ]),
     ['Koń', horse],
     ['Język', r.locale],
     ['Strona', r.page],
@@ -90,7 +117,9 @@ export function enquiryEmail(r) {
     ['Wiadomość', r.note],
   ];
   return {
-    subject: `Zapytanie: ${horse} — ${r.name}, ${r.country}`,
+    subject: search
+      ? `${searchHeading} — ${r.whatsapp}`
+      : `Zapytanie: ${horse} — ${r.name}, ${r.country}`,
     text: lines
       .filter(([, v]) => v)
       .map(([k, v]) => `${k}: ${v}`)
