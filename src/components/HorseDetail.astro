@@ -19,6 +19,7 @@ import Photo from './Photo.astro';
 import Video from './Video.astro';
 import Gallery from './Gallery.astro';
 import EnquiryForm from './EnquiryForm.astro';
+import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -101,6 +102,39 @@ if (cover) {
 }
 
 /*
+ * Structured data (E6.3). The breadcrumb is the visible one. The Product goes out
+ * only with a price and only unsold: a priceless Offer is invalid (#2), a Product
+ * without one is invalid too, and a sold horse shows no price (#23). The price is
+ * the gross figure the page shows; a structured price that disagrees with the
+ * visible one is a manual action. The seller is the home page's LocalBusiness.
+ */
+const horsesUrl = new URL(path(locale, 'horses'), Astro.site).href;
+const breadcrumb = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: dict.nav.horses, item: horsesUrl },
+    { '@type': 'ListItem', position: 2, name: horse.name, item: url },
+  ],
+};
+const product = !sold &&
+  horse.price !== null && {
+    '@type': 'Product',
+    name: horse.name,
+    description: horse.headline[locale],
+    url,
+    ...(horse.photos.length && { image: horse.photos.map((p) => photoUrl(p.key)) }),
+    offers: {
+      '@type': 'Offer',
+      price: horse.price,
+      priceCurrency: 'EUR',
+      availability: `https://schema.org/${horse.status === 'reserved' ? 'Reserved' : 'InStock'}`,
+      url,
+      /* One business across both locales, so the id is the Polish home page, as x-default is. */
+      seller: { '@id': `${new URL(path('pl', 'home'), Astro.site).href}#business` },
+    },
+  };
+
+/*
  * ponytail: three, as the row is drawn, in the editor's order. A sold horse is
  * never listed (#23). An "all horses" link if the stable ever outgrows a row.
  */
@@ -119,6 +153,8 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   image={image}
   barForm={`${path(locale, 'horse', slug)}#enquiry`}
 >
+  <JsonLd data={breadcrumb} />
+  {product && <JsonLd data={product} />}
   <section class="hero">
     {horse.photos[0] && (
       <Photo photo={horse.photos[0]} locale={locale} sizes="100vw" hero class="hero-img" />
@@ -171,7 +207,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     <>
       {salesVideo && (
         <section class="band">
-          <Video video={salesVideo} locale={locale} />
+          <Video video={salesVideo} locale={locale} horse={horse} />
         </section>
       )}
       <section class="band">
@@ -202,7 +238,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       </section>
       {roundVideo && (
         <section class="band">
-          <Video video={roundVideo} locale={locale} />
+          <Video video={roundVideo} locale={locale} horse={horse} />
         </section>
       )}
       <section class="band cols">

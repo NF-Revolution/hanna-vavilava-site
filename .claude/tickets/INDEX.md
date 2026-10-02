@@ -60,6 +60,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.11 search form endpoint   | #126               | done — `searchSchema`, `kind: search` in both messages, deploy owed |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI        |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`        |
+| E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate       |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                               |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                      |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                     |
@@ -398,6 +399,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   1200 × 630 gets a smaller card of the same shape, and the size tags say what was built.
   `npm run links` fails any og:image over 300 000 bytes or not on HTTPS. The CI fixture has no
   photos, so the gate bites on the preview and deploy builds, and `preview.yml` now runs it.
+- Structured data is one `JsonLd.astro` per block, in the body of the page that owns it (E6.3):
+  LocalBusiness on both home pages under one `@id`, the Polish home, which each Offer names as
+  seller. BreadcrumbList on every horse page, Product with Offer only for a priced unsold horse,
+  because a Product without an Offer is as invalid as an Offer without a price. VideoObject per
+  video, with `uploadDate` from the R2 object's `Last-Modified`: keys are content-addressed and
+  never overwritten. FAQPage from `pages.faq.items`. `npm run links` parses every block and
+  fails a Product without an Offer or an Offer without a price. The address is `addressCountry`
+  only until the registered seller details land.
 - The horse page's enquiry is `EnquiryForm` with `horse` and `dark` (E5.2): the page's one
   inverted band after Viewing, with the horse preselected and its label reading "Koń — wybrany".
   A sold horse gets no form. At 390 the whole form is inline, in one column. `MobileDetail`

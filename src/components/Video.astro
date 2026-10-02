@@ -15,6 +15,11 @@
  * first, because the boards draw "PL / EN" and it is the indexable asset #52
  * feeds to `VideoObject`. An empty one — the round has no commentary — is left out.
  *
+ * The `VideoObject` (E6.3) points at the file itself, not a player, so the rich
+ * result is this page's. No field holds `uploadDate`, which Google requires, so
+ * it is the object's `Last-Modified`: keys are content-addressed and never
+ * overwritten, so that is the upload. One HEAD per video per build.
+ *
  * ponytail: `poster=` is eager and has no srcset, so every video costs one
  * WebP at page load. A lazy <Picture> behind a scripted button if the budget
  * ever allows.
@@ -22,6 +27,7 @@
  * captions if a clip ever needs them.
  */
 import { getImage, inferRemoteSize } from 'astro:assets';
+import JsonLd from './JsonLd.astro';
 import { media } from '../media';
 import { locales, t, type Locale } from '../i18n';
 import { fill, plural } from '../i18n/format';
@@ -30,8 +36,9 @@ import type { Horse } from '../horse';
 interface Props {
   video: Horse['videos'][number];
   locale: Locale;
+  horse: Horse;
 }
-const { video, locale } = Astro.props;
+const { video, locale, horse } = Astro.props;
 const dict = t(locale);
 
 const posterSrc = `${media.base}/${video.posterKey}`;
@@ -55,6 +62,20 @@ const duration = [
 const clock = `${minutes}:${String(seconds).padStart(2, '0')}`;
 const note = video.note[locale].trim();
 
+const contentUrl = `${media.base}/${video.key}`;
+const modified = (await fetch(contentUrl, { method: 'HEAD' })).headers.get('last-modified');
+if (!modified) console.warn(`${contentUrl}: no Last-Modified, so no VideoObject`);
+const videoObject = modified && {
+  '@type': 'VideoObject',
+  name: `${horse.name} — ${dict.video[video.kind]}`,
+  description: horse.headline[locale],
+  contentUrl,
+  thumbnailUrl: posterSrc,
+  uploadDate: new Date(modified).toISOString(),
+  duration: `PT${minutes}M${seconds}S`,
+  ...(video.transcript[locale].trim() && { transcript: video.transcript[locale].trim() }),
+};
+
 const transcripts = [locale, ...locales.filter((other) => other !== locale)].filter((lang) =>
   video.transcript[lang].trim(),
 );
@@ -74,7 +95,7 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
     height={height}
     aria-label={fill(dict.video.label, { title: dict.video[video.kind], duration })}
   >
-    <source src={`${media.base}/${video.key}`} type="video/mp4" />
+    <source src={contentUrl} type="video/mp4" />
   </video>
   {transcripts.map((lang) => (
     <details>
@@ -92,6 +113,7 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
     </details>
   ))}
 </figure>
+{videoObject && <JsonLd data={videoObject} />}
 
 <style>
   .video-head {
