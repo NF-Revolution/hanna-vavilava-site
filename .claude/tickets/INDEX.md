@@ -69,7 +69,8 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.3 privacy notice          | #59                | done — `PrivacyPage.astro`, `site.operator`, purge owed in #142, canvas v46 |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                       |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                              |
-| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                             |
+| E0.3 seller identity         | #3                 | decided — per-horse kind; operator values landed in #61                     |
+| E7.5 seller identity footer  | #61                | done — `operator` in `site.ts`, footer legal block, KSH art. 206 lines      |
 | E0.4 X-rays                  | #4                 | decided — PDF study, public download                                        |
 | E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1                   |
 | everything else              | see the milestones | not started                                                                 |
@@ -519,3 +520,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   Doing that would mean carrying the tags in JS from the landing page to the form, on pages
   already over budget, and it would still miss WhatsApp and Telegram clicks.
   `ponytail:` add it if Hanna asks for the source in each message.
+- The footer names the operator as `CEWET TAS sp. z o.o.`, not the registered
+  `CEWET TAS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ`: KSH art. 160 §1 allows the
+  abbreviation. REGON is the 9-digit entity number; the KRS prints the 14-digit
+  main-unit form. Registry court and share capital are shown because KSH art. 206 §1
+  requires them on a sp. z o.o.'s website (#61). The homepage and menu have no
+  footer by design (#13), so the legal block is one click away there.

@@ -112,7 +112,9 @@
     "updated": "zaktualizowano {date}"
   },
   "footer": {
-    "stable": "Stajnia [PLACEHOLDER]",
+    "registry": "KRS {krs} · NIP {nip} · REGON {regon}",
+    "court": "{court} · kapitał zakładowy {capital}",
+    "stock": "Sprzedaję własne konie i oferuję konie klientów — dane właściciela przekazuję przed umową.",
     "location": "40 km od Warszawy, Polska",
     "languages": "Polski · English",
     "vetting": "Badanie przedzakupowe — weterynarza wybiera kupujący",
