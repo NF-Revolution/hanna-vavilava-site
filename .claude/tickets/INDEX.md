@@ -37,6 +37,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size                |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5                  |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code                 |
+| E3.7 gallery scroll, swipe   | #150               | done — scroll-snap list, × close, gallery script 524 B                      |
 | E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`                |
 | E3.4 sales video facade      | #28                | done — `Video.astro`, native player, mounted by E4.5                        |
 | E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                                  |
@@ -317,6 +318,14 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   the image box instead, and doubles as the counter. The boards draw no prev/next controls,
   so none are built. Arrow keys move, and a phone visitor closes and taps the next tile.
   With no JS, a thumbnail links to a full WebP built into `dist/`, never to the bucket.
+- The gallery lightbox is one scroll-snap list, not one photo at a time (E3.7, #150). On desktop it
+  scrolls vertically and below 720 px it is a horizontal swipe carousel. A × in the top-right
+  corner closes it. The list takes focus on open, so the arrow keys along its axis scroll it
+  natively. A small handler makes left and right page the vertical list on desktop too. The
+  gallery script may not grow (owner, 2026-10-03): it is 524 B, down from 558 B, paid for
+  with `on*` handler properties. Chrome's own lazy-load distance still fetches about two photos either side of
+  the one opened, but never the whole set. The horse page as a whole is over 1 KB because of
+  the drawer and the form scripts; that is #154.
 - The photo and X-ray intake guide is a static Polish page at `/admin/poradnik`, not a shared doc
   and not a repo markdown file (E3.6). Standalone like `/admin`: `noindex`, no script, no sign-in,
   out of `routes.ts`. It is owner documentation with one reader, so its prose is inline Polish and

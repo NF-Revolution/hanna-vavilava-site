@@ -4,15 +4,23 @@
  * that shows them full size. With JavaScript off each thumbnail is a link to
  * the full image, built into dist/ — never the Storage URL, which visitors do
  * not read (E2.5). With it on, showModal() gives the focus trap, Escape and
- * inertness; the script adds only the arrow keys and focus restore.
+ * inertness; the script adds open-at-the-photo, left/right on desktop and
+ * focus restore.
  *
- * Every photo sits in the dialog already, as a hidden figure with a lazy
- * <img>. A hidden figure in a closed dialog is not rendered, so the browser
- * fetches a full image only when it is shown, and no script swaps a `src`.
+ * Every photo sits in the dialog as a figure with a lazy <img>, in one
+ * scroll-snap list (E3.7): a vertical scroll on desktop, a horizontal carousel
+ * with swipe under 720 px — CSS only, no touch code. A closed dialog renders
+ * nothing, and opening it jumps straight to the clicked photo, so the photos
+ * in between are skipped. The list takes focus on open, so the arrow keys
+ * along its axis scroll it natively and the snap moves one photo per press.
  *
- * ponytail: no prev/next buttons and no swipe, because the boards draw
- * neither — on a phone the visitor closes and taps the next tile. Add two
- * buttons calling `show(at ± 1)` if touch visitors need them.
+ * ponytail: the browser's lazy loading decides what loads, and Chrome fetches
+ * about two photos either side of the one on screen. Swap `src` in from an
+ * IntersectionObserver rooted on the list if that weight ever matters, but the
+ * 1 KB budget has no room for it today (#154). The scroll lock is CSS: body
+ * `overflow: hidden` plus `overscroll-behavior: contain`. If iOS Safari still
+ * rubber-bands the page behind, swap in the position:fixed scroll-offset dance,
+ * the same upgrade MenuDrawer names.
  */
 import { getImage } from 'astro:assets';
 import Photo from './Photo.astro';
@@ -44,9 +52,14 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
 </ul>
 
 <dialog id="hv-gallery" class="lightbox" aria-label={dict.gallery.preview}>
-  <div class="lightbox-slides" aria-live="polite">
+  <form method="dialog">
+    <button type="submit" class="lightbox-close" aria-label={dict.gallery.close}>
+      <span aria-hidden="true">×</span>
+    </button>
+  </form>
+  <div class="lightbox-slides" tabindex="-1" autofocus>
     {photos.map((photo, i) => (
-      <figure hidden>
+      <figure>
         <Photo photo={photo} locale={locale} sizes="(max-width: 1160px) 100vw, 1120px" />
         <figcaption class="lbl num">
           {[number(i), photo.caption[locale]].filter(Boolean).join(' · ')}
@@ -54,11 +67,6 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
       </figure>
     ))}
   </div>
-  <form method="dialog">
-    <button type="submit" class="lbl lightbox-close">
-      {dict.gallery.close}
-    </button>
-  </form>
 </dialog>
 
 <script>
@@ -66,11 +74,24 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
 
   if (dialog?.showModal) {
     const thumbs = document.querySelectorAll<HTMLAnchorElement>('.gallery-thumb');
-    const slides = dialog.querySelectorAll('figure');
+    const slides = dialog.querySelector<HTMLElement>('.lightbox-slides')!;
     let at = 0;
-    const show = (i: number) => {
-      at = (i + slides.length) % slides.length;
-      slides.forEach((slide, k) => (slide.hidden = k !== at));
+
+    // Each figure is exactly one page of the scroller, so the page is the photo. Kept
+    // here because by the time `close` fires the dialog has no size to measure.
+    // `on*` properties, not addEventListener: this script owns these elements, and
+    // the bytes saved pay for the arrow keys below.
+    slides.onscroll = () => {
+      at = Math.round(
+        slides.scrollTop / slides.clientHeight + slides.scrollLeft / slides.clientWidth,
+      );
+    };
+
+    // The focused list already scrolls along its own axis. Left and right also page
+    // the vertical desktop list; on a phone the list has no height to page, so this is a no-op.
+    dialog.onkeydown = (event) => {
+      const step = ({ ArrowRight: 1, ArrowLeft: -1 } as Record<string, number>)[event.key];
+      if (step) slides.scrollBy(0, step * slides.clientHeight);
     };
 
     thumbs.forEach((thumb, i) =>
@@ -78,23 +99,15 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         // Let modified clicks still open the full image in a new tab.
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
         event.preventDefault();
-        show(i);
         dialog.showModal();
-        document.body.style.overflow = 'hidden';
+        // Instant, never smooth: a smooth scroll would pass, and so fetch, every photo in between.
+        slides.children[(at = i)].scrollIntoView();
       }),
     );
 
-    dialog.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight') show(at + 1);
-      if (event.key === 'ArrowLeft') show(at - 1);
-    });
-
     // Explicit, because Safari never focuses a clicked link, so the dialog's own
     // restore would land on <body>. The last photo viewed keeps the visitor's place.
-    dialog.addEventListener('close', () => {
-      document.body.style.overflow = '';
-      thumbs[at].focus();
-    });
+    dialog.onclose = () => thumbs[at].focus();
   }
 </script>
 
@@ -124,46 +137,51 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
     object-fit: cover;
   }
 
+  /* The scroll lock, in CSS so it costs the script nothing. */
+  :global(body:has(#hv-gallery[open])) {
+    overflow: hidden;
+  }
+
   .lightbox {
     border: 0;
-    padding: 20px var(--gutter-mobile);
+    padding: 0;
     margin: 0;
     max-width: none;
     max-height: none;
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
+    overflow: hidden;
     background: rgba(14, 14, 13, 0.94);
     color: var(--ink-inv);
   }
 
-  .lightbox[open] {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-  }
-
+  /* Every figure is one page of the scroller — the script reads the page as the photo. */
   .lightbox-slides {
-    width: min(1120px, 100%);
-    min-height: 0;
+    display: grid;
+    grid-auto-rows: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-snap-type: y mandatory;
   }
 
   .lightbox figure {
     margin: 0;
+    padding: 20px var(--gutter-mobile);
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 18px;
-  }
-
-  .lightbox figure[hidden] {
-    display: none;
+    min-width: 0;
+    scroll-snap-align: start;
   }
 
   .lightbox :global(picture) {
     display: block;
-    height: min(700px, calc(100dvh - 180px));
+    width: min(1120px, 100%);
+    height: min(700px, calc(100dvh - 120px));
     background: #1e1e1b;
   }
 
@@ -177,16 +195,36 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
   }
 
   .lightbox-close {
-    min-height: var(--tap);
-    padding: 16px 34px;
-    box-sizing: border-box;
-    border: 1px solid var(--ink-inv);
+    position: absolute;
+    top: 12px;
+    right: var(--gutter-mobile);
+    z-index: 1;
+    width: var(--tap);
+    height: var(--tap);
+    padding: 0;
+    text-align: center;
+    font-size: 32px;
+    line-height: 1;
     color: var(--ink-inv);
   }
 
   @media (max-width: 720px) {
     .gallery-thumb {
       height: 190px;
+    }
+
+    .lightbox-slides {
+      grid-auto-flow: column;
+      grid-auto-columns: 100%;
+      overflow: auto hidden;
+      scroll-snap-type: x mandatory;
+    }
+
+    /* A phone is narrower than the photo is wide, so the box takes the photo's height. */
+    .lightbox :global(picture),
+    .lightbox :global(img) {
+      height: auto;
+      max-height: calc(100dvh - 120px);
     }
   }
 </style>
