@@ -46,7 +46,6 @@ A worktree with no session is fine — its session already went.
 Then delete what is left of the branches:
 
     git branch -D <branch>
-    git branch -D worktree-<name>   # the -w placeholder, if it still exists
 
 `-D`, not `-d`, because a squash merge leaves the local branch looking unmerged. The pull
 request says `MERGED`, so nothing is lost.
@@ -54,6 +53,17 @@ request says `MERGED`, so nothing is lost.
 ## 5. Tidy
 
     git worktree prune
+    git branch --list 'worktree-*'
+
+`claude --bg -w <name>` creates a placeholder branch `worktree-<name>`. The session then
+moves to its ticket branch, so the placeholder never gets a pull request and §3 never
+matches it. Delete every listed placeholder that no remaining worktree has checked out:
+
+    git branch -d worktree-<name>
+
+Use `-d` here, not `-D`. A placeholder that only marks where the worktree started is an
+ancestor of `main`, so `-d` deletes it. A placeholder with commits of its own makes `-d`
+refuse. Report that refusal verbatim and keep the branch.
 
 ## 6. Pull
 
