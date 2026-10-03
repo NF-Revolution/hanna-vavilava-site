@@ -70,7 +70,13 @@ const selects = [
 ];
 ---
 
-<form class:list={['enquiry', dark && 'dark']} method="post" action="/api/enquiry">
+<form
+  class:list={['enquiry', dark && 'dark']}
+  method="post"
+  action="/api/enquiry"
+  data-event="enquiry_submit"
+  data-form="enquiry"
+>
   <input type="hidden" name="locale" value={locale} />
   <input type="hidden" name="elapsed" />
   <input type="hidden" name="page" />
