@@ -69,6 +69,10 @@ const contacts = [
     <p class="lbl foot-facts">
       {[dict.footer.languages, dict.footer.vetting, dict.footer.footage].join('   ·   ')}
     </p>
+    <p class="lbl foot-legal">
+      <a href={path(locale, 'privacy')}>{dict.nav.privacy}</a>
+      <a href={`${path(locale, 'privacy')}#cookies`}>{dict.footer.cookies}</a>
+    </p>
     <p class="lbl foot-langs">
       <span class="foot-lang-current">{locale.toUpperCase()}</span>
       <a
@@ -121,6 +125,7 @@ const contacts = [
   .foot-nav a,
   .foot-contact a,
   .foot-wordmark,
+  .foot-legal a,
   .foot-lang-other {
     display: flex;
     align-items: center;
@@ -160,6 +165,7 @@ const contacts = [
     color: var(--ink-muted);
   }
 
+  .foot-legal,
   .foot-langs {
     display: flex;
     align-items: center;
@@ -173,6 +179,12 @@ const contacts = [
     padding-bottom: 3px;
   }
 
+  .foot-legal {
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .foot-legal a,
   .foot-lang-other {
     color: var(--ink-muted);
   }
@@ -193,6 +205,10 @@ const contacts = [
 
     .foot-facts {
       line-height: 2;
+    }
+
+    .foot-legal {
+      margin-left: 0;
     }
   }
 </style>

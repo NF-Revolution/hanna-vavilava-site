@@ -121,7 +121,8 @@
     "languages": "Polski · English · Русский",
     "vetting": "Pre-purchase exam — the buyer chooses the vet",
     "footage": "Full uncut footage on request",
-    "phone": "Phone"
+    "phone": "Phone",
+    "cookies": "Cookies"
   },
   "lang": {
     "switchTo": "Polski",
@@ -450,6 +451,14 @@
           "Providing data is voluntary, but without the fields marked as required an enquiry cannot be answered.",
           "The data is not used for automated decision-making or profiling. The Turnstile check only filters out bots and has no legal effect on anyone.",
           "The WhatsApp and Telegram links open a chat in those apps. What you write there they process on their own terms, as separate controllers."
+        ]
+      },
+      "device": {
+        "h": "Cookies and device storage",
+        "p": [
+          "This site sets no cookies and stores nothing on your device, which is why it asks for no consent. Your browser keeps its own cached copies of pages and photos to load them faster; you can clear them at any time.",
+          "The videos are plain files from our own subdomain, {media}, not a player embedded from someone else's service. A film on a horse's page is downloaded only once you press play; before that, only its still frame. The short loop on the homepage downloads straight away, unless the browser asks for reduced motion or data saving, or the connection is slow. Either way, your browser downloads the film from Cloudflare R2, which sees the IP address like any server and sets no cookie. The play is counted in the statistics as an event, also without cookies.",
+          "When you start filling in an enquiry form, the page loads Cloudflare Turnstile. Cloudflare may then store its own security cookies on the device. They are strictly necessary to tell a person from a bot, so they need no consent."
         ]
       },
       "turnstile": "The enquiry forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",

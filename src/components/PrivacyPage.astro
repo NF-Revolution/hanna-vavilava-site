@@ -3,7 +3,8 @@
  * Privacy (E7.3): the Art. 13 notice, one column of text in the order the article
  * lists it. The controller and the email come from `site.ts`, the copy from the
  * dictionaries; Turnstile keeps its own paragraph and the Addendum link that
- * invisible mode is conditional on (#45).
+ * invisible mode is conditional on (#45). The last section, `#cookies`, is the
+ * technology statement the footer links to (E7.4).
  */
 import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
@@ -25,6 +26,7 @@ const [data, ...rest] = [
   page.retention,
   page.rights,
   page.other,
+  page.device,
 ];
 const host = new URL(media.base).hostname;
 /* `{email}` becomes a link, so a paragraph is split around it rather than filled. */
@@ -83,11 +85,13 @@ const parts = (text: string) => text.split('{email}');
     </section>
 
     {rest.map((s) => (
-      <section>
+      <section id={s === page.device ? 'cookies' : undefined}>
         <h3 class="lbl">{s.h}</h3>
         {s.p.map((p) => (
           <p class="copy">
-            {parts(p).map((x, i) => (i ? [<a href={emailHref()}>{site.email}</a>, x] : x))}
+            {parts(fill(p, { media: host })).map((x, i) =>
+              i ? [<a href={emailHref()}>{site.email}</a>, x] : x,
+            )}
           </p>
         ))}
       </section>
