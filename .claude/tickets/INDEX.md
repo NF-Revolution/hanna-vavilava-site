@@ -470,6 +470,12 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   bounce rate. The owner wanted it free. Cloudflare Web Analytics, which #1 and #69 assumed in
   passing, was ruled out as the original plan had ruled it out: it records pageviews only,
   with no custom events and no bounce rate, it is not EU-hosted, and Hanna's KPIs are events.
+  Firebase Analytics, which is GA4, was ruled out when the owner asked on 2026-10-03. Its
+  `_ga` cookie needs consent under ePrivacy art. 5(3) whether or not the data is personal, so
+  it brings the banner over the hero. A reject button as prominent as accept, which the Polish
+  regulator expects, then loses exactly the visitors `xray_download` exists to catch. It is
+  also about 100 KB of JS. The US transfer itself would be lawful under the Data Privacy
+  Framework; that was never the obstacle.
   Umami's own `script.js` was ruled out too. It is about 2 KB of third-party code, and its
   `data-umami-event` attribute covers only clicks.
   The beacon is one hand-minified inline script in `Base.astro`. It posts what Umami's tracker
