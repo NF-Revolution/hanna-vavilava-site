@@ -14,6 +14,11 @@
     },
     "subscribers": {
       ".read": "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true",
+      ".indexOn": ["email"]
+    },
+    "announced": {
+      ".read": "auth != null && auth.token.admin === true",
       ".write": "auth != null && auth.token.admin === true"
     }
   }

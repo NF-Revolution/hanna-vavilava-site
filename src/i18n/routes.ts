@@ -17,6 +17,13 @@ export const routes = {
   enquiryFailed: { pl: '/zapytanie/niewyslane', en: '/en/enquiry/not-sent' },
   menu: { pl: '/menu', en: '/en/menu' },
   privacy: { pl: '/prywatnosc', en: '/en/privacy' },
+  /* The new-horse list (E5.9). Mirrored in `functions/subscribe.js`, which cannot import this. */
+  notifySent: { pl: '/powiadomienia/sprawdz', en: '/en/new-horses/check' },
+  notifyConfirm: { pl: '/powiadomienia/potwierdz', en: '/en/new-horses/confirm' },
+  notifyConfirmed: { pl: '/powiadomienia/zapisano', en: '/en/new-horses/confirmed' },
+  notifyUnsubscribe: { pl: '/powiadomienia/wypisz', en: '/en/new-horses/unsubscribe' },
+  notifyUnsubscribed: { pl: '/powiadomienia/wypisano', en: '/en/new-horses/unsubscribed' },
+  notifyFailed: { pl: '/powiadomienia/niezapisano', en: '/en/new-horses/failed' },
 } as const;
 
 export type RouteKey = keyof typeof routes;

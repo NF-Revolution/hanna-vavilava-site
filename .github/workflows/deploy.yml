@@ -52,3 +52,14 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           channelId: live
+
+      # The new-horse emails (E5.9), only once the pages they link to are live. The
+      # Function marks a horse before it mails it, so a re-run never mails twice.
+      # Skipped until the secret exists, like the job itself without a project.
+      - name: Announce new horses
+        env:
+          ANNOUNCE_TOKEN: ${{ secrets.ANNOUNCE_TOKEN }}
+        run: |
+          [ -n "$ANNOUNCE_TOKEN" ] || exit 0
+          curl -fsS -X POST -H "X-Announce: $ANNOUNCE_TOKEN" \
+            https://hanna-vavilava-site.web.app/api/notify/announce

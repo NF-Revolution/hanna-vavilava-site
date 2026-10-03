@@ -83,7 +83,8 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 - Realtime Database, not Firestore (owner's call). Content is read once at build
   time, so Firestore's per-document read model bought nothing, and one JSON tree
   priced on bandwidth is the predictable number. Paths: `/horses`, `/enquiries`,
-  `/subscribers`, `/site`, and `/monitor`, which only the enquiry probe (#49) writes.
+  `/subscribers`, `/site`, `/monitor`, which only the enquiry probe (#49) writes, and
+  `/announced`, the horses the new-horse list (#48) has already mailed about.
 - Three colours deviate from the artboards, and E1.10 repainted the boards to
   match rather than the other way round. The tertiary greys `#8D8B83` (3.13:1)
   and `#6E6D68` (3.73:1) fail WCAG AA at the 10–11px sizes they are drawn at,

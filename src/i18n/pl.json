@@ -101,7 +101,10 @@
     "placeholder": "adres e-mail",
     "submit": "Zapisz",
     "note": "Jedna wiadomość, kiedy dochodzi nowy koń. Zwykle raz w miesiącu.",
-    "consent": "Zgadzam się na otrzymywanie wiadomości o nowych koniach. Mogę wypisać się w każdej chwili."
+    "consent": "Zgadzam się na otrzymywanie od {operator} wiadomości e-mail o nowych koniach na sprzedaż. Mogę wypisać się w każdej chwili linkiem w każdej wiadomości.",
+    "privacy": "Jak przetwarzamy dane",
+    "trap": "Proszę zostawić to pole puste",
+    "noscript": "Zapis wymaga JavaScriptu."
   },
   "status": {
     "city": "Warszawa, Polska",
@@ -374,7 +377,7 @@
       "description": "Informacja o przetwarzaniu danych osobowych.",
       "label": "Prywatność",
       "heading": "Jak przetwarzamy dane osobowe",
-      "intro": "Informacja z art. 13 RODO dla osób, które odwiedzają tę stronę lub wysyłają zapytanie przez formularz.",
+      "intro": "Informacja z art. 13 RODO dla osób, które odwiedzają tę stronę, wysyłają zapytanie przez formularz lub zapisują się na powiadomienia o nowych koniach.",
       "controller": {
         "h": "Administrator",
         "lead": "Administratorem danych osobowych jest:",
@@ -384,6 +387,7 @@
         "h": "Jakie dane, w jakim celu i na jakiej podstawie",
         "p": [
           "Zapytanie o konia: imię, kraj, numer WhatsApp, opcjonalnie konto na Instagramie i wiadomość, poziom jeździecki, budżet i termin zakupu. Zapytanie o konia spoza listy: numer WhatsApp i opisane życzenia. Do obu dołączamy język i adres strony, z której wysłano formularz, oraz to, skąd przyszedł odwiedzający (np. znaczniki UTM). Dane te służą do odpowiedzi na zapytanie i przedstawienia oferty, czyli do działań na żądanie osoby, której dotyczą, przed zawarciem umowy (art. 6 ust. 1 lit. b RODO).",
+          "Powiadomienia o nowych koniach: adres e-mail, język oraz czas zapisu i jego potwierdzenia. Wysyłamy na ten adres wiadomość z linkiem potwierdzającym, a po potwierdzeniu jedną wiadomość, kiedy dochodzi nowy koń na sprzedaż. Podstawą jest zgoda (art. 6 ust. 1 lit. a RODO), będąca też zgodą na marketing bezpośredni drogą elektroniczną. Zgodę można wycofać w każdej chwili linkiem w każdej wiadomości, bez wpływu na zgodność z prawem wysyłki przed jej wycofaniem.",
           "Ochrona formularza: adres IP i dane przeglądarki pomagają odróżnić człowieka od bota i ograniczyć liczbę zapytań z jednego adresu. Adres IP nie jest zapisywany. Podstawą jest prawnie uzasadniony interes administratora, czyli ochrona kanału kontaktu przed spamem (art. 6 ust. 1 lit. f RODO).",
           "Działanie strony: przy każdym wejściu serwer przetwarza adres IP i dane żądania, aby dostarczyć stronę i chronić ją przed nadużyciami (art. 6 ust. 1 lit. f RODO).",
           "Statystyki odwiedzin: liczymy odsłony i kilka zdarzeń, na przykład wysłanie zapytania. Statystyki nie używają plików cookie i niczego nie zapisują na urządzeniu. Wizyta jest rozpoznawana po skrócie adresu IP i przeglądarki z solą zmienianą codziennie, więc nie da się jej powiązać z osobą ani z wizytą z innego dnia. Adres strony jest wysyłany bez części po znaku #. Podstawą jest prawnie uzasadniony interes: wiedza, które części strony działają (art. 6 ust. 1 lit. f RODO)."
@@ -395,7 +399,7 @@
         "items": [
           {
             "name": "Google (Firebase)",
-            "role": "hosting strony, funkcja obsługująca formularz (Warszawa) i baza danych z zapytaniami (Belgia)."
+            "role": "hosting strony, funkcja obsługująca formularze (Warszawa) i baza danych z zapytaniami i listą powiadomień (Belgia)."
           },
           {
             "name": "Microsoft (Microsoft 365)",
@@ -403,7 +407,7 @@
           },
           {
             "name": "Resend",
-            "role": "wysyła tę kopię e-mailem, z serwerów w Unii Europejskiej."
+            "role": "wysyła tę kopię e-mailem, a także wiadomości potwierdzające zapis i powiadomienia o nowych koniach, z serwerów w Unii Europejskiej."
           },
           {
             "name": "Telegram",
@@ -435,6 +439,7 @@
         "h": "Jak długo przechowujemy dane",
         "p": [
           "Zapytanie usuwamy z bazy danych, ze skrzynki pocztowej i z Telegrama sześć miesięcy po tym, jak zostanie obsłużone. Jeśli zakończy się sprzedażą konia, przechowujemy je tak długo, jak wymagają tego przepisy podatkowe i rachunkowe.",
+          "Adres na liście powiadomień przechowujemy do wypisania się, a wypisanie usuwa go od razu. Zapis niepotwierdzony w ciągu 7 dni wygasa i jest usuwany.",
           "Zapytanie, które nie przejdzie weryfikacji Turnstile, nie jest nigdzie zapisywane. Statystyki odwiedzin nie zawierają danych osobowych, bo skrótu z codziennie zmienianą solą nie da się odwrócić."
         ]
       },
@@ -448,7 +453,7 @@
       "other": {
         "h": "Pozostałe informacje",
         "p": [
-          "Podanie danych jest dobrowolne, ale bez pól oznaczonych jako wymagane nie możemy odpowiedzieć na zapytanie.",
+          "Podanie danych jest dobrowolne, ale bez pól oznaczonych jako wymagane nie możemy odpowiedzieć na zapytanie. Zapis na powiadomienia jest osobny od zapytania i nie jest warunkiem żadnej odpowiedzi.",
           "Dane nie służą do zautomatyzowanego podejmowania decyzji ani do profilowania. Weryfikacja Turnstile tylko odsiewa automaty i nie wywołuje wobec nikogo skutków prawnych.",
           "Linki do WhatsApp i Telegrama otwierają rozmowę w tych aplikacjach. To, co tam piszesz, przetwarzają one na własnych zasadach, jako odrębni administratorzy."
         ]
@@ -458,11 +463,58 @@
         "p": [
           "Strona nie ustawia plików cookie i niczego nie zapisuje na Twoim urządzeniu, dlatego nie prosi o zgodę. Przeglądarka sama przechowuje kopie stron i zdjęć w pamięci podręcznej, aby szybciej je wczytać; możesz ją wyczyścić w dowolnej chwili.",
           "Filmy to zwykłe pliki z naszej subdomeny {media}, a nie odtwarzacz osadzony z cudzego serwisu. Film na stronie konia pobiera się dopiero po naciśnięciu odtwarzania; wcześniej tylko kadr tytułowy. Krótka pętla na stronie głównej pobiera się od razu, chyba że przeglądarka prosi o ograniczenie ruchu lub oszczędzanie danych albo połączenie jest wolne. W obu przypadkach przeglądarka pobiera film z Cloudflare R2, który — jak każdy serwer — widzi adres IP i nie ustawia plików cookie. Odtworzenie liczymy w statystykach jako zdarzenie, również bez plików cookie.",
-          "Gdy zaczniesz wypełniać formularz zapytania, strona wczytuje Cloudflare Turnstile. Cloudflare może wtedy zapisać na urządzeniu własne pliki cookie bezpieczeństwa. Są one niezbędne, aby odróżnić człowieka od bota, więc nie wymagają zgody."
+          "Gdy zaczniesz wypełniać formularz zapytania lub zapisu na powiadomienia, strona wczytuje Cloudflare Turnstile. Cloudflare może wtedy zapisać na urządzeniu własne pliki cookie bezpieczeństwa. Są one niezbędne, aby odróżnić człowieka od bota, więc nie wymagają zgody."
         ]
       },
-      "turnstile": "Formularze zapytań są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",
+      "turnstile": "Formularze zapytań i zapisu na powiadomienia są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",
       "turnstileLink": "Informacja Cloudflare o prywatności w Turnstile"
+    },
+    "notifySent": {
+      "title": "Proszę sprawdzić skrzynkę — Hanna Vavilava",
+      "description": "Link potwierdzający zapis na powiadomienia wysłany.",
+      "label": "Powiadomienia",
+      "heading": "Proszę sprawdzić skrzynkę.",
+      "body": "Wysłaliśmy link potwierdzający. Adres trafi na listę dopiero po jego kliknięciu, a link działa przez 7 dni. Jeśli adres był już zapisany, nic nowego nie przyjdzie."
+    },
+    "notifyConfirm": {
+      "title": "Potwierdzenie zapisu — Hanna Vavilava",
+      "description": "Potwierdzenie zapisu na powiadomienia o nowych koniach.",
+      "label": "Powiadomienia",
+      "heading": "Potwierdzenie zapisu",
+      "body": "Jedno kliknięcie i adres trafi na listę powiadomień o nowych koniach.",
+      "button": "Potwierdzam zapis",
+      "noscript": "Ten przycisk wymaga JavaScriptu. Proszę włączyć go i otworzyć link z wiadomości ponownie."
+    },
+    "notifyConfirmed": {
+      "title": "Zapisano — Hanna Vavilava",
+      "description": "Zapis na powiadomienia o nowych koniach potwierdzony.",
+      "label": "Powiadomienia",
+      "heading": "Zapisano.",
+      "body": "Napiszę, kiedy dojdzie nowy koń. Wypisać się można linkiem w każdej wiadomości."
+    },
+    "notifyUnsubscribe": {
+      "title": "Wypisanie z powiadomień — Hanna Vavilava",
+      "description": "Wypisanie z powiadomień o nowych koniach.",
+      "label": "Powiadomienia",
+      "heading": "Wypisanie z powiadomień",
+      "body": "Po kliknięciu adres zostanie usunięty z listy.",
+      "button": "Wypisz mnie",
+      "noscript": "Ten przycisk wymaga JavaScriptu. Można też napisać na {email}, a usuniemy adres ręcznie."
+    },
+    "notifyUnsubscribed": {
+      "title": "Wypisano — Hanna Vavilava",
+      "description": "Adres usunięty z listy powiadomień.",
+      "label": "Powiadomienia",
+      "heading": "Wypisano.",
+      "body": "Adres został usunięty z listy. Więcej wiadomości nie wyślemy."
+    },
+    "notifyFailed": {
+      "title": "Nie udało się — Hanna Vavilava",
+      "description": "Zapis lub wypisanie nie powiodło się.",
+      "label": "Powiadomienia",
+      "heading": "Nie udało się.",
+      "body": "Link mógł wygasnąć albo coś poszło nie tak. Proszę zapisać się ponownie albo, by się wypisać, napisać na {email}.",
+      "retry": "Zapisz się ponownie"
     },
     "notFound": {
       "title": "Nie ma takiej strony — Hanna Vavilava",

@@ -1,0 +1,179 @@
+---
+/*
+ * The new-horse signup (E5.9, #48), below the horses index and on a sold horse's
+ * page, drawn on `Horses`, `MobileHorses` and both sold-detail boards. Electronic marketing, so the opt-in
+ * stands on its own: a separate form from the enquiry, and a consent box that is
+ * never pre-ticked and is `required`, naming who sends what and linking the notice.
+ * A plain POST to `/api/notify` (`newHorses`), answered with a 303 like the
+ * enquiry's; the double opt-in starts there. `website` is the honeypot, and the
+ * invisible Turnstile is loaded on first focus, as on the enquiry form.
+ */
+import TurnstileLoader from './TurnstileLoader.astro';
+import { t, type Locale } from '../i18n';
+import { fill } from '../i18n/format';
+import { path } from '../i18n/routes';
+import { operator, turnstileSitekey } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const n = t(locale).notify;
+---
+
+<section class="notify" aria-labelledby="notify-h">
+  <div class="intro">
+    <h2 class="heading" id="notify-h">
+      {n.label}
+    </h2>
+    <p class="copy note">{n.note}</p>
+  </div>
+  <form method="post" action="/api/notify" data-event="notify_submit">
+    <input type="hidden" name="locale" value={locale} />
+    <label class="trap" aria-hidden="true">
+      {n.trap}
+      <input name="website" type="text" tabindex="-1" autocomplete="off" />
+    </label>
+    <div class="row">
+      <label class="fld">
+        <span class="lbl">{n.placeholder}</span>
+        <input
+          class="und"
+          name="email"
+          type="email"
+          required
+          maxlength="254"
+          autocomplete="email"
+        />
+      </label>
+      <button class="lbl send" type="submit">
+        {n.submit}
+      </button>
+    </div>
+    <label class="consent">
+      <input type="checkbox" name="consent" value="yes" required />
+      <span class="copy">{fill(n.consent, { operator: operator.name })}</span>
+    </label>
+    <a class="meta privacy" href={path(locale, 'privacy')}>
+      {n.privacy}
+    </a>
+    <div class="cf-turnstile" data-sitekey={turnstileSitekey}></div>
+    <noscript>
+      <p class="meta nojs">{n.noscript}</p>
+    </noscript>
+  </form>
+</section>
+<TurnstileLoader />
+
+<style>
+  .notify {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 40px 80px;
+    padding: 80px var(--gutter) 88px;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .heading {
+    margin: 0 0 16px;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .note,
+  .fld > .lbl,
+  .privacy,
+  .nojs {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .trap {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .row {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+  }
+
+  .fld {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .und {
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--rule-field);
+    padding: 9px 0 11px;
+    font-size: 15px;
+  }
+
+  .send {
+    min-height: var(--tap);
+    padding: 19px 44px;
+    box-sizing: border-box;
+    background: var(--ink);
+    color: var(--ink-inv);
+  }
+
+  .consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+  }
+
+  .consent input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--ink);
+  }
+
+  .privacy {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    align-self: flex-start;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Out of flow, so the empty widget adds no gap; the invisible mode draws nothing. */
+  .cf-turnstile {
+    position: absolute;
+  }
+
+  @media (max-width: 720px) {
+    .notify {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding: 48px var(--gutter-mobile) 56px;
+    }
+
+    .heading {
+      font-size: 24px;
+    }
+
+    .row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+    }
+  }
+</style>

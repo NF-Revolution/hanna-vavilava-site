@@ -1,0 +1,17 @@
+---
+/*
+ * Appends Cloudflare's Turnstile script the first time a visitor focuses a field of a
+ * form that holds a `cf-turnstile` div (E5.6), never the gallery's or the menu's
+ * dialog form, so browsing loads nothing third-party. Shared by the enquiry form and
+ * the new-horse signup (E5.9); no page renders both.
+ */
+---
+
+<script is:inline>
+  document.addEventListener('focusin', function load(e) {
+    if (!e.target.form?.querySelector('.cf-turnstile')) return;
+    document.removeEventListener('focusin', load);
+    const src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    document.head.append(Object.assign(document.createElement('script'), { src }));
+  });
+</script>

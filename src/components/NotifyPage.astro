@@ -1,0 +1,134 @@
+---
+/*
+ * The new-horse list's pages (E5.9, #48), drawn as `NotifyPages` and `MobileNotifyPages`: where `newHorses`'
+ * 303s land, and the two pages the emails link to. Every one is `noindex`.
+ *
+ * `confirm` and `unsubscribe` act only on the button, never on load: mail scanners
+ * open links on their own, and would confirm or unsubscribe people who never
+ * clicked. The token is the link's fragment, which reaches no server log and no
+ * analytics (the beacon drops the hash); one inline line copies it into the form.
+ * The 303 that follows replaces the URL, so the token leaves the history too.
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import { t, type Locale } from '../i18n';
+import { fill } from '../i18n/format';
+import { path, type RouteKey } from '../i18n/routes';
+import { site } from '../site';
+
+type State = 'sent' | 'confirm' | 'confirmed' | 'unsubscribe' | 'unsubscribed' | 'failed';
+interface Props {
+  locale: Locale;
+  state: State;
+}
+const { locale, state } = Astro.props;
+const pages = t(locale).pages;
+const routeKey = `notify${state[0].toUpperCase()}${state.slice(1)}` as RouteKey &
+  keyof typeof pages;
+const page = pages[routeKey] as {
+  title: string;
+  description: string;
+  label: string;
+  heading: string;
+  body: string;
+  button?: string;
+  noscript?: string;
+  retry?: string;
+};
+const action = state === 'confirm' || state === 'unsubscribe';
+const email = { email: site.email };
+---
+
+<Page locale={locale} routeKey={routeKey} title={page.title} description={page.description} noindex>
+  <SubBar label={page.label} />
+
+  <section class="done">
+    <h2 class="heading">{page.heading}</h2>
+    <p class="copy body">{fill(page.body, email)}</p>
+    {action ? (
+      <form method="post" action={`/api/notify/${state}`}>
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="t" id="t" />
+        <script is:inline>
+          document.getElementById('t').value = location.hash.slice(1);
+        </script>
+        <button class="lbl btn" type="submit">
+          {page.button}
+        </button>
+        <noscript>
+          <p class="copy body nojs">{fill(page.noscript ?? '', email)}</p>
+        </noscript>
+      </form>
+    ) : (
+      <a class="lbl more" href={path(locale, 'horses')}>
+        {page.retry ?? pages.enquirySent.back}
+        <span aria-hidden="true">→</span>
+      </a>
+    )}
+  </section>
+</Page>
+
+<style>
+  .done {
+    max-width: 1040px;
+    padding: 96px var(--gutter) 104px;
+  }
+
+  .heading {
+    margin: 0 0 22px;
+    font-size: 44px;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+
+  .body {
+    max-width: 620px;
+    margin: 0 0 52px;
+    color: var(--ink-muted);
+  }
+
+  .nojs {
+    margin: 24px 0 0;
+  }
+
+  /* ponytail: EnquiryDone's two link styles, scoped as it scopes them. */
+  .btn {
+    min-height: var(--tap);
+    padding: 19px 38px;
+    box-sizing: border-box;
+    background: var(--ink);
+    color: var(--ground-light);
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--tap);
+    padding-bottom: 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  @media (max-width: 720px) {
+    .done {
+      padding: 44px var(--gutter-mobile) 52px;
+    }
+
+    .heading {
+      margin-bottom: 24px;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .body {
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 52px;
+    }
+  }
+</style>

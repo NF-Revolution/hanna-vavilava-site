@@ -10,6 +10,7 @@ import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import Photo from './Photo.astro';
 import ViewSwitch from './ViewSwitch.astro';
+import NotifyForm from './NotifyForm.astro';
 import { t, type Locale } from '../i18n';
 import { fill, formatDate, formatPrice } from '../i18n/format';
 import { path } from '../i18n/routes';
@@ -79,6 +80,7 @@ const imageVw = [61, 61, 61, 70];
       </li>
     ))}
   </ol>
+  <NotifyForm locale={locale} />
 </Page>
 
 <style>
