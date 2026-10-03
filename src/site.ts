@@ -34,16 +34,24 @@ export const site = {
 
 /*
  * The site operator and data controller (#3), as entered in the KRS extract posted
- * on #61. Registration facts, not editable content, so they live here rather than
- * in `/site`. The privacy notice (#59) names it; the footer (#61) will.
+ * on #61, state of 15.07.2026. Registration facts, not editable content, so they
+ * live here rather than in `/site`. The privacy notice (#59) and the footer (#61)
+ * name it: UŚUDE art. 5 and, for a sp. z o.o., KSH art. 206 §1, hence the court and
+ * the capital. KSH art. 160 §1 allows the `sp. z o.o.` abbreviation. REGON is the
+ * 9-digit entity number; the KRS prints the 14-digit main-unit form, `…00000`.
  */
 export const operator = {
   name: 'CEWET TAS sp. z o.o.',
   street: 'ul. Kąty Grodziskie 19J lok. 5',
-  city: '03-289 Warszawa',
+  postalCode: '03-289',
+  city: 'Warszawa',
   krs: '0001015121',
   nip: '5242961289',
   regon: '524266376',
+  court: 'Sąd Rejonowy dla m.st. Warszawy w Warszawie, XIV Wydział Gospodarczy KRS',
+  capital: '5 000 PLN',
+  /* A registered VAT payer (#61), so the NIP is also its PL VAT number. */
+  vatId: 'PL5242961289',
 };
 
 /*

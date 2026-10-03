@@ -22,7 +22,7 @@ import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
 import { path } from '../i18n/routes';
 import { formatPrice, plural } from '../i18n/format';
-import { site, telegramHref } from '../site';
+import { site, operator, telegramHref } from '../site';
 import { hero, media } from '../media';
 
 interface Props {
@@ -59,8 +59,15 @@ const business = {
   telephone: site.phone,
   email: site.email,
   sameAs: [site.instagram, telegramHref()],
-  // PLACEHOLDER: street and locality from the registered seller details (E7.5).
-  address: { '@type': 'PostalAddress', addressCountry: 'PL' },
+  legalName: operator.name,
+  vatID: operator.vatId,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: operator.street,
+    postalCode: operator.postalCode,
+    addressLocality: operator.city,
+    addressCountry: 'PL',
+  },
 };
 
 const posterSrc = hero && `${media.base}/${hero.posterKey}`;

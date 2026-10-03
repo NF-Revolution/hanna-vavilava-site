@@ -112,7 +112,9 @@
     "updated": "updated {date}"
   },
   "footer": {
-    "stable": "[PLACEHOLDER] stables",
+    "registry": "KRS {krs} · NIP {nip} · REGON {regon}",
+    "court": "Registry court: {court} · share capital {capital}",
+    "stock": "I sell my own horses and offer horses owned by clients — the owner's details are given before contract.",
     "location": "40 km from Warsaw, Poland",
     "languages": "Polski · English · Русский",
     "vetting": "Pre-purchase exam — the buyer chooses the vet",
