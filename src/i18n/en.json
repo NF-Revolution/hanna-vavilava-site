@@ -233,7 +233,7 @@
     },
     "about": {
       "title": "About and how buying works — Hanna Vavilava",
-      "description": "I have sold horses since 2016, and only show jumpers since 2021. Five steps: enquiry, video call, viewing, pre-purchase exam, contract.",
+      "description": "I have sold horses since 2016, and only show jumpers since 2021. Five steps: enquiry, phone call, viewing, pre-purchase exam, contract.",
       "label": "About",
       "meta": "Selling since 2016 · show jumpers since 2021",
       "portraitAlt": "Hanna Vavilava on a bay horse in an orange winner's rug, wearing a championship sash, in a show arena",
@@ -245,8 +245,8 @@
           "text": "The form on this site or WhatsApp. I reply personally within the hour, {hours}."
         },
         {
-          "title": "Video call and the full footage",
-          "text": "Twenty minutes about your level and your goals, and after the call the complete set of recordings: a round with no cuts, flatwork, the horse in the stable and at the farrier."
+          "title": "A phone call",
+          "text": "We arrange a call about your level and your goals."
         },
         {
           "title": "Viewing",
@@ -288,7 +288,7 @@
         },
         {
           "q": "Can I buy a horse without travelling to Poland?",
-          "a": "Yes, but not on the strength of a video alone. The order is always the same: a video call, the full uncut footage, a pre-purchase exam by a vet of your choice, and a viewing by someone you trust. The buyer makes the decision, not me."
+          "a": "Yes, but not on the strength of a video alone. The order is always the same: a phone call, the full uncut footage, a pre-purchase exam by a vet of your choice, and a viewing by someone you trust. The buyer makes the decision, not me."
         },
         {
           "q": "What happens once I decide to buy?",
@@ -347,12 +347,8 @@
           "text": "I write from {phone} and confirm which horse it is about."
         },
         {
-          "title": "Video call",
-          "text": "Twenty minutes, at a time you choose — usually within 48 hours."
-        },
-        {
-          "title": "Full material",
-          "text": "An uncut round, flatwork and the X-rays — by link, after the call."
+          "title": "A call and a visit",
+          "text": "We can arrange a phone call and a meeting at the stable."
         }
       ],
       "whatsapp": "Message me on WhatsApp now",

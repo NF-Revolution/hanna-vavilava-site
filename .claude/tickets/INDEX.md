@@ -58,6 +58,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E5.8 contact links           | #47                | done — `ContactLinks.astro` by every form, prefilled, canvas v41            |
 | E5.10 endpoint monitor       | #49                | done — daily `enquiryProbe`, uptime check, alerts by hand                   |
 | E5.11 search form endpoint   | #126               | done — `searchSchema`, `kind: search` in both messages, deploy owed         |
+| E5.12 simpler next steps     | #151               | done — two sent-page steps, phone call on About and FAQ, canvas v53         |
 | E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI                |
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`                |
 | E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate               |

@@ -233,7 +233,7 @@
     },
     "about": {
       "title": "O mnie i jak przebiega zakup — Hanna Vavilava",
-      "description": "Sprzedaję konie od 2016 roku, od 2021 wyłącznie konie skokowe. Pięć kroków zakupu: zapytanie, rozmowa wideo, oglądanie, badanie przedzakupowe, umowa.",
+      "description": "Sprzedaję konie od 2016 roku, od 2021 wyłącznie konie skokowe. Pięć kroków zakupu: zapytanie, rozmowa telefoniczna, oglądanie, badanie przedzakupowe, umowa.",
       "label": "O mnie",
       "meta": "Sprzedaję od 2016 · konie skokowe od 2021",
       "portraitAlt": "Hanna Vavilava na gniadym koniu w pomarańczowej derce zwycięzcy, z szarfą mistrzostw, na placu konkursowym",
@@ -245,8 +245,8 @@
           "text": "Formularz na tej stronie albo WhatsApp. Odpowiadam osobiście w ciągu godziny, w godzinach {hours}."
         },
         {
-          "title": "Rozmowa wideo i pełny materiał",
-          "text": "Dwadzieścia minut o Państwa poziomie i celach, a po rozmowie komplet nagrań: przejazd bez cięć, praca na płaskim, koń w stajni i przy kowalu."
+          "title": "Rozmowa telefoniczna",
+          "text": "Umówimy rozmowę o Państwa poziomie i celach."
         },
         {
           "title": "Oglądanie",
@@ -288,7 +288,7 @@
         },
         {
           "q": "Czy można kupić konia bez przyjazdu do Polski?",
-          "a": "Tak, ale nie na podstawie samego filmu. Kolejność jest zawsze ta sama: rozmowa wideo, pełny materiał bez cięć, badanie przedzakupowe przez wybranego przez Państwa weterynarza i oglądanie przez zaufanego przedstawiciela. Decyzję podejmuje kupujący, nie ja."
+          "a": "Tak, ale nie na podstawie samego filmu. Kolejność jest zawsze ta sama: rozmowa telefoniczna, pełny materiał bez cięć, badanie przedzakupowe przez wybranego przez Państwa weterynarza i oglądanie przez zaufanego przedstawiciela. Decyzję podejmuje kupujący, nie ja."
         },
         {
           "q": "Co dzieje się po decyzji o zakupie?",
@@ -347,12 +347,8 @@
           "text": "Piszę z numeru {phone} i potwierdzam, o którego konia chodzi."
         },
         {
-          "title": "Rozmowa wideo",
-          "text": "Dwadzieścia minut, w terminie, który Państwo wybiorą — najczęściej w ciągu 48 godzin."
-        },
-        {
-          "title": "Pełny materiał",
-          "text": "Przejazd bez cięć, praca na płaskim i zdjęcia RTG — linkiem, po rozmowie."
+          "title": "Rozmowa i spotkanie",
+          "text": "Umówimy rozmowę telefoniczną i spotkanie w stajni."
         }
       ],
       "whatsapp": "Napisz teraz na WhatsApp",
