@@ -3,7 +3,7 @@ import '../styles/fonts.css';
 import '../styles/base.css';
 import { locales, htmlLang, t, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
-import { indexable } from '../site';
+import { analytics, indexable, umami } from '../site';
 
 export interface Props {
   locale: Locale;
@@ -38,6 +38,31 @@ const alternates = locales.map((l) => ({
   href: new URL(path(l, routeKey, slug), Astro.site).href,
 }));
 const ogLocale: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' };
+
+/*
+ * The analytics beacon (E6.6): a pageview on load, and an event for any link or
+ * form carrying `data-event`, any `wa.me` / `t.me` link, and the first play of a
+ * `<video data-event>`. The element's other `data-*` attributes become the event's
+ * data, and on a horse page every event carries `horse`. The sent and not-sent
+ * pages report `enquiry_success` and `enquiry_failure`. Homepage bounce is Umami's
+ * bounce rate on the `/` and `/en` entry pages: each entry point is a navigation or
+ * an event. The URL drops the hash, which holds the buyer's number on the sent page.
+ * ponytail: ad-blockers drop `*.umami.is`; a `/api/event` rewrite to a Function that
+ * forwards with X-Forwarded-For if the counts look low.
+ *
+ * Hand-minified, as the sent page's echo is (E5.7): the formatter would triple its
+ * size, and it is the one script on every page. Wrapped, so its names never meet
+ * another inline script's.
+ */
+const J = JSON.stringify;
+const pageEvent = (
+  { enquirySent: 'enquiry_success', enquiryFailed: 'enquiry_failure' } as Partial<
+    Record<RouteKey, string>
+  >
+)[routeKey];
+const beacon =
+  analytics &&
+  String.raw`(()=>{const w=${J(umami.website)},h=${J(routeKey === 'horse' ? slug : null)},s=(n,d)=>fetch(${J(umami.endpoint)},{method:"POST",keepalive:!0,headers:{"Content-Type":"application/json","x-umami-website-id":w},body:JSON.stringify({type:"event",payload:{website:w,hostname:location.hostname,url:location.pathname+location.search,referrer:document.referrer,language:navigator.language,screen:screen.width+"x"+screen.height,name:n,data:n&&{...h&&{horse:h},...d}}})}).catch(()=>{}),f=(e,n)=>{const{event:v,...d}=e.dataset;(v||n)&&s(v||n,d)},o=(t,l)=>addEventListener(t,l,!0);s();h&&s("horse_view");${pageEvent ? `s(${J(pageEvent)});` : ''}o("click",e=>{const a=e.target.closest?.("a");a&&f(a,{"wa.me":"whatsapp_click","t.me":"telegram_click"}[a.host])});o("submit",e=>f(e.target));o("play",e=>{const v=e.target;v.dataset?.event&&(f(v),delete v.dataset.event)})})()`;
 ---
 
 <!doctype html>
@@ -91,6 +116,7 @@ const ogLocale: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' };
       />
     )}
     <slot name="head" />
+    {beacon && <script is:inline set:html={beacon}></script>}
   </head>
   <body data-ground={ground}>
     <a class="skip-link" href="#main">

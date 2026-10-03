@@ -28,6 +28,8 @@ const links = [
       class="lbl"
       href={path(locale, link.key)}
       aria-current={link.key === current ? 'page' : undefined}
+      data-event="view_switch"
+      data-view={link.key === 'horses' ? 'editorial' : 'grid'}
     >
       {link.label}
     </a>

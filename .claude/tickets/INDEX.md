@@ -62,6 +62,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`        |
 | E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate       |
 | E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63      |
+| E6.6 analytics               | #55                | done — Umami EU beacon in `Base.astro`, website ID owed by owner    |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                               |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                      |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                     |
@@ -464,3 +465,26 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   page only when it has `noindex` and no canonical, because otherwise the site-wide `noindex`
   would turn it off on every CI build. Search Console and Bing are #63's job: a Domain property
   verified by DNS TXT, then Bing imported from Search Console.
+- Analytics is Umami Cloud on the free Hobby plan, EU region (E6.6, #55). It sets no
+  cookies and needs no consent banner, it records custom events with data, and it reports a
+  bounce rate. The owner wanted it free. Cloudflare Web Analytics, which #1 and #69 assumed in
+  passing, was ruled out as the original plan had ruled it out: it records pageviews only,
+  with no custom events and no bounce rate, it is not EU-hosted, and Hanna's KPIs are events.
+  Umami's own `script.js` was ruled out too. It is about 2 KB of third-party code, and its
+  `data-umami-event` attribute covers only clicks.
+  The beacon is one hand-minified inline script in `Base.astro`. It posts what Umami's tracker
+  posts to `https://gateway.umami.is/api/send`, the collect host since 2026-06-06. It renders
+  only when `HOSTING_CHANNEL` is `live` and `umami.website` is set, so previews and CI send
+  nothing. The page URL it sends never includes the hash, because the sent page's hash is the
+  buyer's phone number. Event names:
+  - `data-event` on a link, form or `<video>`. The element's other `data-*` attributes become
+    the event's data. On a horse page every event also carries `horse`.
+  - `whatsapp_click` and `telegram_click`, taken from the link's host, so a new link is
+    tracked without any markup.
+  - `horse_view`, `enquiry_success` and `enquiry_failure`, sent from the page itself.
+  - Homepage bounce is Umami's bounce rate on the `/` and `/en` entry pages.
+- The analytics beacon is the one exception to the 1 KB public-JS budget, and the owner
+  accepted it (E6.6). It is 815 B raw and about 515 B gzipped, measured on the live build.
+  With it, the homepage carries 1 658 B of inline JS, the horse page 1 845 B and the enquiry
+  page 1 840 B. Without it they carry 843, 1 025 and 1 025 B. Ad-blocked visitors are not
+  counted; the `ponytail:` upgrade is a forwarding Function.

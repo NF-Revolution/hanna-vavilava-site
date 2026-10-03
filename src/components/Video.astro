@@ -94,6 +94,8 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
     width={width}
     height={height}
     aria-label={fill(dict.video.label, { title: dict.video[video.kind], duration })}
+    data-event="video_play"
+    data-video={video.kind}
   >
     <source src={contentUrl} type="video/mp4" />
   </video>

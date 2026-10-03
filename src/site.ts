@@ -42,6 +42,18 @@ export const indexable =
   process.env.HOSTING_CHANNEL === 'live' &&
   !/\.(web\.app|firebaseapp\.com)$/.test(new URL(import.meta.env.SITE).hostname);
 
+/*
+ * Analytics (E6.6): Umami Cloud, Hobby plan, EU region — free, cookieless, custom
+ * events. The endpoint is the one Umami's own `script.js` posts to; the account's
+ * region decides where the data lives. Only the live deploy reports, so previews
+ * and CI never pollute the numbers, and it does not wait for `indexable` (#63).
+ */
+export const umami = {
+  endpoint: 'https://gateway.umami.is/api/send',
+  website: '', // PLACEHOLDER — the website ID from the owner's Umami Cloud account
+};
+export const analytics = process.env.HOSTING_CHANNEL === 'live' && umami.website !== '';
+
 export const whatsappHref = (text?: string): string =>
   `https://wa.me/${site.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 
