@@ -77,8 +77,6 @@ export async function fetchStarts(key, name, born) {
   return all;
 }
 
-// Fixed names: Intl's en-GB prints "Sept".
-const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 const ordinal = (n) =>
   n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th'));
 
@@ -118,10 +116,11 @@ export function startFacts(starts) {
         ? last.klasa.slice(0, -last.height.length - 1)
         : last.klasa;
     const round = [klasa, last.height && `${last.height} cm`].filter(Boolean).join(' ');
-    const line = (date, place) => [date, round, place].filter(Boolean).join(' · ');
+    // "12.09.2026" in both languages, as the site prints every date (E7.2).
+    const line = (place) => [`${d}.${m}.${y}`, round, place].filter(Boolean).join(' · ');
     lastStart = {
-      pl: line(`${d}.${m}.${y}`, last.place && `${last.place}. miejsce`),
-      en: line(`${Number(d)} ${months[m - 1]} ${y}`, last.place && `${ordinal(last.place)} place`),
+      pl: line(last.place && `${last.place}. miejsce`),
+      en: line(last.place && `${ordinal(last.place)} place`),
     };
   }
   return { starts: count, lastStart };

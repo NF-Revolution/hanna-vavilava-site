@@ -300,7 +300,7 @@
     },
     "enquiry": {
       "title": "Zapytanie — Hanna Vavilava",
-      "description": "Zapytanie trafia bezpośrednio do Hanny. Odpowiedź w ciągu godziny, 8:00–21:00 CET.",
+      "description": "Zapytanie trafia bezpośrednio do Hanny. Odpowiedź w ciągu godziny, {hours}.",
       "label": "Zapytanie",
       "meta": "Odpowiedź w ciągu 1 godziny · {hours}",
       "heading": "Piszą Państwo bezpośrednio do Hanny.",
@@ -417,6 +417,7 @@
     "slugTaken": "Koń o tym adresie już istnieje.",
     "saveFailed": "Nie udało się zapisać. Spróbuj ponownie.",
     "invalid": "Popraw pola:",
+    "pairHalf": "Uzupełnij obie wersje, PL i EN:",
     "lineHint": "Jedna pozycja w wierszu, ta sama kolejność po polsku i po angielsku.",
     "priceHint": "Puste = cena na zapytanie.",
     "xraysHint": "Pusta liczba = brak badania.",

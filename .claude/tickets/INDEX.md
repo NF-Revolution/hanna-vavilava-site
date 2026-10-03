@@ -63,6 +63,8 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate              |
 | E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63             |
 | E6.6 analytics               | #55                | done — Umami EU beacon in `Base.astro`, site `hanna-vavilava-site.web.app` |
+| E6.5 icons and manifest      | #54                | done — owner's logo, rasters by sharp at build, canvas v44                 |
+| E7.2 English pass            | #58                | done — EN board copy, `19.09.2026` dates, `EUR` code, half-pair check      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                      |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                             |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                            |
@@ -331,9 +333,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   (`:nth-child(even)`, `:nth-child(4n)`), so the number of entries follows the data and not the
   board's four. The boards' full-bleed 1440 × 500 entry was dropped on the owner's review: a slot
   that wide crops a standing horse, so its head and legs are lost (canvas v24). `price: null` shows "Cena na zapytanie" in the price
-  slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Four deliberate
-  deviations: the price is `formatPrice`'s `32 000 €`, as on the homepage, where the board writes
-  `32 000 EUR`; the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
+  slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Three deliberate
+  deviations: the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
   an empty stable renders "· 00" and no entries, a state no board draws; and each "Karta konia"
   link carries the horse's name, visually hidden, so a screen reader can tell them apart.
 - The horse detail page is one component, `HorseDetail.astro`, for both locales and both states
@@ -465,6 +466,21 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   page only when it has `noindex` and no canonical, because otherwise the site-wide `noindex`
   would turn it off on every CI build. Search Console and Bing are #63's job: a Domain property
   verified by DNS TXT, then Bing imported from Search Console.
+- The icon set is the owner's own logo (E6.5, #54): a laurel wreath around a horse and rider
+  clearing a jump, in `#F2F1ED` on a `#0E0E0D` square. It replaced the HV monogram we had first
+  chosen. The favicon (32 px, SVG and ICO) is `src/assets/logo-mark.svg`: the same paths with the
+  wreath removed and cropped to the horse, because at 32 px the wreath is noise. Every size is
+  rasterised at build time by `src/pages/[icon].ts` from the two SVGs, so no binary is committed.
+  The ICO is a 22-byte header around the 32 px PNG. The manifest is an endpoint, so the name comes
+  from i18n, and it uses `display: browser`, so a sales site keeps its address bar. `sharp` is now
+  declared in `package.json`, because the endpoint imports it directly. The header keeps the text
+  wordmark the boards draw; the logo appears only as icons. The `Icons` board on the canvas draws the set.
+- One date format and one currency display for both languages (E7.2): `19.09.2026` and the ISO
+  code, `EUR 32,000` / `32 000 EUR`, as the EN and PL boards write them and as the EN budget
+  options already did. The starts sync's EN `lastStart` follows, so a detail page never mixes
+  `12 Sep 2026` with `19.09.2026`. The admin panel stays Polish; its English half is the content,
+  and Save refuses a PL/EN pair with one half blank (`halfPairs`). It is not a schema rule, so a
+  stored horse with a half pair still builds.
 - Analytics is Umami Cloud on the free Hobby plan, EU region (E6.6, #55). It sets no
   cookies and needs no consent banner, it records custom events with data, and it reports a
   bounce rate. The owner wanted it free. Cloudflare Web Analytics, which #1 and #69 assumed in

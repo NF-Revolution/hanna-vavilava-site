@@ -34,7 +34,12 @@ const searchFields: [string, string, string, boolean?][] = [
 ];
 ---
 
-<Page locale={locale} routeKey="enquiry" title={page.title} description={page.description}>
+<Page
+  locale={locale}
+  routeKey="enquiry"
+  title={page.title}
+  description={fill(page.description, { hours: site.responseWindow })}
+>
   <SubBar label={page.label}>
     <p class="meta sub-meta">{fill(page.meta, hours)}</p>
   </SubBar>
