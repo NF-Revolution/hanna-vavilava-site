@@ -1,0 +1,52 @@
+---
+/*
+ * The point-of-collection notice (E7.6): one sentence in every form's send row,
+ * what the data is for, how long it is kept, and a link to the full notice (E7.3).
+ * No consent checkbox — the basis is pre-contractual steps, Art. 6(1)(b), not
+ * consent. The inverted band is the parent form's `.dark`, as in `ContactLinks`.
+ */
+import { t, type Locale } from '../i18n';
+import { path } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const f = t(locale).enquiryForm;
+/* `{privacy}` becomes a link, so the sentence is split around it rather than filled. */
+const [before, after] = f.notice.split('{privacy}');
+---
+
+<p class="copy notice">
+  {before}
+  <a href={path(locale, 'privacy')}>{f.noticeLink}</a>
+  {after}
+</p>
+
+<style>
+  /* Third in the send row: beside the contact links while 280px are left, else under them. */
+  .notice {
+    flex: 1 1 280px;
+    max-width: 420px;
+    margin: 0;
+    padding-top: 12px;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+
+  .notice a {
+    text-decoration: underline;
+  }
+
+  :global(.dark) .notice {
+    color: var(--ink-inv-muted);
+  }
+
+  /* The send rows stack at the forms' 720px breakpoint, where a basis would set the height. */
+  @media (max-width: 720px) {
+    .notice {
+      flex: none;
+      padding-top: 0;
+    }
+  }
+</style>

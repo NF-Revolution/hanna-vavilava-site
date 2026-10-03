@@ -92,7 +92,9 @@
     "orWhatsapp": "Albo napisz na WhatsApp",
     "mailSubject": "Zapytanie o konia {name}",
     "trap": "Proszę zostawić to pole puste",
-    "noscript": "Formularz wymaga JavaScriptu. Prosimy napisać na WhatsApp."
+    "noscript": "Formularz wymaga JavaScriptu. Prosimy napisać na WhatsApp.",
+    "notice": "Danych z formularza używamy tylko do odpowiedzi na zapytanie i usuwamy je sześć miesięcy po jego obsłużeniu. Szczegóły w {privacy}.",
+    "noticeLink": "informacji o prywatności"
   },
   "notify": {
     "label": "Powiadom mnie o nowych koniach",

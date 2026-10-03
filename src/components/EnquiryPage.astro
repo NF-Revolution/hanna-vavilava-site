@@ -11,6 +11,7 @@ import Page from '../layouts/Page.astro';
 import SubBar from './SubBar.astro';
 import EnquiryForm from './EnquiryForm.astro';
 import ContactLinks from './ContactLinks.astro';
+import FormNotice from './FormNotice.astro';
 import { t, type Locale } from '../i18n';
 import { fill, plural } from '../i18n/format';
 import { site, turnstileSitekey } from '../site';
@@ -110,6 +111,7 @@ const searchFields: [string, string, string, boolean?][] = [
           {s.submit}
         </button>
         <ContactLinks locale={locale} />
+        <FormNotice locale={locale} />
       </div>
     </form>
   </section>

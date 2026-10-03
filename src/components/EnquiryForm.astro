@@ -36,6 +36,7 @@ import { formatPrice } from '../i18n/format';
 import { path } from '../i18n/routes';
 import { site, turnstileSitekey } from '../site';
 import ContactLinks from './ContactLinks.astro';
+import FormNotice from './FormNotice.astro';
 
 interface Props {
   locale: Locale;
@@ -162,6 +163,7 @@ const selects = [
       {f.submit}
     </button>
     <ContactLinks locale={locale} prefill={prefill} />
+    <FormNotice locale={locale} />
   </div>
 </form>
 
