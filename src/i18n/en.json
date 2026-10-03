@@ -206,7 +206,7 @@
       "description": "The current stable: show jumping horses from 110 to 130 cm, with full documentation, uncut footage and downloadable X-rays.",
       "label": "All horses",
       "asOf": "Stable as of {date}",
-      "more": "Horse profile",
+      "more": "Full details",
       "onRequest": "Price on request",
       "view": {
         "label": "View",
@@ -300,7 +300,7 @@
     },
     "enquiry": {
       "title": "Enquiry — Hanna Vavilava",
-      "description": "Your enquiry goes straight to Hanna. A reply within the hour, 08:00–21:00 CET.",
+      "description": "Your enquiry goes straight to Hanna. A reply within the hour, {hours}.",
       "label": "Enquiry",
       "meta": "Reply within 1 hour · {hours}",
       "heading": "You are writing directly to Hanna.",
@@ -389,9 +389,9 @@
     "sound": "Turn sound on",
     "soundOff": "Turn sound off",
     "soundHint": "Hoofbeats, breathing, the rail",
-    "videoSpec": "Video · 100vh · 8 s loop · muted · no captions over the frame",
+    "videoSpec": "Video · 100vh · 8 s loop · muted · no text across the frame",
     "videoSpecDetail": "Poster < 120 kb · file < 2.5 MB · still image under prefers-reduced-motion",
-    "videoAlt": "ALT: the mare Cascada jumps a 125 cm oxer, side view in an indoor arena — clicking the frame leads to the horses"
+    "videoAlt": "ALT: the mare Cascada jumping a 125 cm oxer, side view in an indoor arena — clicking the frame leads to the horses"
   },
   "admin": {
     "title": "Admin — Hanna Vavilava",
@@ -417,6 +417,7 @@
     "slugTaken": "A horse with this address already exists.",
     "saveFailed": "Could not save. Try again.",
     "invalid": "Fix these fields:",
+    "pairHalf": "Fill in both PL and EN:",
     "lineHint": "One item per line, in the same order in Polish and English.",
     "priceHint": "Empty = price on request.",
     "xraysHint": "Empty count = no study.",

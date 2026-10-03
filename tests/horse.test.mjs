@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { horseSchema } from '../src/horse.ts';
-import { fromFields, toFields } from '../src/horse-form.ts';
+import { fromFields, halfPairs, toFields } from '../src/horse-form.ts';
 import { fit } from '../src/photo.ts';
 
 const t = (pl) => ({ pl, en: pl });
@@ -130,4 +130,11 @@ test('a photo is scaled to a 2400 px long edge and never up', () => {
   assert.deepEqual(fit(4032, 3024), [2400, 1800]);
   assert.deepEqual(fit(3024, 4032), [1800, 2400]);
   assert.deepEqual(fit(800, 600), [800, 600]);
+});
+
+test('a pair with one half filled names the blank half; two empty halves pass', () => {
+  const horse = horseSchema.parse(cascada);
+  assert.deepEqual(halfPairs(horse), []);
+  assert.deepEqual(halfPairs({ ...horse, headline: { pl: 'Klacz', en: ' ' } }), ['headline.en']);
+  assert.deepEqual(halfPairs({ ...horse, headline: { pl: '', en: '' } }), []);
 });

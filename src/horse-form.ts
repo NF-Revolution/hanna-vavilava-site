@@ -90,3 +90,24 @@ export function fromFields(fields: Fields): Record<string, any> {
 
   return horse;
 }
+
+/*
+ * Dotted paths of the blank half of every PL/EN pair with one half filled (E7.2),
+ * `facts.breeding.en` — the form's own field names, so the panel can focus one.
+ * Both halves empty is "not given" and passes.
+ *
+ * ponytail: the editor checks, the schema does not, so a horse already stored with
+ * a half pair cannot fail the build. Move it into `horseSchema` once the data is clean.
+ */
+export function halfPairs(value: unknown, path = ''): string[] {
+  if (value === null || typeof value !== 'object') return [];
+  const node = value as Record<string, unknown>;
+  if (typeof node.pl === 'string' && typeof node.en === 'string') {
+    const pl = node.pl.trim();
+    const en = node.en.trim();
+    return pl && !en ? [`${path}.en`] : en && !pl ? [`${path}.pl`] : [];
+  }
+  return Object.entries(node).flatMap(([key, child]) =>
+    halfPairs(child, path ? `${path}.${key}` : key),
+  );
+}

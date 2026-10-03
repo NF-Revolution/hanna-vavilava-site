@@ -17,19 +17,23 @@ export function plural(locale: Locale, forms: PluralForms, count: number): strin
   return fill(forms[rule] ?? forms.other, { count });
 }
 
-const dateOptions: Record<Locale, Intl.DateTimeFormatOptions> = {
-  pl: { day: '2-digit', month: '2-digit', year: 'numeric' },
-  en: { day: 'numeric', month: 'short', year: 'numeric' },
-};
+/* "19.09.2026" in both languages, as the EN boards draw it (E7.2): digits need no translation. */
+const dateFormat = new Intl.DateTimeFormat('pl-PL', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
 
-export function formatDate(locale: Locale, iso: string): string {
-  return new Intl.DateTimeFormat(htmlLang[locale], dateOptions[locale]).format(new Date(iso));
+export function formatDate(_locale: Locale, iso: string): string {
+  return dateFormat.format(new Date(iso));
 }
 
 export function formatPrice(locale: Locale, eur: number): string {
   return new Intl.NumberFormat(htmlLang[locale], {
     style: 'currency',
     currency: 'EUR',
+    /* "EUR 32,000" / "32 000 EUR", as both boards and the budget options write it (E7.2). */
+    currencyDisplay: 'code',
     maximumFractionDigits: 0,
   }).format(eur);
 }
