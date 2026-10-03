@@ -34,6 +34,7 @@
     "firebase-admin": "^14.4.0",
     "prettier": "^3.9.8",
     "prettier-plugin-astro": "^1.0.1",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.3"
   }
 }
