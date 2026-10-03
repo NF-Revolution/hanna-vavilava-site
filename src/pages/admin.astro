@@ -30,8 +30,9 @@ const a = dict.admin;
 const f = a.fields as Record<string, string>;
 const o = a.options as Record<string, string>;
 
-/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, X-ray files, or a select. */
-type Kind = 'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | 'xrays' | string[];
+/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, the phone cover, X-ray files, or a select. */
+type Kind =
+  'text' | 'number' | 'date' | 'pair' | 'lines' | 'json' | 'photos' | 'cover' | 'xrays' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
 /* Facts only the starts sync writes (E2.12); the form never shows them. */
@@ -105,6 +106,7 @@ const sections: [legend: string, fields: Field[]][] = [
     [
       ['videos', 'json'],
       ['photos', 'photos'],
+      ['phoneCover', 'cover'],
     ],
   ],
 ];
@@ -237,6 +239,22 @@ const hints: Record<string, string> = {
                     </label>
                     <p id="photo-status" role="status"></p>
                     <ol id="photos"></ol>
+                  </fieldset>
+                ) : kind === 'cover' ? (
+                  <fieldset>
+                    <legend>
+                      {f[path]} <small>{a.phoneCoverHint}</small>
+                    </legend>
+                    <img id="cover-img" class="cover-img" alt="" width="96" height="171" hidden />
+                    <input id="cover-key" type="hidden" name={path} />
+                    <label class="drop">
+                      {a.phoneCoverDrop}
+                      <input id="cover-input" type="file" accept="image/*" />
+                    </label>
+                    <button id="cover-remove" type="button" hidden>
+                      {a.phoneCoverRemove}
+                    </button>
+                    <p id="cover-status" role="status"></p>
                   </fieldset>
                 ) : kind === 'xrays' ? (
                   <fieldset>
@@ -547,27 +565,35 @@ const hints: Record<string, string> = {
     numberPhotos();
   }
 
-  /* One file at a time: downscale, which drops the EXIF, then upload under a content hash. */
+  /* Downscale, which drops the EXIF, then upload under a content hash. Returns the key. */
+  async function store(file: File, slug: string) {
+    const blob = await downscale(file);
+    const key = await photoKey(slug, blob);
+    await uploadBytes(storageRef(storage, key), blob, {
+      contentType: 'image/jpeg',
+      cacheControl: media.cacheControl,
+    });
+    return key;
+  }
+
+  /* The slug names the Storage folder, so no upload goes before it. */
+  function slugFor(status: HTMLElement) {
+    if (slugInput.value && slugInput.checkValidity()) return slugInput.value;
+    status.textContent = admin.photoNeedSlug;
+    slugInput.focus();
+  }
+
+  /* One file at a time. */
   async function upload(files: FileList | null | undefined) {
     if (!files?.length) return;
-    if (!slugInput.value || !slugInput.checkValidity()) {
-      photoStatus.textContent = admin.photoNeedSlug;
-      slugInput.focus();
-      return;
-    }
-    const slug = slugInput.value;
+    const slug = slugFor(photoStatus);
+    if (!slug) return;
     const done: string[] = [];
     const failed: string[] = [];
     for (const file of files) {
       photoStatus.textContent = admin.photoUploading.replace('{name}', file.name);
       try {
-        const blob = await downscale(file);
-        const key = await photoKey(slug, blob);
-        await uploadBytes(storageRef(storage, key), blob, {
-          contentType: 'image/jpeg',
-          cacheControl: media.cacheControl,
-        });
-        addPhoto({ key });
+        addPhoto({ key: await store(file, slug) });
         done.push(file.name);
       } catch {
         failed.push(file.name);
@@ -583,6 +609,41 @@ const hints: Record<string, string> = {
   }
 
   photoInput.addEventListener('change', () => upload(photoInput.files));
+
+  /*
+   * The phone cover (#149): one optional portrait photo, a hidden key and its
+   * preview. ponytail: a replaced or removed one stays in Storage, as photos do.
+   */
+  const coverImg = $<HTMLImageElement>('cover-img');
+  const coverKey = $<HTMLInputElement>('cover-key');
+  const coverInput = $<HTMLInputElement>('cover-input');
+  const coverRemove = $<HTMLButtonElement>('cover-remove');
+  const coverStatus = $('cover-status');
+
+  function showCover(key: string) {
+    coverKey.value = key;
+    coverImg.hidden = coverRemove.hidden = !key;
+    if (key) coverImg.src = photoUrl(key);
+    else coverImg.removeAttribute('src');
+  }
+
+  coverInput.addEventListener('change', async () => {
+    const file = coverInput.files?.[0];
+    const slug = file && slugFor(coverStatus);
+    if (!file || !slug) return;
+    coverStatus.textContent = admin.photoUploading.replace('{name}', file.name);
+    try {
+      showCover(await store(file, slug));
+      coverStatus.textContent = admin.photoDone.replace('{count}', '1');
+    } catch {
+      coverStatus.textContent = admin.photoFailed.replace('{name}', file.name);
+    }
+    coverInput.value = '';
+  });
+  coverRemove.addEventListener('click', () => {
+    showCover('');
+    coverInput.focus();
+  });
   $('drop').addEventListener('dragover', (event) => event.preventDefault());
   $('drop').addEventListener('drop', (event) => {
     event.preventDefault();
@@ -700,6 +761,8 @@ const hints: Record<string, string> = {
     photoStatus.textContent = '';
     photoList.replaceChildren();
     for (const photo of (slug && horses[slug].photos) || []) addPhoto(photo);
+    coverStatus.textContent = '';
+    showCover((slug && horses[slug].phoneCover) || '');
     uploaded = new Set();
     xrayStatus.textContent = '';
     xrayInput.disabled = true;
@@ -1100,6 +1163,13 @@ const hints: Record<string, string> = {
     padding-bottom: 1rem;
   }
   #photos img {
+    object-fit: cover;
+    background: var(--rule);
+  }
+  .cover-img:not([hidden]) {
+    display: block;
+    width: 6rem;
+    aspect-ratio: 9 / 16;
     object-fit: cover;
     background: var(--rule);
   }

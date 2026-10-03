@@ -134,6 +134,12 @@ export const horseSchema = z.strictObject({
       }),
     )
     .default([]),
+  /*
+   * A portrait shot for the 390 hero (#149), which the landscape cover cannot
+   * fill without losing the head. Without one the phone crops the cover. The
+   * alt is the cover's: the same horse, the same moment.
+   */
+  phoneCover: key.nullable().default(null),
 });
 
 export type Horse = z.infer<typeof horseSchema>;

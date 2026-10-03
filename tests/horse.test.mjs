@@ -85,6 +85,13 @@ test('the admin form round-trips a horse, status, order and photos included', ()
   assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
 });
 
+test('the admin form round-trips a phone cover, and an empty one is none', () => {
+  const horse = horseSchema.parse({ ...cascada, phoneCover: 'photos/cascada/1a2b3c4d.jpg' });
+  assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
+  const fields = { ...toFields(horse), phoneCover: '' };
+  assert.equal(horseSchema.parse(fromFields(fields)).phoneCover, null);
+});
+
 test('the admin form round-trips X-ray files, and an empty label is no label', () => {
   const files = [
     { key: 'horses/cascada/xrays/2026-03-04-1a2b3c4d.pdf', bytes: 24_000_000, label: t('przód') },

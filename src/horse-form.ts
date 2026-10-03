@@ -65,6 +65,8 @@ export function fromFields(fields: Fields): Record<string, any> {
 
   // `photos.0.key` built an object keyed "0", "1"…; integer keys enumerate in order.
   horse.photos = Object.values(horse.photos ?? {});
+  // An empty hidden input is no phone cover.
+  horse.phoneCover ||= null;
   if (horse.xrays?.files) {
     horse.xrays.files = Object.values(horse.xrays.files);
     // The label is optional, and two empty halves are no label.

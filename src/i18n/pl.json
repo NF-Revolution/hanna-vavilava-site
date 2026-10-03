@@ -566,6 +566,9 @@
     "photoHint": "Pierwsze zdjęcie to okładka. Zmniejszane do 2400 px, bez danych EXIF i lokalizacji GPS.",
     "guideLink": "Poradnik: zdjęcia i RTG",
     "photoNeedSlug": "Najpierw wpisz adres konia.",
+    "phoneCoverHint": "Opcjonalne zdjęcie pionowe, cały koń w kadrze. Na telefonie zastępuje okładkę; bez niego telefon przycina okładkę.",
+    "phoneCoverDrop": "Wybierz zdjęcie pionowe",
+    "phoneCoverRemove": "Usuń okładkę na telefon",
     "photoUploading": "Wysyłanie: {name}…",
     "photoFailed": "Nie udało się wysłać: {name}",
     "photoDone": "Wysłano zdjęcia: {count}",
@@ -648,7 +651,8 @@
       "viewing.airport": "Lotnisko",
       "viewing.visitDay": "Dzień wizyty",
       "videos": "Filmy",
-      "photos": "Zdjęcia"
+      "photos": "Zdjęcia",
+      "phoneCover": "Okładka na telefon"
     },
     "options": {
       "available": "Dostępny",
