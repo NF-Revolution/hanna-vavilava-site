@@ -41,9 +41,10 @@ accepted it as the one exception to the 1 KB budget, and the measured bytes are 
 
 Traps for next time:
 
-- **Nothing is recorded yet.** The website ID is `''` until the owner creates the Umami
-  Cloud site in the EU region. After that it is a one-line change in `src/site.ts` and a
-  redeploy.
+- The Umami site is registered under the domain `hanna-vavilava-site.web.app`, and its website
+  ID is in `src/site.ts`. When #63 moves the site to `hannavavilava.com`, edit the Domain
+  field on that same Umami site; the ID stays the same. A `setup_check` event on
+  `/__setup-check` (2026-10-03) is a test from setup, not a visitor.
 - Umami moved its collect host to `gateway.umami.is` on 2026-06-06. If the events stop,
   check the current `script.js` for the host it builds.
 - The CI fixture has no X-rays and no videos, so `xray_download` and `video_play` never

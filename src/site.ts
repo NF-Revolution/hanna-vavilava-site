@@ -50,7 +50,7 @@ export const indexable =
  */
 export const umami = {
   endpoint: 'https://gateway.umami.is/api/send',
-  website: '', // PLACEHOLDER — the website ID from the owner's Umami Cloud account
+  website: 'b11ef019-bcc2-4fb1-88f4-7a82d59d31dc',
 };
 export const analytics = process.env.HOSTING_CHANNEL === 'live' && umami.website !== '';
 
