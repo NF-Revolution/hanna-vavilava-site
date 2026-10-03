@@ -64,6 +64,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63             |
 | E6.6 analytics               | #55                | done — Umami EU beacon in `Base.astro`, site `hanna-vavilava-site.web.app` |
 | E6.5 icons and manifest      | #54                | done — owner's logo, rasters by sharp at build, canvas v44                 |
+| E6.7 campaign tagging        | #56                | done — UTM vocabulary in `README.md`, read in Umami, no code               |
 | E7.2 English pass            | #58                | done — EN board copy, `19.09.2026` dates, `EUR` code, half-pair check      |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                      |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                             |
@@ -510,3 +511,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   With it, the homepage carries 1 658 B of inline JS, the horse page 1 845 B and the enquiry
   page 1 840 B. Without it they carry 843, 1 025 and 1 025 B. Ad-blocked visitors are not
   counted; the `ponytail:` upgrade is a forwarding Function.
+- Campaign attribution happens in Umami, not in the enquiry (E6.7, #56). The tagging rules are
+  in `README.md` under Campaign links. The beacon already sends the landing page's query string.
+  Umami's Attribution report links a session's `utm_*` to `enquiry_success`, `whatsapp_click`
+  and `telegram_click`. The enquiry Hanna receives does not say where the buyer came from.
+  Doing that would mean carrying the tags in JS from the landing page to the form, on pages
+  already over budget, and it would still miss WhatsApp and Telegram clicks.
+  `ponytail:` add it if Hanna asks for the source in each message.
