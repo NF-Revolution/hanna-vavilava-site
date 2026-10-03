@@ -92,7 +92,9 @@
     "orWhatsapp": "Or message on WhatsApp",
     "mailSubject": "Enquiry about {name}",
     "trap": "Leave this field empty",
-    "noscript": "The form needs JavaScript. Please message on WhatsApp instead."
+    "noscript": "The form needs JavaScript. Please message on WhatsApp instead.",
+    "notice": "We use the data in this form only to answer your enquiry, and delete it six months after the enquiry is handled. Details in the {privacy}.",
+    "noticeLink": "privacy notice"
   },
   "notify": {
     "label": "Tell me when a new horse arrives",
