@@ -6,10 +6,21 @@ import { site as facts } from '../site';
 /*
  * Every indexable page with its locale pair, the same set the head's hreflang
  * names (E6.4). Horse pages come from `horsesListed`, so a sold horse keeps its
- * page but leaves the sitemap (#23). The menu and the two `noindex` enquiry
- * results stay out.
+ * page but leaves the sitemap (#23). The menu, the two `noindex` enquiry
+ * results and the `noindex` new-horse list pages (E5.9) stay out.
  */
-const skip: RouteKey[] = ['horse', 'menu', 'enquirySent', 'enquiryFailed'];
+const skip: RouteKey[] = [
+  'horse',
+  'menu',
+  'enquirySent',
+  'enquiryFailed',
+  'notifySent',
+  'notifyConfirm',
+  'notifyConfirmed',
+  'notifyUnsubscribe',
+  'notifyUnsubscribed',
+  'notifyFailed',
+];
 
 export const GET: APIRoute = ({ site }) => {
   const pages: { key: RouteKey; slug?: string }[] = [

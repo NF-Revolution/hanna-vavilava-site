@@ -39,6 +39,17 @@
  *
  *   npx firebase-tools@15 functions:secrets:set PROBE_TOKEN --project hanna-vavilava-site
  *
+ * `newHorses` (E5.9, #48) sits behind the `/api/notify` rewrites, so it deploys before
+ * the hosting that carries them, with the database rules for its email index. It needs
+ * `ANNOUNCE_TOKEN`, another long random string, set to the same value as the GitHub
+ * Actions secret of that name: `deploy.yml` sends it to announce new horses. Its
+ * `subscribersCleanup` is the third Cloud Scheduler job, still inside the free three.
+ *
+ *   npx firebase-tools@15 functions:secrets:set ANNOUNCE_TOKEN --project hanna-vavilava-site
+ *   gh secret set ANNOUNCE_TOKEN --repo NF-Revolution/hanna-vavilava-site
+ *   npx firebase-tools@15 deploy --only database,functions:newHorses,functions:subscribersCleanup \
+ *     --project hanna-vavilava-site
+ *
  * Cloud Monitoring watches both of them, and it mails the developer, never Hanna. It
  * needs one email channel, an uptime check (a 405 on GET counts as up), and the two
  * policies in `monitoring/`. <CHANNEL> is the `name` that the first command prints:
@@ -77,6 +88,17 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { enquiryEmail, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
+import {
+  announceEmail,
+  confirmEmail,
+  confirmWindow,
+  from,
+  oneClickUrl,
+  parseSignup,
+  paths,
+  replyTo,
+  toAnnounce,
+} from './subscribe.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
 import { apiKey, fetchStarts, startFacts } from './starts.js';
@@ -404,10 +426,11 @@ async function notify(record, probe) {
   }
 }
 
-const isProbe = (req) => {
-  const [got, want] = [req.get('x-probe') ?? '', probeToken.value()].map((s) => Buffer.from(s));
+const matches = (header, secret) => {
+  const [got, want] = [header ?? '', secret].map((s) => Buffer.from(s));
   return want.length > 0 && got.length === want.length && timingSafeEqual(got, want);
 };
+const isProbe = (req) => matches(req.get('x-probe'), probeToken.value());
 const hits = new Map();
 let verified = 0;
 let windowStart = Date.now();
@@ -445,24 +468,27 @@ async function human(token) {
  */
 const resendKey = defineSecret('RESEND_API_KEY');
 
-async function sendEnquiryEmail(record, probe) {
+async function resend(endpoint, body) {
   if (!resendKey.value()) throw new Error('RESEND_API_KEY is not set');
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch(`https://api.resend.com${endpoint}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${resendKey.value()}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      from: 'Formularz <formularz@nfrevolution.com>',
-      // Resend's test inbox: the key and the domain are proven, the mailbox stays clean.
-      to: probe ? 'delivered@resend.dev' : 'kontakt@nfrevolution.com',
-      ...enquiryEmail(record),
-    }),
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
 }
+
+const sendEnquiryEmail = (record, probe) =>
+  resend('/emails', {
+    from: 'Formularz <formularz@nfrevolution.com>',
+    // Resend's test inbox: the key and the domain are proven, the mailbox stays clean.
+    to: probe ? 'delivered@resend.dev' : 'kontakt@nfrevolution.com',
+    ...enquiryEmail(record),
+  });
 
 export const submitEnquiry = onRequest(
   {
@@ -577,5 +603,213 @@ export const enquiryProbe = onSchedule(
     } catch (e) {
       logger.error(`probe: /api/enquiry ${e.message}`);
     }
+  },
+);
+
+/*
+ * The new-horse list (E5.9, #48), behind the Hosting rewrites `/api/notify` and
+ * `/api/notify/**`. Every answer to a form is a 303, as the enquiry's is.
+ *
+ * Signup: the honeypot and Turnstile as on the enquiry, and the same two in-memory
+ * limits on their own counters, so signups never use up the enquiries' budget. A
+ * bot that signs up a stranger costs that stranger one confirmation mail at most:
+ * nothing more goes out without the click, and an unconfirmed address is deleted
+ * after 7 days. An address already on the list gets the same "check your inbox"
+ * answer and no mail, so the form never tells who is subscribed. The record is
+ * `/subscribers/<token>`, `{ email, locale, createdAt }`, and `confirmedAt` once
+ * confirmed: the consent and its timestamp. The token is the key and the secret in
+ * every link; no IP is stored.
+ *
+ * Confirm and unsubscribe are POSTs from the pages the emails link to, never a GET:
+ * mail scanners open links on their own, and would confirm or unsubscribe people
+ * who never clicked. RFC 8058's one-click is the one exception that carries the
+ * token in the query: a mail client POSTs it to the `List-Unsubscribe` URL, and it
+ * gets a plain 200.
+ *
+ * Announce: `deploy.yml` posts it with `X-Announce` once the hosting deploy is live,
+ * so every link already works. Horses newly `available` are marked in `/announced`
+ * first and mailed second: a failed send loses one announcement, and nobody is ever
+ * mailed twice. The first run only marks the current stock.
+ * ponytail: Resend's free plan sends 100 mails a day, so ~100 confirmed subscribers
+ * per announcement; the paid plan is the upgrade. The read is after the build, so a
+ * horse saved in the seconds between the two can link to a page not live yet. The
+ * list has no panel view: an erasure request is a delete in the console.
+ */
+const signupHits = new Map();
+let signups = 0;
+let signupWindow = Date.now();
+const announceToken = defineSecret('ANNOUNCE_TOKEN');
+// `randomBytes(24)` in base64url; the pattern also keeps a token out of any other path.
+const tokenPattern = /^[\w-]{32}$/;
+
+async function subscribe(req, res) {
+  if (Date.now() - signupWindow > 60 * 60 * 1000) {
+    signupHits.clear();
+    signups = 0;
+    signupWindow = Date.now();
+  }
+  const body = req.body ?? {};
+  const to = paths(body.locale);
+  const ip =
+    req.get('fastly-client-ip') ?? req.get('x-forwarded-for')?.split(',')[0].trim() ?? req.ip;
+  const count = (signupHits.get(ip) ?? 0) + 1;
+  signupHits.set(ip, count);
+  if (count > perHour) return res.redirect(303, to.failed);
+  if (body.website) return res.redirect(303, to.sent);
+
+  const signup = parseSignup(body);
+  if (!signup) return res.redirect(303, to.failed);
+  const token = body['cf-turnstile-response'];
+  if (!(typeof token === 'string' && token && (await human(token))))
+    return res.redirect(303, to.failed);
+  if (++signups > allPerHour) return res.redirect(303, to.failed);
+
+  const list = getDatabase().ref('subscribers');
+  const [old] = Object.entries(
+    (await list.orderByChild('email').equalTo(signup.email).get()).val() ?? {},
+  );
+  // Confirmed, or a confirmation mailed in the last 10 minutes: nothing new to send.
+  if (old && (old[1].confirmedAt || Date.now() - old[1].createdAt < 10 * 60 * 1000))
+    return res.redirect(303, to.sent);
+  if (old) await list.child(old[0]).remove();
+
+  const id = randomBytes(24).toString('base64url');
+  await list.child(id).set({ ...signup, createdAt: ServerValue.TIMESTAMP });
+  try {
+    await resend('/emails', {
+      from,
+      to: signup.email,
+      reply_to: replyTo,
+      ...confirmEmail(signup.locale, id),
+    });
+  } catch (e) {
+    logger.error(`notify: confirmation: ${e.message}`);
+    await list.child(id).remove();
+    return res.redirect(303, to.failed);
+  }
+  res.redirect(303, to.sent);
+}
+
+async function confirm(req, res) {
+  const { t, locale } = req.body ?? {};
+  const fail = paths(locale).failed;
+  if (typeof t !== 'string' || !tokenPattern.test(t)) return res.redirect(303, fail);
+  const ref = getDatabase().ref(`subscribers/${t}`);
+  const s = (await ref.get()).val();
+  if (!s || (!s.confirmedAt && Date.now() - s.createdAt > confirmWindow))
+    return res.redirect(303, fail);
+  if (!s.confirmedAt) await ref.update({ confirmedAt: ServerValue.TIMESTAMP });
+  res.redirect(303, paths(s.locale).confirmed);
+}
+
+async function unsubscribe(req, res) {
+  const oneClick = req.query.t;
+  const t = oneClick ?? req.body?.t;
+  if (typeof t !== 'string' || !tokenPattern.test(t)) {
+    if (oneClick) return res.status(400).send('bad token');
+    return res.redirect(303, paths(req.body?.locale).failed);
+  }
+  // Gone whether or not it was there: unsubscribing twice is not an error.
+  await getDatabase().ref(`subscribers/${t}`).remove();
+  if (oneClick) return res.status(200).send('unsubscribed');
+  res.redirect(303, paths(req.body?.locale).unsubscribed);
+}
+
+async function announce(req, res) {
+  if (!matches(req.get('x-announce'), announceToken.value()))
+    return res.status(403).send('forbidden');
+  const db = getDatabase();
+  const [horses, announced, subscribers] = await Promise.all(
+    ['horses', 'announced', 'subscribers'].map((p) =>
+      db
+        .ref(p)
+        .get()
+        .then((s) => s.val()),
+    ),
+  );
+  const { seed, fresh } = toAnnounce(horses, announced);
+  const marked = [...seed, ...fresh.map((h) => h.slug)];
+  if (marked.length)
+    await db.ref('announced').update(Object.fromEntries(marked.map((s) => [s, Date.now()])));
+
+  const emails = !fresh.length
+    ? []
+    : Object.entries(subscribers ?? {})
+        .filter(([, s]) => s?.confirmedAt)
+        .map(([id, s]) => ({
+          from,
+          to: s.email,
+          reply_to: replyTo,
+          headers: {
+            'List-Unsubscribe': `<${oneClickUrl(id)}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
+          ...announceEmail(s.locale, fresh, id),
+        }));
+  let failed = 0;
+  // Resend's batch endpoint takes 100 at a time.
+  for (let i = 0; i < emails.length; i += 100) {
+    const batch = emails.slice(i, i + 100);
+    try {
+      await resend('/emails/batch', batch);
+    } catch (e) {
+      failed += batch.length;
+      logger.error(`notify: announce: ${e.message}`);
+    }
+  }
+  const sent = emails.length - failed;
+  logger.info(`notify: announced ${fresh.length} horse(s) to ${sent}`);
+  res.json({ seeded: seed.length, announced: fresh.map((h) => h.slug), sent, failed });
+}
+
+const notifyRoutes = {
+  '/': subscribe,
+  '/confirm': confirm,
+  '/unsubscribe': unsubscribe,
+  '/announce': announce,
+};
+
+export const newHorses = onRequest(
+  {
+    region: 'europe-central2',
+    maxInstances: 1,
+    timeoutSeconds: 120,
+    secrets: [turnstile, resendKey, announceToken],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.set('Allow', 'POST').status(405).send('POST only');
+      return;
+    }
+    // Through the rewrite the path keeps `/api/notify`; on the function's own URL it does not.
+    const route = notifyRoutes[req.path.replace(/^\/api\/notify/, '').replace(/\/$/, '') || '/'];
+    if (!route) {
+      res.status(404).send('not found');
+      return;
+    }
+    try {
+      await route(req, res);
+    } catch (e) {
+      // A database or network failure: the failure page, never a bare error body (E5.7).
+      logger.error(`notify: ${req.path}: ${e.message}`);
+      if (res.headersSent) return;
+      // Announce answers `deploy.yml`'s curl, which fails the step on a 500, not on a 303.
+      if (route === announce) res.status(500).send('announce failed');
+      else res.redirect(303, paths(req.body?.locale).failed);
+    }
+  },
+);
+
+/* What the privacy notice promises: an unconfirmed signup is gone after 7 days. */
+export const subscribersCleanup = onSchedule(
+  { schedule: '0 4 * * *', timeZone: 'Europe/Warsaw', region: 'europe-central2' },
+  async () => {
+    const list = getDatabase().ref('subscribers');
+    const all = (await list.get()).val() ?? {};
+    const stale = Object.keys(all).filter(
+      (id) => !all[id]?.confirmedAt && Date.now() - (all[id]?.createdAt ?? 0) > confirmWindow,
+    );
+    if (stale.length) await list.update(Object.fromEntries(stale.map((id) => [id, null])));
+    logger.info(`notify: deleted ${stale.length} unconfirmed signup(s)`);
   },
 );

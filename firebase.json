@@ -13,6 +13,10 @@
         "source": "/api/enquiry",
         "function": { "functionId": "submitEnquiry", "region": "europe-central2" }
       },
+      {
+        "source": "/api/notify{,/**}",
+        "function": { "functionId": "newHorses", "region": "europe-central2" }
+      },
       { "source": "/en/**", "destination": "/en/404/index.html" }
     ],
     "headers": [

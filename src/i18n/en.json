@@ -101,7 +101,10 @@
     "placeholder": "email address",
     "submit": "Sign up",
     "note": "One message when a new horse arrives. Usually once a month.",
-    "consent": "I agree to receive messages about new horses. I can unsubscribe at any time."
+    "consent": "I agree to receive emails from {operator} about new horses for sale. I can unsubscribe at any time with the link in every email.",
+    "privacy": "How data is processed",
+    "trap": "Leave this field empty",
+    "noscript": "Signing up needs JavaScript."
   },
   "status": {
     "city": "Warsaw, Poland",
@@ -374,7 +377,7 @@
       "description": "How personal data is processed on this site.",
       "label": "Privacy",
       "heading": "How personal data is processed",
-      "intro": "The notice under Article 13 GDPR for anyone who visits this site or sends an enquiry through its forms.",
+      "intro": "The notice under Article 13 GDPR for anyone who visits this site, sends an enquiry through its forms or signs up for new-horse emails.",
       "controller": {
         "h": "Controller",
         "lead": "The controller of personal data is:",
@@ -384,6 +387,7 @@
         "h": "What data, why, and on what basis",
         "p": [
           "An enquiry about a horse: name, country, WhatsApp number, optionally an Instagram account and a message, riding level, budget and buying timeframe. An enquiry for a horse not on the list: a WhatsApp number and the wishes described. Both carry the language and address of the page the form was sent from, and where the visitor came from (UTM tags, for example). This data is used to answer the enquiry and present an offer — steps taken at the request of the person concerned before entering into a contract (Art. 6(1)(b) GDPR).",
+          "New-horse emails: the email address, the language, and when the signup was made and confirmed. We send that address one message with a confirmation link and, once confirmed, one message whenever a new horse comes up for sale. The basis is consent (Art. 6(1)(a) GDPR), which is also the consent to direct marketing by electronic means. It can be withdrawn at any time with the link in every email, without affecting the lawfulness of what was sent before.",
           "Protecting the forms: the IP address and browser data help tell a person from a bot and limit the number of enquiries from one address. The IP address is not stored. The basis is the controller's legitimate interest in keeping spam off the contact channel (Art. 6(1)(f) GDPR).",
           "Running the site: on every visit the server processes the IP address and request data to deliver the page and protect it from abuse (Art. 6(1)(f) GDPR).",
           "Visit statistics: page views and a few events are counted, sending an enquiry for example. The statistics use no cookies and store nothing on the device. A visit is recognised by a hash of the IP address and browser with a salt that changes daily, so it cannot be linked to a person or to a visit on another day. The page address is sent without the part after the # sign. The basis is legitimate interest: knowing which parts of the site work (Art. 6(1)(f) GDPR)."
@@ -395,7 +399,7 @@
         "items": [
           {
             "name": "Google (Firebase)",
-            "role": "hosting the site, the function that handles the forms (Warsaw) and the database holding the enquiries (Belgium)."
+            "role": "hosting the site, the function that handles the forms (Warsaw) and the database holding the enquiries and the new-horse list (Belgium)."
           },
           {
             "name": "Microsoft (Microsoft 365)",
@@ -403,7 +407,7 @@
           },
           {
             "name": "Resend",
-            "role": "sends that copy by email, from servers in the European Union."
+            "role": "sends that copy by email, and the signup confirmations and new-horse emails, from servers in the European Union."
           },
           {
             "name": "Telegram",
@@ -435,6 +439,7 @@
         "h": "How long data is kept",
         "p": [
           "An enquiry is deleted from the database, the mailbox and Telegram six months after it has been handled. If it ends in the sale of a horse, it is kept for as long as tax and accounting law requires.",
+          "An address on the new-horse list is kept until it unsubscribes, and unsubscribing deletes it at once. A signup not confirmed within 7 days expires and is deleted.",
           "An enquiry that fails the Turnstile check is never stored anywhere. The visit statistics hold no personal data, because a hash with a daily-changing salt cannot be reversed."
         ]
       },
@@ -448,7 +453,7 @@
       "other": {
         "h": "Other information",
         "p": [
-          "Providing data is voluntary, but without the fields marked as required an enquiry cannot be answered.",
+          "Providing data is voluntary, but without the fields marked as required an enquiry cannot be answered. The new-horse signup is separate from any enquiry and no answer depends on it.",
           "The data is not used for automated decision-making or profiling. The Turnstile check only filters out bots and has no legal effect on anyone.",
           "The WhatsApp and Telegram links open a chat in those apps. What you write there they process on their own terms, as separate controllers."
         ]
@@ -458,11 +463,58 @@
         "p": [
           "This site sets no cookies and stores nothing on your device, which is why it asks for no consent. Your browser keeps its own cached copies of pages and photos to load them faster; you can clear them at any time.",
           "The videos are plain files from our own subdomain, {media}, not a player embedded from someone else's service. A film on a horse's page is downloaded only once you press play; before that, only its still frame. The short loop on the homepage downloads straight away, unless the browser asks for reduced motion or data saving, or the connection is slow. Either way, your browser downloads the film from Cloudflare R2, which sees the IP address like any server and sets no cookie. The play is counted in the statistics as an event, also without cookies.",
-          "When you start filling in an enquiry form, the page loads Cloudflare Turnstile. Cloudflare may then store its own security cookies on the device. They are strictly necessary to tell a person from a bot, so they need no consent."
+          "When you start filling in an enquiry or new-horse signup form, the page loads Cloudflare Turnstile. Cloudflare may then store its own security cookies on the device. They are strictly necessary to tell a person from a bot, so they need no consent."
         ]
       },
-      "turnstile": "The enquiry forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",
+      "turnstile": "The enquiry and new-horse signup forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",
       "turnstileLink": "Cloudflare’s Turnstile Privacy Addendum"
+    },
+    "notifySent": {
+      "title": "Check your inbox — Hanna Vavilava",
+      "description": "The link to confirm the new-horse signup has been sent.",
+      "label": "New horses",
+      "heading": "Please check your inbox.",
+      "body": "We have sent a confirmation link. The address joins the list only once it is clicked, and the link works for 7 days. If the address was already signed up, nothing new will arrive."
+    },
+    "notifyConfirm": {
+      "title": "Confirm your signup — Hanna Vavilava",
+      "description": "Confirm the signup for new-horse emails.",
+      "label": "New horses",
+      "heading": "Confirm your signup",
+      "body": "One click and the address joins the list for new-horse emails.",
+      "button": "Confirm signup",
+      "noscript": "This button needs JavaScript. Please turn it on and open the link in the email again."
+    },
+    "notifyConfirmed": {
+      "title": "Signed up — Hanna Vavilava",
+      "description": "The new-horse signup is confirmed.",
+      "label": "New horses",
+      "heading": "Signed up.",
+      "body": "I will write when a new horse arrives. Every email has a link to unsubscribe."
+    },
+    "notifyUnsubscribe": {
+      "title": "Unsubscribe — Hanna Vavilava",
+      "description": "Unsubscribe from new-horse emails.",
+      "label": "New horses",
+      "heading": "Unsubscribe from new-horse emails",
+      "body": "One click and the address is deleted from the list.",
+      "button": "Unsubscribe me",
+      "noscript": "This button needs JavaScript. You can also write to {email}, and we will delete the address by hand."
+    },
+    "notifyUnsubscribed": {
+      "title": "Unsubscribed — Hanna Vavilava",
+      "description": "The address has been deleted from the new-horse list.",
+      "label": "New horses",
+      "heading": "Unsubscribed.",
+      "body": "The address has been deleted from the list. No more emails will be sent."
+    },
+    "notifyFailed": {
+      "title": "That did not work — Hanna Vavilava",
+      "description": "The signup or unsubscribe did not go through.",
+      "label": "New horses",
+      "heading": "That did not work.",
+      "body": "The link may have expired, or something went wrong. Please sign up again or, to unsubscribe, write to {email}.",
+      "retry": "Sign up again"
     },
     "notFound": {
       "title": "Page not found — Hanna Vavilava",
