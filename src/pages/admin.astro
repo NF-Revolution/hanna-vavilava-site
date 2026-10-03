@@ -406,7 +406,7 @@ const hints: Record<string, string> = {
   import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
   import { firebaseConfig, photoUrl } from '../firebase';
   import { horseSchema } from '../horse';
-  import { fromFields, toFields } from '../horse-form';
+  import { fromFields, halfPairs, toFields } from '../horse-form';
   import { admin } from '../i18n/pl.json';
   import { media, xrayMaxBytes } from '../media';
   import { downscale, photoKey } from '../photo';
@@ -767,6 +767,16 @@ const hints: Record<string, string> = {
         .map((i) => editor.elements.namedItem(i.path.join('.')))
         .find((el) => el instanceof HTMLElement);
       first?.focus();
+      return;
+    }
+    // A PL text with no EN twin would leave an empty row on the English page.
+    const half = halfPairs(result.data);
+    if (half.length) {
+      fail([admin.pairHalf, ...half]);
+      half
+        .map((name) => editor.elements.namedItem(name))
+        .find((el) => el instanceof HTMLElement)
+        ?.focus();
       return;
     }
     // Publish deletes a sold horse's X-ray files for good (E2.8), so say so before it is too late.

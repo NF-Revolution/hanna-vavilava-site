@@ -8,67 +8,68 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 
 ## State
 
-| Ticket                       | Issue              | State                                                               |
-| ---------------------------- | ------------------ | ------------------------------------------------------------------- |
-| E1.1 repo, Astro, TS, CI     | #6                 | done                                                                |
-| E1.5 design tokens           | #10                | done                                                                |
-| E1.6 self-hosted fonts       | #11                | done                                                                |
-| E1.7 base layout             | #12                | done                                                                |
-| E1.8 shared footer           | #13                | done                                                                |
-| E1.9 menu drawer             | #14                | done                                                                |
-| E7.1 localised routing       | #57                | done                                                                |
-| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                               |
-| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`                        |
-| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                       |
-| E1.10 accessibility baseline | #15                | done                                                                |
-| E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com`        |
-| E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`                 |
-| E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded       |
-| E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`               |
-| E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN                     |
-| E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required                |
-| E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`            |
-| E2.7 admin enquiry inbox     | #22                | done — `/admin` lists `/enquiries`, ticks `handled`                 |
-| E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays         |
-| E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91           |
-| E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges       |
-| E2.12 livejumping starts     | #110               | done — `refreshStarts` button + `startsWeekly`, not deployed        |
-| E2.13 starts height, season  | #122               | done — string `wysokosc_p`, one season reads as a sentence          |
-| E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size        |
-| E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5          |
-| E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code         |
-| E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`        |
-| E3.4 sales video facade      | #28                | done — `Video.astro`, native player, mounted by E4.5                |
-| E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                          |
-| E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24         |
-| E4.3 horses index, grid      | #33                | done — `HorsesGrid.astro`, `ViewSwitch.astro`, 4:3 cards            |
-| E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26         |
-| E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                       |
-| E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio               |
-| E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`         |
-| E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar                |
-| E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`             |
-| E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone          |
-| E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38           |
-| E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed         |
-| E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`        |
-| E5.5 email sink              | #44                | done — Resend beside the DB write, 303 if either sink worked        |
-| E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39           |
-| E5.7 confirmation, failure   | #46                | done — `EnquiryDone.astro`, 303 to not-sent, number in `#`          |
-| E5.8 contact links           | #47                | done — `ContactLinks.astro` by every form, prefilled, canvas v41    |
-| E5.10 endpoint monitor       | #49                | done — daily `enquiryProbe`, uptime check, alerts by hand           |
-| E5.11 search form endpoint   | #126               | done — `searchSchema`, `kind: search` in both messages, deploy owed |
-| E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI        |
-| E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`        |
-| E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate       |
-| E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63      |
-| E6.5 icons and manifest      | #54                | done — owner's logo, rasters by sharp at build, canvas v44          |
-| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                               |
-| E0.2 price display           | #2                 | decided — price per horse, `null` = on request                      |
-| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                     |
-| E0.4 X-rays                  | #4                 | decided — PDF study, public download                                |
-| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1           |
-| everything else              | see the milestones | not started                                                         |
+| Ticket                       | Issue              | State                                                                 |
+| ---------------------------- | ------------------ | --------------------------------------------------------------------- |
+| E1.1 repo, Astro, TS, CI     | #6                 | done                                                                  |
+| E1.5 design tokens           | #10                | done                                                                  |
+| E1.6 self-hosted fonts       | #11                | done                                                                  |
+| E1.7 base layout             | #12                | done                                                                  |
+| E1.8 shared footer           | #13                | done                                                                  |
+| E1.9 menu drawer             | #14                | done                                                                  |
+| E7.1 localised routing       | #57                | done                                                                  |
+| E1.2 Firebase project        | #7                 | done — `hanna-vavilava-site` on Blaze                                 |
+| E1.3 Actions deploy          | #8                 | done — live on `hanna-vavilava-site.web.app`                          |
+| E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                         |
+| E1.10 accessibility baseline | #15                | done                                                                  |
+| E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com`          |
+| E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`                   |
+| E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded         |
+| E2.3 admin shell             | #18                | done — `/admin`, Firebase Auth, `npm run admin:grant`                 |
+| E2.4 admin horse editor      | #19                | done — list, reorder, status, every field PL/EN                       |
+| E2.5 admin photo upload      | #20                | done — Storage, 2400 px, EXIF stripped, alt required                  |
+| E2.6 publish button          | #21                | done — `functions/` `publish`, live in `europe-central2`              |
+| E2.7 admin enquiry inbox     | #22                | done — `/admin` lists `/enquiries`, ticks `handled`                   |
+| E2.8 sold-horse handling     | #23                | done — trimmed sold page, Publish deletes and purges X-rays           |
+| E2.9 seed real horses        | #24                | done — 2 horses, invented facts, unpublished; rest in #91             |
+| E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges         |
+| E2.12 livejumping starts     | #110               | done — `refreshStarts` button + `startsWeekly`, not deployed          |
+| E2.13 starts height, season  | #122               | done — string `wysokosc_p`, one season reads as a sentence            |
+| E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size          |
+| E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5            |
+| E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code           |
+| E3.3 hero player             | #27                | done — gated `<video>`, keys in `src/media.ts`, still `null`          |
+| E3.4 sales video facade      | #28                | done — `Video.astro`, native player, mounted by E4.5                  |
+| E4.1 homepage                | #31                | done — fixed viewport, MobileHome two bars                            |
+| E4.2 horses index, editorial | #32                | done — `HorsesIndex.astro`, `site.horsesListed`, canvas v24           |
+| E4.3 horses index, grid      | #33                | done — `HorsesGrid.astro`, `ViewSwitch.astro`, 4:3 cards              |
+| E4.4 horse detail page       | #34                | done — `HorseDetail.astro`, price and sale rows, canvas v26           |
+| E4.5 detail videos, gallery  | #35                | done — heading row, free-text `videos[].note`                         |
+| E4.6 about page              | #36                | done — `AboutPage.astro`, 3:4 portrait beside the bio                 |
+| E4.7 questions page          | #37                | done — `FaqPage.astro`, native `<details>`, `CtaBand.astro`           |
+| E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar                  |
+| E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`               |
+| E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone            |
+| E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38             |
+| E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed           |
+| E5.4 Telegram notification   | #43                | done — PL message, `wa.me` greeting button, `page`, `source`          |
+| E5.5 email sink              | #44                | done — Resend beside the DB write, 303 if either sink worked          |
+| E5.6 Turnstile               | #45                | done — invisible widget, siteverify, 20/h cap, canvas v39             |
+| E5.7 confirmation, failure   | #46                | done — `EnquiryDone.astro`, 303 to not-sent, number in `#`            |
+| E5.8 contact links           | #47                | done — `ContactLinks.astro` by every form, prefilled, canvas v41      |
+| E5.10 endpoint monitor       | #49                | done — daily `enquiryProbe`, uptime check, alerts by hand             |
+| E5.11 search form endpoint   | #126               | done — `searchSchema`, `kind: search` in both messages, deploy owed   |
+| E6.1 head component          | #50                | done — `Base.astro`, horse description, hreflang check in CI          |
+| E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`          |
+| E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate         |
+| E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63        |
+| E6.5 icons and manifest      | #54                | done — owner's logo, rasters by sharp at build, canvas v44            |
+| E7.2 English pass            | #58                | done — EN board copy, `19.09.2026` dates, `EUR` code, half-pair check |
+| E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                 |
+| E0.2 price display           | #2                 | decided — price per horse, `null` = on request                        |
+| E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                       |
+| E0.4 X-rays                  | #4                 | decided — PDF study, public download                                  |
+| E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1             |
+| everything else              | see the milestones | not started                                                           |
 
 ## Decisions made along the way
 
@@ -331,9 +332,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   (`:nth-child(even)`, `:nth-child(4n)`), so the number of entries follows the data and not the
   board's four. The boards' full-bleed 1440 × 500 entry was dropped on the owner's review: a slot
   that wide crops a standing horse, so its head and legs are lost (canvas v24). `price: null` shows "Cena na zapytanie" in the price
-  slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Four deliberate
-  deviations: the price is `formatPrice`'s `32 000 €`, as on the homepage, where the board writes
-  `32 000 EUR`; the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
+  slot, and `Horses`/`MobileHorses` now draw it on entry 04 (canvas v22). Three deliberate
+  deviations: the 390 sub-bar keeps "Wszystkie konie" where the board shortens it to "Konie";
   an empty stable renders "· 00" and no entries, a state no board draws; and each "Karta konia"
   link carries the horse's name, visually hidden, so a screen reader can tell them apart.
 - The horse detail page is one component, `HorseDetail.astro`, for both locales and both states
@@ -474,3 +474,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   from i18n, and it uses `display: browser`, so a sales site keeps its address bar. `sharp` is now
   declared in `package.json`, because the endpoint imports it directly. The header keeps the text
   wordmark the boards draw; the logo appears only as icons. The `Icons` board on the canvas draws the set.
+- One date format and one currency display for both languages (E7.2): `19.09.2026` and the ISO
+  code, `EUR 32,000` / `32 000 EUR`, as the EN and PL boards write them and as the EN budget
+  options already did. The starts sync's EN `lastStart` follows, so a detail page never mixes
+  `12 Sep 2026` with `19.09.2026`. The admin panel stays Polish; its English half is the content,
+  and Save refuses a PL/EN pair with one half blank (`halfPairs`). It is not a schema rule, so a
+  stored horse with a half pair still builds.

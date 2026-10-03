@@ -36,7 +36,7 @@ test('every start of the exact name counts, and a withdrawal is never the last s
     starts: { pl: '8 · 2026: 7 · 2025: 1', en: '8 · 2026: 7 · 2025: 1' },
     lastStart: {
       pl: '12.09.2026 · N 120 cm · 2. miejsce',
-      en: '12 Sep 2026 · N 120 cm · 2nd place',
+      en: '12.09.2026 · N 120 cm · 2nd place',
     },
   });
 });
@@ -64,10 +64,10 @@ test('heights: phases collapse only when equal, a class never repeats it, junk s
 });
 
 test('ordinals, a missing placing, and no finished round', () => {
-  assert.equal(startFacts(lotus([sample[8]])).lastStart.en, '1 Jun 2025 · L 100 cm · 11th place');
+  assert.equal(startFacts(lotus([sample[8]])).lastStart.en, '01.06.2025 · L 100 cm · 11th place');
   assert.deepEqual(startFacts(lotus([row('2026-09-01', 'H', 'N', '120', '', 1)])).lastStart, {
     pl: '01.09.2026 · N 120 cm',
-    en: '1 Sep 2026 · N 120 cm',
+    en: '01.09.2026 · N 120 cm',
   });
   assert.equal(startFacts(lotus([sample[0]])).lastStart, null);
 });
