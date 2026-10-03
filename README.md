@@ -41,6 +41,38 @@ Repository settings the workflows expect:
 | Variable | `SITE_URL`                 | Canonical origin: the Firebase `.web.app` URL until E8.1, then `https://hannavavilava.com` |
 | Secret   | `FIREBASE_SERVICE_ACCOUNT` | Service account JSON: Hosting deploy + database read                                       |
 
+## Campaign links
+
+Every link posted outside the site carries UTM tags, so Umami can tell which post or ad
+brought an enquiry (E6.7). The analytics beacon sends the page's query string, and that is all
+it takes. There is nothing to configure.
+
+Tags are lowercase, words joined with hyphens, no spaces. `utm_source`, `utm_medium` and
+`utm_campaign` are always set. `utm_content` is optional and tells two versions of one ad apart.
+
+| Tag            | Means                       | Values                                                                               |
+| -------------- | --------------------------- | ------------------------------------------------------------------------------------ |
+| `utm_source`   | where the click happens     | `instagram`, `facebook`, `meta` (one ad on both), `google`, `whatsapp`, `email`      |
+| `utm_medium`   | what kind of link it is     | `bio`, `story`, `post`, `dm`, `paid`, `email`                                        |
+| `utm_campaign` | why the link exists         | `profile` for the bio link, a horse's slug, `YYYY-MM-<name>` for anything time-boxed |
+| `utm_content`  | which version, if there are | `video`, `photo`, `a`, `b`                                                           |
+
+Link to `/`, `/en` or a horse page from the Routes table, never with a trailing slash:
+Hosting redirects `/en/` to `/en`. Give each ad fixed values. Meta's `{{site_source_name}}`
+gives `ig` and `fb`, and those break the list above.
+
+    # Instagram bio link
+    https://hanna-vavilava-site.web.app/?utm_source=instagram&utm_medium=bio&utm_campaign=profile
+    # A paid ad for one horse, shown on Instagram and Facebook
+    https://hanna-vavilava-site.web.app/en/horses/<slug>?utm_source=meta&utm_medium=paid&utm_campaign=<slug>
+
+When the site moves to `https://hannavavilava.com` (E8.1), change the host in the bio link and
+in every live ad.
+
+In Umami, the UTM report counts visits per tag. The Attribution report shows which tags led to
+enquiries. Set its conversion to the event `enquiry_success`, `whatsapp_click` or
+`telegram_click`. The enquiry Hanna receives does not name its source.
+
 ## Media
 
 Video, posters and X-ray PDFs live in the Cloudflare R2 bucket `hanna-vavilava-media`,
