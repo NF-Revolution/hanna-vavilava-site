@@ -156,9 +156,16 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 >
   <JsonLd data={breadcrumb} />
   {product && <JsonLd data={product} />}
-  <section class="hero">
+  <section class:list={['hero', { 'hero-barred': !sold }]}>
     {horse.photos[0] && (
-      <Photo photo={horse.photos[0]} locale={locale} sizes="100vw" hero class="hero-img" />
+      <Photo
+        photo={horse.photos[0]}
+        locale={locale}
+        sizes="100vw"
+        hero
+        phone={horse.phoneCover}
+        class="hero-img"
+      />
     )}
     <div class="hero-text">
       <div class="hero-id">
@@ -401,6 +408,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 
 <style>
   /* ---- Hero: the header floats on it, the text sits on a scrim ---- */
+
+  /*
+   * At 390 the sticky WhatsApp bar (MobileBar, 81px) sits over the hero's foot
+   * on a horse for sale, so its text is padded clear of it (#149).
+   */
 
   .hero {
     position: relative;
@@ -736,6 +748,10 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       align-items: stretch;
       gap: 18px;
       padding: 120px var(--gutter-mobile) 24px;
+    }
+
+    .hero-barred .hero-text {
+      padding-bottom: calc(24px + 81px + env(safe-area-inset-bottom));
     }
 
     .hero-name {

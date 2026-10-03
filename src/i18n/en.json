@@ -566,6 +566,9 @@
     "photoHint": "The first photo is the cover. Downscaled to 2400 px, EXIF and GPS location removed.",
     "guideLink": "Guide: photos and X-rays",
     "photoNeedSlug": "Enter the horse's address first.",
+    "phoneCoverHint": "Optional portrait photo with the whole horse in frame. Replaces the cover on phones; without it, phones crop the cover.",
+    "phoneCoverDrop": "Choose a portrait photo",
+    "phoneCoverRemove": "Remove the phone cover",
     "photoUploading": "Uploading: {name}…",
     "photoFailed": "Upload failed: {name}",
     "photoDone": "Photos uploaded: {count}",
@@ -648,7 +651,8 @@
       "viewing.airport": "Airport",
       "viewing.visitDay": "Visit day",
       "videos": "Videos",
-      "photos": "Photos"
+      "photos": "Photos",
+      "phoneCover": "Phone cover"
     },
     "options": {
       "available": "Available",

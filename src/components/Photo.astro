@@ -8,11 +8,15 @@
  * `sizes` is required: each slot knows its own drawn width from its board, and
  * a missing one silently makes the browser assume 100vw.
  *
+ * `phone` is a second photo for 720px and below (#149), the hero's portrait
+ * cover. Astro's <Picture> has no art direction, so that one <picture> is
+ * written out by hand from `getImage`; the browser still fetches one image.
+ *
  * ponytail: the size is read from the photo at build (one request per photo),
  * because the schema stores none. Store `width`/`height` at upload (E2.5's
  * panel knows them) if build time or Storage reads ever matter.
  */
-import { Picture, inferRemoteSize } from 'astro:assets';
+import { Picture, getImage, inferRemoteSize } from 'astro:assets';
 import { photoUrl } from '../firebase';
 import type { Horse } from '../horse';
 import type { Locale } from '../i18n';
@@ -22,28 +26,75 @@ interface Props {
   locale: Locale;
   sizes: string;
   hero?: boolean;
+  phone?: string | null;
   class?: string;
 }
-const { photo, locale, sizes, hero = false, class: className } = Astro.props;
+const { photo, locale, sizes, hero = false, phone, class: className } = Astro.props;
+
+const formats = hero ? (['avif', 'webp'] as const) : (['webp'] as const);
+// Astro trims the ladder to the original only for imported files; a remote one
+// would get a `1920w` entry sharp will not upscale, so the label would lie.
+const ladder = (width: number) => [...[640, 960, 1280, 1920].filter((w) => w < width), width];
 
 const src = photoUrl(photo.key);
 const { width, height } = await inferRemoteSize(src);
-// Astro trims the ladder to the original only for imported files; a remote one
-// would get a `1920w` entry sharp will not upscale, so the label would lie.
-const widths = [...[640, 960, 1280, 1920].filter((w) => w < width), width];
+const widths = ladder(width);
+
+/* One <source> per format, then the JPEG, for `key` at its own size. */
+async function sources(key: string) {
+  const src = photoUrl(key);
+  const { width, height } = await inferRemoteSize(src);
+  return Promise.all(
+    [...formats, 'jpg' as const].map(async (format) => {
+      const image = await getImage({ src, width, height, widths: ladder(width), format });
+      return { width, height, src: image.src, srcset: image.srcSet.attribute, format };
+    }),
+  );
+}
+const type = (format: string) => `image/${format === 'jpg' ? 'jpeg' : format}`;
+const art = phone && { phone: await sources(phone), main: await sources(photo.key) };
+const fallback = art && art.main.at(-1)!;
 ---
 
-<Picture
-  src={src}
-  width={width}
-  height={height}
-  widths={widths}
-  sizes={sizes}
-  formats={hero ? ['avif', 'webp'] : ['webp']}
-  fallbackFormat="jpg"
-  alt={photo.alt[locale]}
-  loading={hero ? 'eager' : 'lazy'}
-  decoding="async"
-  fetchpriority={hero ? 'high' : undefined}
-  class={className}
-/>
+{art && fallback ? (
+  <picture>
+    {art.phone.map((s) => (
+      <source
+        media="(max-width: 720px)"
+        type={type(s.format)}
+        srcset={s.srcset}
+        sizes={sizes}
+        width={s.width}
+        height={s.height}
+      />
+    ))}
+    {art.main.map((s) => (
+      <source type={type(s.format)} srcset={s.srcset} sizes={sizes} />
+    ))}
+    <img
+      src={fallback.src}
+      width={fallback.width}
+      height={fallback.height}
+      alt={photo.alt[locale]}
+      loading={hero ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchpriority={hero ? 'high' : undefined}
+      class={className}
+    />
+  </picture>
+) : (
+  <Picture
+    src={src}
+    width={width}
+    height={height}
+    widths={widths}
+    sizes={sizes}
+    formats={[...formats]}
+    fallbackFormat="jpg"
+    alt={photo.alt[locale]}
+    loading={hero ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={hero ? 'high' : undefined}
+    class={className}
+  />
+)}
