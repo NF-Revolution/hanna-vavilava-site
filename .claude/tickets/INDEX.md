@@ -62,6 +62,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E6.2 link preview cards      | #51                | done — cover cropped to 1200×630 JPEG, size gated in `links`        |
 | E6.3 structured data         | #52                | done — `JsonLd.astro`, Product only when priced, `links` gate       |
 | E6.4 sitemap and robots      | #53                | done — `site.indexable`, own sitemap endpoint, consoles at #63      |
+| E6.5 icons and manifest      | #54                | done — owner's logo, rasters by sharp at build, canvas v44          |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                               |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                      |
 | E0.3 seller identity         | #3                 | decided — per-horse kind, values pending in #61                     |
@@ -464,3 +465,12 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   page only when it has `noindex` and no canonical, because otherwise the site-wide `noindex`
   would turn it off on every CI build. Search Console and Bing are #63's job: a Domain property
   verified by DNS TXT, then Bing imported from Search Console.
+- The icon set is the owner's own logo (E6.5, #54): a laurel wreath around a horse and rider
+  clearing a jump, in `#F2F1ED` on a `#0E0E0D` square. It replaced the HV monogram we had first
+  chosen. The favicon (32 px, SVG and ICO) is `src/assets/logo-mark.svg`: the same paths with the
+  wreath removed and cropped to the horse, because at 32 px the wreath is noise. Every size is
+  rasterised at build time by `src/pages/[icon].ts` from the two SVGs, so no binary is committed.
+  The ICO is a 22-byte header around the 32 px PNG. The manifest is an endpoint, so the name comes
+  from i18n, and it uses `display: browser`, so a sales site keeps its address bar. `sharp` is now
+  declared in `package.json`, because the endpoint imports it directly. The header keeps the text
+  wordmark the boards draw; the logo appears only as icons. The `Icons` board on the canvas draws the set.
