@@ -33,6 +33,20 @@ export const site = {
 };
 
 /*
+ * The site operator and data controller (#3), as entered in the KRS extract posted
+ * on #61. Registration facts, not editable content, so they live here rather than
+ * in `/site`. The privacy notice (#59) names it; the footer (#61) will.
+ */
+export const operator = {
+  name: 'CEWET TAS sp. z o.o.',
+  street: 'ul. Kąty Grodziskie 19J lok. 5',
+  city: '03-289 Warszawa',
+  krs: '0001015121',
+  nip: '5242961289',
+  regon: '524266376',
+};
+
+/*
  * Whether search engines may index this build (E6.4). Only the live deploy on
  * the real domain: a preview channel and the `.web.app` host before #63 are full
  * copies of the site on a throwaway host. Fail-closed — only `deploy.yml` sets

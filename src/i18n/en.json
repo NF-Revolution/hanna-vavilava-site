@@ -368,6 +368,86 @@
       "title": "Privacy — Hanna Vavilava",
       "description": "How personal data is processed on this site.",
       "label": "Privacy",
+      "heading": "How personal data is processed",
+      "intro": "The notice under Article 13 GDPR for anyone who visits this site or sends an enquiry through its forms.",
+      "controller": {
+        "h": "Controller",
+        "lead": "The controller of personal data is:",
+        "contact": "For anything about personal data, write to {email}."
+      },
+      "data": {
+        "h": "What data, why, and on what basis",
+        "p": [
+          "An enquiry about a horse: name, country, WhatsApp number, optionally an Instagram account and a message, riding level, budget and buying timeframe. An enquiry for a horse not on the list: a WhatsApp number and the wishes described. Both carry the language and address of the page the form was sent from, and where the visitor came from (UTM tags, for example). This data is used to answer the enquiry and present an offer — steps taken at the request of the person concerned before entering into a contract (Art. 6(1)(b) GDPR).",
+          "Protecting the forms: the IP address and browser data help tell a person from a bot and limit the number of enquiries from one address. The IP address is not stored. The basis is the controller's legitimate interest in keeping spam off the contact channel (Art. 6(1)(f) GDPR).",
+          "Running the site: on every visit the server processes the IP address and request data to deliver the page and protect it from abuse (Art. 6(1)(f) GDPR).",
+          "Visit statistics: page views and a few events are counted, sending an enquiry for example. The statistics use no cookies and store nothing on the device. A visit is recognised by a hash of the IP address and browser with a salt that changes daily, so it cannot be linked to a person or to a visit on another day. The page address is sent without the part after the # sign. The basis is legitimate interest: knowing which parts of the site work (Art. 6(1)(f) GDPR)."
+        ]
+      },
+      "processors": {
+        "h": "Who processes data on our behalf",
+        "intro": "The following service providers process data on the controller's behalf:",
+        "items": [
+          {
+            "name": "Google (Firebase)",
+            "role": "hosting the site, the function that handles the forms (Warsaw) and the database holding the enquiries (Belgium)."
+          },
+          {
+            "name": "Microsoft (Microsoft 365)",
+            "role": "the mailbox that receives a copy of every enquiry."
+          },
+          {
+            "name": "Resend",
+            "role": "sends that copy by email, from servers in the European Union."
+          },
+          {
+            "name": "Telegram",
+            "role": "the messenger in which Hanna Vavilava is notified of a new enquiry, with its content."
+          },
+          {
+            "name": "Umami Software, Inc. (Umami Cloud)",
+            "role": "the visit statistics described above, on an account in the EU region."
+          },
+          {
+            "name": "Cloudflare (R2)",
+            "role": "stores and serves the videos and the X-ray reports from our own subdomain, {media}. It sets no cookie, so it needs no consent — these are plain files, not a player embedded from someone else's service."
+          }
+        ]
+      },
+      "transfers": {
+        "h": "Transfers outside the EEA",
+        "p": [
+          "Some of these providers are based in the United States. Where data leaves the European Economic Area, the basis is the EU–US Data Privacy Framework or the standard contractual clauses approved by the European Commission. Telegram operates outside the EEA, and notifications there are governed by its own privacy policy."
+        ]
+      },
+      "xray": {
+        "h": "Horses' X-ray reports",
+        "p": [
+          "The published radiograph reports name the vet who carried out the examination and no other person: the horse's owner is removed before publication. A horse is not a person, so the rest of a report is not personal data."
+        ]
+      },
+      "retention": {
+        "h": "How long data is kept",
+        "p": [
+          "An enquiry is deleted from the database, the mailbox and Telegram six months after it has been handled. If it ends in the sale of a horse, it is kept for as long as tax and accounting law requires.",
+          "An enquiry that fails the Turnstile check is never stored anywhere. The visit statistics hold no personal data, because a hash with a daily-changing salt cannot be reversed."
+        ]
+      },
+      "rights": {
+        "h": "Your rights",
+        "p": [
+          "You have the right to access your data, to have it corrected or erased, to restrict its processing and to receive it in a portable form, and to object to processing based on legitimate interest (Articles 15–21 GDPR). To exercise them, write to {email}. You will have an answer within a month.",
+          "You also have the right to lodge a complaint with the President of the Personal Data Protection Office (Prezes UODO, ul. Stawki 2, 00-193 Warsaw)."
+        ]
+      },
+      "other": {
+        "h": "Other information",
+        "p": [
+          "Providing data is voluntary, but without the fields marked as required an enquiry cannot be answered.",
+          "The data is not used for automated decision-making or profiling. The Turnstile check only filters out bots and has no legal effect on anyone.",
+          "The WhatsApp and Telegram links open a chat in those apps. What you write there they process on their own terms, as separate controllers."
+        ]
+      },
       "turnstile": "The enquiry forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",
       "turnstileLink": "Cloudflare’s Turnstile Privacy Addendum"
     },

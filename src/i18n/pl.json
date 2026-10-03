@@ -368,6 +368,86 @@
       "title": "Prywatność — Hanna Vavilava",
       "description": "Informacja o przetwarzaniu danych osobowych.",
       "label": "Prywatność",
+      "heading": "Jak przetwarzamy dane osobowe",
+      "intro": "Informacja z art. 13 RODO dla osób, które odwiedzają tę stronę lub wysyłają zapytanie przez formularz.",
+      "controller": {
+        "h": "Administrator",
+        "lead": "Administratorem danych osobowych jest:",
+        "contact": "W sprawach danych osobowych prosimy pisać na {email}."
+      },
+      "data": {
+        "h": "Jakie dane, w jakim celu i na jakiej podstawie",
+        "p": [
+          "Zapytanie o konia: imię, kraj, numer WhatsApp, opcjonalnie konto na Instagramie i wiadomość, poziom jeździecki, budżet i termin zakupu. Zapytanie o konia spoza listy: numer WhatsApp i opisane życzenia. Do obu dołączamy język i adres strony, z której wysłano formularz, oraz to, skąd przyszedł odwiedzający (np. znaczniki UTM). Dane te służą do odpowiedzi na zapytanie i przedstawienia oferty, czyli do działań na żądanie osoby, której dotyczą, przed zawarciem umowy (art. 6 ust. 1 lit. b RODO).",
+          "Ochrona formularza: adres IP i dane przeglądarki pomagają odróżnić człowieka od bota i ograniczyć liczbę zapytań z jednego adresu. Adres IP nie jest zapisywany. Podstawą jest prawnie uzasadniony interes administratora, czyli ochrona kanału kontaktu przed spamem (art. 6 ust. 1 lit. f RODO).",
+          "Działanie strony: przy każdym wejściu serwer przetwarza adres IP i dane żądania, aby dostarczyć stronę i chronić ją przed nadużyciami (art. 6 ust. 1 lit. f RODO).",
+          "Statystyki odwiedzin: liczymy odsłony i kilka zdarzeń, na przykład wysłanie zapytania. Statystyki nie używają plików cookie i niczego nie zapisują na urządzeniu. Wizyta jest rozpoznawana po skrócie adresu IP i przeglądarki z solą zmienianą codziennie, więc nie da się jej powiązać z osobą ani z wizytą z innego dnia. Adres strony jest wysyłany bez części po znaku #. Podstawą jest prawnie uzasadniony interes: wiedza, które części strony działają (art. 6 ust. 1 lit. f RODO)."
+        ]
+      },
+      "processors": {
+        "h": "Komu powierzamy dane",
+        "intro": "Dane przetwarzają w imieniu administratora następujący dostawcy usług:",
+        "items": [
+          {
+            "name": "Google (Firebase)",
+            "role": "hosting strony, funkcja obsługująca formularz (Warszawa) i baza danych z zapytaniami (Belgia)."
+          },
+          {
+            "name": "Microsoft (Microsoft 365)",
+            "role": "skrzynka pocztowa, do której trafia kopia każdego zapytania."
+          },
+          {
+            "name": "Resend",
+            "role": "wysyła tę kopię e-mailem, z serwerów w Unii Europejskiej."
+          },
+          {
+            "name": "Telegram",
+            "role": "komunikator, w którym Hanna Vavilava dostaje powiadomienie o nowym zapytaniu wraz z jego treścią."
+          },
+          {
+            "name": "Umami Software, Inc. (Umami Cloud)",
+            "role": "statystyki odwiedzin opisane wyżej, konto w regionie UE."
+          },
+          {
+            "name": "Cloudflare (R2)",
+            "role": "przechowuje i serwuje filmy oraz raporty RTG z naszej własnej subdomeny {media}. Nie ustawia plików cookie, więc nie wymaga zgody — to zwykłe pliki, a nie odtwarzacz osadzony z cudzego serwisu."
+          }
+        ]
+      },
+      "transfers": {
+        "h": "Przekazywanie danych poza EOG",
+        "p": [
+          "Część dostawców ma siedzibę w USA. Jeśli dane trafiają poza Europejski Obszar Gospodarczy, podstawą są Ramy ochrony danych UE–USA (Data Privacy Framework) albo standardowe klauzule umowne zatwierdzone przez Komisję Europejską. Telegram działa poza EOG, a powiadomienia w nim podlegają jego polityce prywatności."
+        ]
+      },
+      "xray": {
+        "h": "Raporty RTG koni",
+        "p": [
+          "Opublikowane raporty z badań radiologicznych podają lekarza weterynarii, który wykonał badanie, i żadnej innej osoby: dane właściciela konia są usuwane przed publikacją. Koń nie jest osobą, więc reszta raportu nie jest daną osobową."
+        ]
+      },
+      "retention": {
+        "h": "Jak długo przechowujemy dane",
+        "p": [
+          "Zapytanie usuwamy z bazy danych, ze skrzynki pocztowej i z Telegrama sześć miesięcy po tym, jak zostanie obsłużone. Jeśli zakończy się sprzedażą konia, przechowujemy je tak długo, jak wymagają tego przepisy podatkowe i rachunkowe.",
+          "Zapytanie, które nie przejdzie weryfikacji Turnstile, nie jest nigdzie zapisywane. Statystyki odwiedzin nie zawierają danych osobowych, bo skrótu z codziennie zmienianą solą nie da się odwrócić."
+        ]
+      },
+      "rights": {
+        "h": "Twoje prawa",
+        "p": [
+          "Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przeniesienia, a także prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie (art. 15–21 RODO). Aby z nich skorzystać, napisz na {email}. Odpowiemy w ciągu miesiąca.",
+          "Masz też prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa)."
+        ]
+      },
+      "other": {
+        "h": "Pozostałe informacje",
+        "p": [
+          "Podanie danych jest dobrowolne, ale bez pól oznaczonych jako wymagane nie możemy odpowiedzieć na zapytanie.",
+          "Dane nie służą do zautomatyzowanego podejmowania decyzji ani do profilowania. Weryfikacja Turnstile tylko odsiewa automaty i nie wywołuje wobec nikogo skutków prawnych.",
+          "Linki do WhatsApp i Telegrama otwierają rozmowę w tych aplikacjach. To, co tam piszesz, przetwarzają one na własnych zasadach, jako odrębni administratorzy."
+        ]
+      },
       "turnstile": "Formularze zapytań są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",
       "turnstileLink": "Informacja Cloudflare o prywatności w Turnstile"
     },

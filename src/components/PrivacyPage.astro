@@ -1,0 +1,172 @@
+---
+/*
+ * Privacy (E7.3): the Art. 13 notice, one column of text in the order the article
+ * lists it. The controller and the email come from `site.ts`, the copy from the
+ * dictionaries; Turnstile keeps its own paragraph and the Addendum link that
+ * invisible mode is conditional on (#45).
+ */
+import Page from '../layouts/Page.astro';
+import SubBar from './SubBar.astro';
+import { t, type Locale } from '../i18n';
+import { fill } from '../i18n/format';
+import { media } from '../media';
+import { emailHref, operator, site, turnstilePrivacyHref } from '../site';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const page = t(locale).pages.privacy;
+/* The processors list sits between the first section and the rest. */
+const [data, ...rest] = [
+  page.data,
+  page.transfers,
+  page.xray,
+  page.retention,
+  page.rights,
+  page.other,
+];
+const host = new URL(media.base).hostname;
+/* `{email}` becomes a link, so a paragraph is split around it rather than filled. */
+const parts = (text: string) => text.split('{email}');
+---
+
+<Page locale={locale} routeKey="privacy" title={page.title} description={page.description}>
+  <SubBar label={page.label} />
+
+  <article class="notice">
+    <header>
+      <h2 class="heading">{page.heading}</h2>
+      <p class="copy muted">{page.intro}</p>
+    </header>
+
+    <section>
+      <h3 class="lbl">{page.controller.h}</h3>
+      <p class="copy">{page.controller.lead}</p>
+      <address class="copy">
+        {operator.name}
+        <br />
+        {operator.street}
+        <br />
+        {operator.city}
+        <br />
+        KRS {operator.krs} · NIP {operator.nip} · REGON {operator.regon}
+      </address>
+      <p class="copy">
+        {parts(page.controller.contact).map((s, i) =>
+          i ? [<a href={emailHref()}>{site.email}</a>, s] : s,
+        )}
+      </p>
+    </section>
+
+    <section>
+      <h3 class="lbl">{data.h}</h3>
+      {data.p.map((p) => (
+        <p class="copy">{p}</p>
+      ))}
+    </section>
+
+    <section>
+      <h3 class="lbl">{page.processors.h}</h3>
+      <p class="copy">{page.processors.intro}</p>
+      <dl class="copy">
+        {page.processors.items.map((item) => (
+          <div>
+            <dt>{item.name}</dt>
+            <dd>{fill(item.role, { media: host })}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="copy">
+        {page.turnstile} <a href={turnstilePrivacyHref}>{page.turnstileLink}</a>
+      </p>
+    </section>
+
+    {rest.map((s) => (
+      <section>
+        <h3 class="lbl">{s.h}</h3>
+        {s.p.map((p) => (
+          <p class="copy">
+            {parts(p).map((x, i) => (i ? [<a href={emailHref()}>{site.email}</a>, x] : x))}
+          </p>
+        ))}
+      </section>
+    ))}
+  </article>
+</Page>
+
+<style>
+  .notice {
+    max-width: 780px;
+    padding: 64px var(--gutter) 72px;
+  }
+
+  header {
+    margin-bottom: 44px;
+  }
+
+  .heading {
+    margin: 0 0 16px;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .muted {
+    color: var(--ink-muted);
+  }
+
+  section {
+    padding: 24px 0 8px;
+    border-top: 1px solid var(--rule);
+  }
+
+  h3 {
+    margin: 0 0 16px;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+  }
+
+  p,
+  address,
+  dl {
+    margin: 0 0 16px;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  dl div {
+    margin-bottom: 12px;
+  }
+
+  dt {
+    color: var(--ink);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 720px) {
+    .notice {
+      padding: 36px var(--gutter-mobile) 48px;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    .heading {
+      font-size: 28px;
+    }
+  }
+</style>
