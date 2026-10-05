@@ -118,26 +118,31 @@ const imageVw = [61, 61, 61, 70];
     grid-template-areas: 'text fig';
   }
 
+  /*
+   * The photo frame sets the row height, not the other way round (#160): a 3:2 cover
+   * fills it uncropped, so the whole horse shows at every width. A row-sized slot
+   * narrower than the photo cut the head off a side shot, even at 1440. The shape
+   * is on the frame, not left to the <img>: Safari sized the row before the lazy
+   * photo had a height, and left bands or overlapping rows.
+   * ponytail: fixed 3:2 — a 4:3 upload loses about 5% top and bottom, a 16:9 one
+   * about 8% each side. Set a per-photo `aspect-ratio` from the size `Photo.astro`
+   * reads at build if covers stop being 3:2.
+   */
   .fig {
     grid-area: fig;
     margin: 0;
     min-height: 0;
+    aspect-ratio: 3 / 2;
     overflow: hidden;
     background: var(--placeholder);
   }
 
-  /*
-   * The photo sets the row height, not the other way round (#160): uncropped, it
-   * shows the whole horse at every width. A row-sized slot narrower than the photo
-   * cut the head off a side shot, even at 1440.
-   * ponytail: a portrait cover would make a tall row; the admin guide asks for a
-   * landscape one. Cap it with a max-height and `object-fit` if that ever happens.
-   */
   .fig :global(picture),
   .fig :global(img) {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
   }
 
   .text {
