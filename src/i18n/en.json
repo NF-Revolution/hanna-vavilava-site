@@ -121,7 +121,7 @@
     "court": "Registry court: {court} · share capital {capital}",
     "stock": "I sell my own horses and offer horses owned by clients — the owner's details are given before contract.",
     "location": "40 km from Warsaw, Poland",
-    "languages": "Polski · English · Русский",
+    "languages": "Polski · English",
     "vetting": "Pre-purchase exam — the buyer chooses the vet",
     "footage": "Full uncut footage on request",
     "phone": "Phone",
@@ -237,7 +237,7 @@
       "label": "About",
       "meta": "Selling since 2016 · show jumpers since 2021",
       "portraitAlt": "Hanna Vavilava on a bay horse in an orange winner's rug, wearing a championship sash, in a show arena",
-      "bio": "I have sold horses since 2016, and since 2021 only show jumpers that I choose and train myself. Between three and six horses stand in the stable at any one time — I ride each of them myself for at least four months before it appears on this site. I speak Polish, English and Russian, and I answer myself, with no intermediary.",
+      "bio": "I have sold horses since 2016, and since 2021 only show jumpers that I choose and train myself. Between three and six horses stand in the stable at any one time — I ride each of them myself for at least four months before it appears on this site. I speak Polish and English, and I answer myself, with no intermediary.",
       "stepsHead": "How buying works",
       "steps": [
         {
@@ -545,6 +545,15 @@
     "noAccess": "This account has no access to the panel.",
     "enquiries": "Enquiries",
     "enquiriesEmpty": "No enquiries.",
+    "enquiriesWaiting": {
+      "one": "{count} new enquiry.",
+      "few": "{count} new enquiries.",
+      "many": "{count} new enquiries.",
+      "other": "{count} new enquiries."
+    },
+    "enquiriesNone": "No new enquiries.",
+    "enquiriesOpen": "Open enquiries",
+    "backToPanel": "← Admin",
     "handled": "Handled",
     "horses": "Horses",
     "add": "Add horse",

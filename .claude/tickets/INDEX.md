@@ -34,6 +34,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.10 X-ray PDF upload       | #70                | done — presigned PUT to R2, owner tick, Save deletes + purges               |
 | E2.12 livejumping starts     | #110               | done — `refreshStarts` button + `startsWeekly`, not deployed                |
 | E2.13 starts height, season  | #122               | done — string `wysokosc_p`, one season reads as a sentence                  |
+| E2.14 enquiry inbox page     | #158               | done — `/admin/zapytania` lists, `/admin` counts unhandled live             |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size                |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5                  |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code                 |
@@ -72,6 +73,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.3 privacy notice          | #59                | done — `PrivacyPage.astro`, `site.operator`, purge owed in #142, canvas v46 |
 | E7.6 point-of-collection     | #62                | done — `FormNotice.astro` in every send row, no checkbox, canvas v50        |
 | E7.4 technology statement    | #60                | done — `#cookies` section in the privacy notice, footer links, canvas v51   |
+| E7.8 no Russian              | #152               | done — footer languages and bio in both dictionaries, canvas v57            |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                       |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                              |
 | E0.3 seller identity         | #3                 | decided — per-horse kind; operator values landed in #61                     |
@@ -550,3 +552,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   is no longer an exception: a horse page with photos carries about 1.4 KB plus the 821 B
   beacon. Turnstile's `api.js` stays the one exception, because it is third-party and loads
   only on a form's first focus. The E6.6 and E5.6 lines above describe the old 1 KB budget.
+- The enquiry inbox moved to `/admin/zapytania` (E2.14, #158); `/admin` keeps only a live count of
+  unhandled enquiries and a link, so the list no longer pushes the horse editor down. Both read
+  `handled` through `isHandled` in `src/enquiry.ts`, so a record with no flag counts as
+  unhandled in both. The inbox has no sign-in form of its own: a signed-out or non-admin visit is
+  sent to `/admin`, which loses a deep link after sign-in. A shared gate is the upgrade. The E2.7
+  line above describes the old placement.

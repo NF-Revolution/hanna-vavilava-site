@@ -237,7 +237,7 @@
       "label": "O mnie",
       "meta": "Sprzedaję od 2016 · konie skokowe od 2021",
       "portraitAlt": "Hanna Vavilava na gniadym koniu w pomarańczowej derce zwycięzcy, z szarfą mistrzostw, na placu konkursowym",
-      "bio": "Sprzedaję konie od 2016 roku, a od 2021 wyłącznie konie skokowe, które sama wybieram i trenuję. W stajni stoi jednocześnie od trzech do sześciu koni — każdego jeżdżę osobiście przez co najmniej cztery miesiące, zanim trafi na tę stronę. Rozmawiam po polsku, angielsku i rosyjsku, i odpowiadam sama, bez pośrednika.",
+      "bio": "Sprzedaję konie od 2016 roku, a od 2021 wyłącznie konie skokowe, które sama wybieram i trenuję. W stajni stoi jednocześnie od trzech do sześciu koni — każdego jeżdżę osobiście przez co najmniej cztery miesiące, zanim trafi na tę stronę. Rozmawiam po polsku i angielsku, i odpowiadam sama, bez pośrednika.",
       "stepsHead": "Jak przebiega zakup",
       "steps": [
         {
@@ -545,6 +545,15 @@
     "noAccess": "To konto nie ma dostępu do panelu.",
     "enquiries": "Zapytania",
     "enquiriesEmpty": "Brak zapytań.",
+    "enquiriesWaiting": {
+      "one": "{count} nowe zapytanie.",
+      "few": "{count} nowe zapytania.",
+      "many": "{count} nowych zapytań.",
+      "other": "{count} nowego zapytania."
+    },
+    "enquiriesNone": "Brak nowych zapytań.",
+    "enquiriesOpen": "Otwórz zapytania",
+    "backToPanel": "← Panel",
     "handled": "Załatwione",
     "horses": "Konie",
     "add": "Dodaj konia",
