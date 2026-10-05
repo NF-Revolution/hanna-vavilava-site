@@ -3,6 +3,7 @@
 Shipped 2026-10-05 — see the last `## Outcome` at the bottom.
 
 Issue [#167](https://github.com/NF-Revolution/hanna-vavilava-site/issues/167) ·
+PR [#169](https://github.com/NF-Revolution/hanna-vavilava-site/pull/169) ·
 branch `167-e113-close-the-menu-drawer-by-clicking-outside-it` · no canvas change
 
 ## 2026-10-05
