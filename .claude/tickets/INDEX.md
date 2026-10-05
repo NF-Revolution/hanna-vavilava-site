@@ -52,6 +52,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.8 390px mobile pass       | #38                | done — `MobileBar.astro`, sticky WhatsApp + form bar                        |
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`                     |
 | E4.14 list whole horse       | #160               | done — photo sets the row height, stack at 1024, canvas v58                 |
+| E4.15 name the stables       | #164               | done — `stables` in `site.ts`, `{stables}` in four lines, canvas v59        |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |

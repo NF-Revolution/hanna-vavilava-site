@@ -55,6 +55,24 @@ export const operator = {
 };
 
 /*
+ * Where the horses stand (#164). The footer, the about and sent pages and the FAQ
+ * name it; the map (#165) and the directions link (#166) read the same facts. The
+ * copy says "w stajni {stables}", so the name stays nominative and the town is never
+ * declined. PLACEHOLDER: street, postal code and town are from the Google, re-volta.pl
+ * and horsee.pl listings, until Hanna confirms them.
+ */
+export const stables = {
+  name: 'Becker Sport Equestrian Center',
+  street: 'ul. Magnolii 2a',
+  postalCode: '96-321',
+  town: 'Kaleń-Towarzystwo',
+  lat: 52.0179059,
+  lng: 20.6976585,
+  mapsHref:
+    'https://www.google.com/maps/place/Becker+Sport+Equestrian+Center+-+Stajnia+Sportowa/@52.0179092,20.6950836,667m/data=!3m2!1e3!4b1!4m6!3m5!1s0x4719395e7eed44c3:0x4101477f9bfcb092!8m2!3d52.0179059!4d20.6976585!16s%2Fg%2F11j038_nbz',
+};
+
+/*
  * Whether search engines may index this build (E6.4). Only the live deploy on
  * the real domain: a preview channel and the `.web.app` host before #63 are full
  * copies of the site on a throwaway host. Fail-closed — only `deploy.yml` sets

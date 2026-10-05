@@ -11,16 +11,18 @@ import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
 import { fill } from '../i18n/format';
 import { path } from '../i18n/routes';
-import { site } from '../site';
+import { site, stables } from '../site';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
 const page = t(locale).pages.faq;
+/* Filled once, so the FAQPage block carries the same answers as the page. */
+const items = page.items.map((item) => ({ ...item, a: fill(item.a, { stables: stables.name }) }));
 const faq = {
   '@type': 'FAQPage',
-  mainEntity: page.items.map((item) => ({
+  mainEntity: items.map((item) => ({
     '@type': 'Question',
     name: item.q,
     acceptedAnswer: { '@type': 'Answer', text: item.a },
@@ -39,7 +41,7 @@ const faq = {
       <h2 class="heading">{page.heading}</h2>
       <p class="copy intro-text">{page.intro}</p>
     </div>
-    {page.items.map((item) => (
+    {items.map((item) => (
       <details>
         <summary class="lbl">
           {item.q}

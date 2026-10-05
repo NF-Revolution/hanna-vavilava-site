@@ -120,7 +120,7 @@
     "registry": "KRS {krs} · NIP {nip} · REGON {regon}",
     "court": "Registry court: {court} · share capital {capital}",
     "stock": "I sell my own horses and offer horses owned by clients — the owner's details are given before contract.",
-    "location": "40 km from Warsaw, Poland",
+    "location": "{stables}, {town} · 40 km from Warsaw, Poland",
     "languages": "Polski · English",
     "vetting": "Pre-purchase exam — the buyer chooses the vet",
     "footage": "Full uncut footage on request",
@@ -250,7 +250,7 @@
         },
         {
           "title": "Viewing",
-          "text": "In person at the stable near Warsaw, with your trainer if you work with one — or through a trusted representative if travelling is not possible."
+          "text": "In person at {stables} near Warsaw, with your trainer if you work with one — or through a trusted representative if travelling is not possible."
         },
         {
           "title": "Pre-purchase exam",
@@ -300,7 +300,7 @@
         },
         {
           "q": "How long does it take to arrange a viewing?",
-          "a": "Three to five working days. The horses are in training — I need a day to prepare the horse and book a rider to present it."
+          "a": "Three to five working days. Viewings are at {stables}. The horses are in training — I need a day to prepare the horse and book a rider to present it."
         }
       ],
       "band": "A question with no answer here? I reply within the hour, {hours}.",
@@ -348,7 +348,7 @@
         },
         {
           "title": "A call and a visit",
-          "text": "We can arrange a phone call and a meeting at the stable."
+          "text": "We can arrange a phone call and a meeting at {stables}."
         }
       ],
       "whatsapp": "Message me on WhatsApp now",
