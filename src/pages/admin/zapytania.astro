@@ -1,0 +1,202 @@
+---
+/*
+ * The enquiry inbox (E2.7), on its own page since E2.14 so the list no longer
+ * pushes the horse editor down /admin. Standalone like /admin: noindex, not in
+ * routes.ts, no /en twin. /admin counts the unhandled ones and links here.
+ *
+ * ponytail: no sign-in form of its own — a signed-out or non-admin visit is
+ * sent to /admin, which has one, and lands there after signing in. A shared
+ * sign-in gate for both pages is the upgrade if deep links start to matter.
+ */
+import '../../styles/fonts.css';
+import '../../styles/base.css';
+import { htmlLang, t } from '../../i18n';
+
+const dict = t('pl');
+const a = dict.admin;
+---
+
+<!doctype html>
+<html lang={htmlLang.pl}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{a.enquiries} — {a.title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {dict.a11y.skipToContent}
+    </a>
+    <main id="main">
+      <a href="/admin">{a.backToPanel}</a>
+      <h1>{a.enquiries}</h1>
+
+      <section id="inbox" hidden>
+        <ol id="enquiries"></ol>
+        <p id="enquiries-empty" hidden>
+          {a.enquiriesEmpty}
+        </p>
+        <p id="enquiry-error" role="alert"></p>
+      </section>
+
+      <template id="enquiry-row">
+        <li>
+          <time data-when></time>
+          <label>
+            <input type="checkbox" data-handled />
+            {a.handled}
+          </label>
+          <dl></dl>
+        </li>
+      </template>
+    </main>
+  </body>
+</html>
+
+<script>
+  import { initializeApp } from 'firebase/app';
+  import { getAuth, onAuthStateChanged } from 'firebase/auth';
+  import { getDatabase, onValue, ref, set } from 'firebase/database';
+  import { isHandled } from '../../enquiry';
+  import { firebaseConfig } from '../../firebase';
+  import { admin } from '../../i18n/pl.json';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const inbox = $('inbox');
+  const enquiryList = $('enquiries');
+  const enquiryRow = $<HTMLTemplateElement>('enquiry-row');
+  const enquiryError = $('enquiry-error');
+  let enquiries: Record<string, Record<string, any>> = {};
+  let unsubscribe: (() => void) | undefined;
+
+  /*
+   * E5.3 writes each record with `createdAt` (ms) and the form's fields;
+   * `handled` is the panel's own, `true` or absent. The values are anonymous
+   * public input, so they only ever reach the page as textContent.
+   *
+   * ponytail: field keys are shown raw — E5.1 has not fixed the field set yet.
+   * Polish labels for them are the upgrade once it has.
+   */
+  function renderEnquiries() {
+    // Rows are rebuilt on every change, so the focused checkbox is found again by id.
+    const focused = (document.activeElement as HTMLElement | null)?.dataset.id;
+    // Newest first, never by `handled`, so a row stays put when it is ticked.
+    const ids = Object.keys(enquiries).sort(
+      (x, y) => (enquiries[y].createdAt ?? 0) - (enquiries[x].createdAt ?? 0),
+    );
+    enquiryList.replaceChildren(
+      ...ids.map((id) => {
+        const { createdAt, handled, ...fields } = enquiries[id];
+        const li = enquiryRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+        const when = li.querySelector('time')!;
+        const box = li.querySelector<HTMLInputElement>('[data-handled]')!;
+        if (typeof createdAt === 'number') {
+          when.dateTime = new Date(createdAt).toISOString();
+          when.textContent = new Date(createdAt).toLocaleString('pl-PL', {
+            timeZone: 'Europe/Warsaw',
+          });
+        }
+        box.checked = isHandled({ handled });
+        box.dataset.id = id;
+        box.setAttribute('aria-label', `${admin.handled}: ${when.textContent || id}`);
+        box.onchange = () => {
+          enquiryError.textContent = '';
+          // `null` deletes the flag rather than leaving a `false` nobody reads.
+          set(ref(db, `enquiries/${id}/handled`), box.checked || null).catch(() => {
+            box.checked = !box.checked;
+            enquiryError.textContent = admin.saveFailed;
+          });
+        };
+        li.querySelector('dl')!.append(
+          ...Object.entries(fields).flatMap(([key, value]) => [
+            Object.assign(document.createElement('dt'), { textContent: key }),
+            Object.assign(document.createElement('dd'), {
+              textContent: typeof value === 'string' ? value : JSON.stringify(value),
+            }),
+          ]),
+        );
+        return li;
+      }),
+    );
+    $('enquiries-empty').hidden = ids.length > 0;
+    if (focused)
+      enquiryList.querySelector<HTMLElement>(`[data-id="${CSS.escape(focused)}"]`)?.focus();
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    unsubscribe?.();
+    unsubscribe = undefined;
+    inbox.hidden = true;
+    // /admin shows the sign-in, or says this account has no access.
+    if (!user) return location.replace('/admin');
+    // Forced refresh, as on /admin: a claim granted after sign-in shows up on the next load.
+    const { claims } = await user.getIdTokenResult(true);
+    if (claims.admin !== true) return location.replace('/admin');
+    // ponytail: the whole `/enquiries` tree, fine to a few thousand records.
+    // orderByChild('createdAt') + limitToLast, with an `.indexOn` rule, is the upgrade.
+    unsubscribe = onValue(
+      ref(db, 'enquiries'),
+      (snapshot) => {
+        enquiries = snapshot.val() ?? {};
+        renderEnquiries();
+      },
+      () => (enquiryError.textContent = admin.saveFailed),
+    );
+    inbox.hidden = false;
+  });
+</script>
+
+<style>
+  main {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: var(--gutter-mobile);
+  }
+  /* :not([hidden]) — a display rule would otherwise beat the hidden attribute. */
+  section:not([hidden]) {
+    display: grid;
+    gap: 1rem;
+  }
+  ol {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1rem;
+    padding-bottom: 1rem;
+  }
+  li:has(:checked) {
+    color: var(--ink-muted);
+  }
+  label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  input {
+    min-height: var(--tap);
+  }
+  dl {
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0;
+  }
+  dd {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  #enquiry-error:empty {
+    display: none;
+  }
+</style>

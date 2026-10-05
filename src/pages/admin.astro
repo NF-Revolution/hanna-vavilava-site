@@ -11,8 +11,8 @@
  * Photos (E2.5) upload to Storage as they are dropped, downscaled and
  * stripped of EXIF by `photo.ts`, and join the form as rows of fields.
  * Publish (E2.6) calls the `publish` Function in `functions/` and watches the
- * deploy it starts. The enquiry inbox (E2.7) lists `/enquiries` live, newest
- * first, and ticks them handled. X-ray PDFs (E2.10) go straight to R2 on a
+ * deploy it starts. The enquiry inbox (E2.7) lives on /admin/zapytania since
+ * E2.14; this page only counts the unhandled ones, live. X-ray PDFs (E2.10) go straight to R2 on a
  * presigned PUT from the `xrayUpload` Function, byte for byte, once a tick says
  * page 1 names no private owner; Save deletes the ones the form let go.
  *
@@ -162,10 +162,8 @@ const hints: Record<string, string> = {
         <section id="list-view">
           <section>
             <h2>{a.enquiries}</h2>
-            <ol id="enquiries"></ol>
-            <p id="enquiries-empty" hidden>
-              {a.enquiriesEmpty}
-            </p>
+            <p id="enquiry-count" role="status"></p>
+            <a href="/admin/zapytania">{a.enquiriesOpen}</a>
             <p id="enquiry-error" role="alert"></p>
           </section>
 
@@ -338,17 +336,6 @@ const hints: Record<string, string> = {
           </li>
         </template>
 
-        <template id="enquiry-row">
-          <li>
-            <time data-when></time>
-            <label>
-              <input type="checkbox" data-handled />
-              {a.handled}
-            </label>
-            <dl></dl>
-          </li>
-        </template>
-
         <template id="photo-row">
           <li>
             <img alt="" width="160" height="120" />
@@ -422,9 +409,11 @@ const hints: Record<string, string> = {
   import { getDatabase, onValue, ref, set, update } from 'firebase/database';
   import { getFunctions, httpsCallable } from 'firebase/functions';
   import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+  import { isHandled } from '../enquiry';
   import { firebaseConfig, photoUrl } from '../firebase';
   import { horseSchema } from '../horse';
   import { fromFields, halfPairs, toFields } from '../horse-form';
+  import { plural } from '../i18n/format';
   import { admin } from '../i18n/pl.json';
   import { media, xrayMaxBytes } from '../media';
   import { downscale, photoKey } from '../photo';
@@ -960,61 +949,17 @@ const hints: Record<string, string> = {
   });
 
   /*
-   * The enquiry inbox (E2.7). E5.3 writes each record with `createdAt` (ms) and
-   * the form's fields; `handled` is the panel's own, `true` or absent. The values
-   * are anonymous public input, so they only ever reach the page as textContent.
-   *
-   * ponytail: field keys are shown raw — E5.1 has not fixed the field set yet.
-   * Polish labels for them are the upgrade once it has.
+   * The enquiry count (E2.14): how many are still unhandled, live, so one that
+   * lands while the panel is open shows up at once. The list is /admin/zapytania.
    */
-  const enquiryList = $('enquiries');
-  const enquiryRow = $<HTMLTemplateElement>('enquiry-row');
+  const enquiryCount = $('enquiry-count');
   const enquiryError = $('enquiry-error');
-  let enquiries: Record<string, Stored> = {};
 
-  function renderEnquiries() {
-    // Rows are rebuilt on every change, so the focused checkbox is found again by id.
-    const focused = (document.activeElement as HTMLElement | null)?.dataset.id;
-    // Newest first, never by `handled`, so a row stays put when it is ticked.
-    const ids = Object.keys(enquiries).sort(
-      (x, y) => (enquiries[y].createdAt ?? 0) - (enquiries[x].createdAt ?? 0),
-    );
-    enquiryList.replaceChildren(
-      ...ids.map((id) => {
-        const { createdAt, handled, ...fields } = enquiries[id];
-        const li = enquiryRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
-        const when = li.querySelector('time')!;
-        const box = li.querySelector<HTMLInputElement>('[data-handled]')!;
-        if (typeof createdAt === 'number') {
-          when.dateTime = new Date(createdAt).toISOString();
-          when.textContent = new Date(createdAt).toLocaleString('pl-PL', {
-            timeZone: 'Europe/Warsaw',
-          });
-        }
-        box.checked = handled === true;
-        box.dataset.id = id;
-        box.setAttribute('aria-label', `${admin.handled}: ${when.textContent || id}`);
-        box.onchange = () => {
-          enquiryError.textContent = '';
-          set(ref(db, `enquiries/${id}/handled`), box.checked || null).catch(() => {
-            box.checked = !box.checked;
-            enquiryError.textContent = admin.saveFailed;
-          });
-        };
-        li.querySelector('dl')!.append(
-          ...Object.entries(fields).flatMap(([key, value]) => [
-            Object.assign(document.createElement('dt'), { textContent: key }),
-            Object.assign(document.createElement('dd'), {
-              textContent: typeof value === 'string' ? value : JSON.stringify(value),
-            }),
-          ]),
-        );
-        return li;
-      }),
-    );
-    $('enquiries-empty').hidden = ids.length > 0;
-    if (focused)
-      enquiryList.querySelector<HTMLElement>(`[data-id="${CSS.escape(focused)}"]`)?.focus();
+  function countEnquiries(enquiries: Record<string, Stored>) {
+    const waiting = Object.values(enquiries).filter((e) => !isHandled(e)).length;
+    enquiryCount.textContent = waiting
+      ? plural('pl', admin.enquiriesWaiting, waiting)
+      : admin.enquiriesNone;
   }
 
   $('add').addEventListener('click', () => open(null));
@@ -1048,10 +993,7 @@ const hints: Record<string, string> = {
       ),
       onValue(
         ref(db, 'enquiries'),
-        (snapshot) => {
-          enquiries = snapshot.val() ?? {};
-          renderEnquiries();
-        },
+        (snapshot) => countEnquiries(snapshot.val() ?? {}),
         () => (enquiryError.textContent = admin.saveFailed),
       ),
     ];
@@ -1206,24 +1148,6 @@ const hints: Record<string, string> = {
   }
   [data-status] {
     color: var(--ink-muted);
-  }
-  #enquiries li {
-    padding-bottom: 1rem;
-  }
-  #enquiries li:has(:checked) {
-    color: var(--ink-muted);
-  }
-  #enquiries dl {
-    flex-basis: 100%;
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 0.25rem 1rem;
-    margin: 0;
-  }
-  #enquiries dd {
-    margin: 0;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
   }
   #errors:empty,
   #list-error:empty,
