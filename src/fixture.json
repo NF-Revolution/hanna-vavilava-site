@@ -87,7 +87,18 @@
         }
       },
       "videos": [],
-      "photos": []
+      "photos": [
+        {
+          "key": "photos/red-bull/8b1f2baa.jpg",
+          "alt": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
+          "caption": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+        },
+        {
+          "key": "photos/red-bull/c7856957.jpg",
+          "alt": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
+          "caption": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+        }
+      ]
     },
     "norton": {
       "name": "Norton",

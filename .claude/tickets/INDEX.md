@@ -539,3 +539,13 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   main-unit form. Registry court and share capital are shown because KSH art. 206 §1
   requires them on a sp. z o.o.'s website (#61). The homepage and menu have no
   footer by design (#13), so the legal block is one click away there.
+- The public JavaScript budget is 4 KB of a page's own inline JS, not 1 KB (E4.13, #154). The
+  1 KB figure had no source: the scaffold shipped 364 B and the line in `AGENTS.md` rounded it
+  up. No ticket, comment or the Astro docs give a reason for it, and Astro sets no limit of its
+  own. Its one size number is Vite's `build.assetsInlineLimit`, 4 KB by default, past which a
+  processed `<script>` stops being inlined and costs a request of its own; that is the new
+  ceiling. The rules that carry the weight stay: no framework, no hydrated islands, every
+  public page works without JavaScript. The analytics beacon now fits inside the budget and
+  is no longer an exception: a horse page with photos carries about 1.4 KB plus the 821 B
+  beacon. Turnstile's `api.js` stays the one exception, because it is third-party and loads
+  only on a form's first focus. The E6.6 and E5.6 lines above describe the old 1 KB budget.

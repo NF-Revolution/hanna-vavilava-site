@@ -63,7 +63,7 @@ Repo: `NF-Revolution/hanna-vavilava-site`. Every `gh` call carries
 - **high** — a real defect someone hits. Wrong behaviour on a reachable path; an architectural
   gap that forces the next ticket to rework this one (a build-time database read that fails
   open and deploys an empty catalogue); an `AGENTS.md` invariant broken with a visible effect —
-  a hydrated island or public JavaScript over 1 KB, a hardcoded URL that breaks hreflang or a
+  a hydrated island or a public page's own inline JavaScript over 4 KB, a hardcoded URL that breaks hreflang or a
   link, a string present in one locale only.
 
 Everything else is dropped silently: style, naming, refactors, "consider", missing tests,
