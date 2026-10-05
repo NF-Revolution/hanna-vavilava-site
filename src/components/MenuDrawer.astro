@@ -52,6 +52,17 @@ const dict = t(locale);
     dialog.addEventListener('close', () => {
       document.body.style.removeProperty('overflow');
     });
+
+    // The dialog fills the viewport, so a click beside the panel lands on the
+    // dialog itself, never ::backdrop. Check where the press began too, so a
+    // text selection dragged out of the panel does not close it.
+    let pressedOutside = false;
+    dialog.addEventListener('pointerdown', (event) => {
+      pressedOutside = event.target === dialog;
+    });
+    dialog.addEventListener('click', (event) => {
+      if (pressedOutside && event.target === dialog) dialog.close();
+    });
   }
 </script>
 
