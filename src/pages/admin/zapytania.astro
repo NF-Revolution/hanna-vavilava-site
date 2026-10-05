@@ -31,6 +31,9 @@ const a = dict.admin;
     <main id="main">
       <a href="/admin">{a.backToPanel}</a>
       <h1>{a.enquiries}</h1>
+      <p>
+        <a href="/admin/poradnik#zapytania">{a.retentionGuide}</a>
+      </p>
 
       <section id="inbox" hidden>
         <ol id="enquiries"></ol>
@@ -47,6 +50,10 @@ const a = dict.admin;
             <input type="checkbox" data-handled />
             {a.handled}
           </label>
+          <label>
+            <input type="checkbox" data-sale />
+            {a.sale}
+          </label>
           <dl></dl>
         </li>
       </template>
@@ -57,7 +64,7 @@ const a = dict.admin;
 <script>
   import { initializeApp } from 'firebase/app';
   import { getAuth, onAuthStateChanged } from 'firebase/auth';
-  import { getDatabase, onValue, ref, set } from 'firebase/database';
+  import { getDatabase, onValue, ref, serverTimestamp, set, update } from 'firebase/database';
   import { isHandled } from '../../enquiry';
   import { firebaseConfig } from '../../firebase';
   import { admin } from '../../i18n/pl.json';
@@ -76,7 +83,9 @@ const a = dict.admin;
 
   /*
    * E5.3 writes each record with `createdAt` (ms) and the form's fields;
-   * `handled` is the panel's own, `true` or absent. The values are anonymous
+   * `handled`, `handledAt` and `sale` are the panel's own, and the daily
+   * `retention` Function deletes a handled record six months after `handledAt`
+   * unless `sale` is set (E7.7). The values are anonymous
    * public input, so they only ever reach the page as textContent.
    *
    * ponytail: field keys are shown raw — E5.1 has not fixed the field set yet.
@@ -91,10 +100,11 @@ const a = dict.admin;
     );
     enquiryList.replaceChildren(
       ...ids.map((id) => {
-        const { createdAt, handled, ...fields } = enquiries[id];
+        const { createdAt, handled, handledAt, sale, ...fields } = enquiries[id];
         const li = enquiryRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
         const when = li.querySelector('time')!;
         const box = li.querySelector<HTMLInputElement>('[data-handled]')!;
+        const saleBox = li.querySelector<HTMLInputElement>('[data-sale]')!;
         if (typeof createdAt === 'number') {
           when.dateTime = new Date(createdAt).toISOString();
           when.textContent = new Date(createdAt).toLocaleString('pl-PL', {
@@ -104,14 +114,27 @@ const a = dict.admin;
         box.checked = isHandled({ handled });
         box.dataset.id = id;
         box.setAttribute('aria-label', `${admin.handled}: ${when.textContent || id}`);
-        box.onchange = () => {
+        // `null` deletes a field rather than leaving a `false` nobody reads.
+        const save = (input: HTMLInputElement, write: Promise<void>) => {
           enquiryError.textContent = '';
-          // `null` deletes the flag rather than leaving a `false` nobody reads.
-          set(ref(db, `enquiries/${id}/handled`), box.checked || null).catch(() => {
-            box.checked = !box.checked;
+          write.catch(() => {
+            input.checked = !input.checked;
             enquiryError.textContent = admin.saveFailed;
           });
         };
+        box.onchange = () =>
+          save(
+            box,
+            update(ref(db, `enquiries/${id}`), {
+              handled: box.checked || null,
+              handledAt: box.checked ? serverTimestamp() : null,
+            }),
+          );
+        saleBox.checked = sale === true;
+        saleBox.dataset.id = `${id}/sale`;
+        saleBox.setAttribute('aria-label', `${admin.sale}: ${when.textContent || id}`);
+        saleBox.onchange = () =>
+          save(saleBox, set(ref(db, `enquiries/${id}/sale`), saleBox.checked || null));
         li.querySelector('dl')!.append(
           ...Object.entries(fields).flatMap(([key, value]) => [
             Object.assign(document.createElement('dt'), { textContent: key }),

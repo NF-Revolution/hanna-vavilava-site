@@ -137,3 +137,22 @@ export const sentPath = { pl: '/zapytanie/wyslane', en: '/en/enquiry/sent' };
 
 /* Where a refused or failed post lands (E5.7); the same mirror, of `enquiryFailed`. */
 export const failedPath = { pl: '/zapytanie/niewyslane', en: '/en/enquiry/not-sent' };
+
+/*
+ * The privacy notice's promise (E7.7): a handled enquiry is deleted six months after
+ * `handledAt`, and one marked `sale` never, because tax law keeps it. Returned as one
+ * `update()` on `/enquiries`, where `null` deletes. A record handled before `handledAt`
+ * existed gets today as its clock, so it expires on time instead of never.
+ * Calendar months: past a month end the cutoff overflows and deletes a day or two early.
+ */
+export function expired(all, now = Date.now()) {
+  const cutoff = new Date(now);
+  cutoff.setMonth(cutoff.getMonth() - 6);
+  const update = {};
+  for (const [id, e] of Object.entries(all ?? {})) {
+    if (e?.handled !== true || e.sale === true) continue;
+    if (typeof e.handledAt !== 'number') update[`${id}/handledAt`] = now;
+    else if (e.handledAt < cutoff.getTime()) update[id] = null;
+  }
+  return update;
+}

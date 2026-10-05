@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { enquiryEmail, enquirySchema, parseEnquiry } from '../functions/enquiry.js';
+import { enquiryEmail, enquirySchema, expired, parseEnquiry } from '../functions/enquiry.js';
 import { telegramMessage } from '../functions/notify.js';
 import en from '../src/i18n/en.json' with { type: 'json' };
 import pl from '../src/i18n/pl.json' with { type: 'json' };
@@ -106,6 +106,25 @@ test('the email names the horse, links back on WhatsApp and skips empty fields',
     enquiryEmail(parseEnquiry({ ...valid, instagram: '@hv.stable' })).text,
     /^Instagram: https:\/\/instagram\.com\/hv\.stable$/m,
   );
+});
+
+test('a handled enquiry expires six months after handledAt, a sale never (E7.7)', () => {
+  const now = Date.UTC(2026, 9, 5);
+  const ago = (months) => Date.UTC(2026, 9 - months, 5);
+  assert.deepEqual(
+    expired(
+      {
+        old: { handled: true, handledAt: ago(7) },
+        recent: { handled: true, handledAt: ago(5) },
+        sold: { handled: true, handledAt: ago(7), sale: true },
+        open: { createdAt: ago(9) },
+        legacy: { handled: true, createdAt: ago(9) },
+      },
+      now,
+    ),
+    { old: null, 'legacy/handledAt': now },
+  );
+  assert.deepEqual(expired(null, now), {});
 });
 
 test('the schema and both dictionaries offer the same select codes', () => {

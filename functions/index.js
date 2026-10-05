@@ -43,12 +43,24 @@
  * the hosting that carries them, with the database rules for its email index. It needs
  * `ANNOUNCE_TOKEN`, another long random string, set to the same value as the GitHub
  * Actions secret of that name: `deploy.yml` sends it to announce new horses. Its
- * `subscribersCleanup` is the third Cloud Scheduler job, still inside the free three.
+ * `retention` is the third Cloud Scheduler job, still inside the free three.
  *
  *   npx firebase-tools@15 functions:secrets:set ANNOUNCE_TOKEN --project hanna-vavilava-site
  *   gh secret set ANNOUNCE_TOKEN --repo NF-Revolution/hanna-vavilava-site
- *   npx firebase-tools@15 deploy --only database,functions:newHorses,functions:subscribersCleanup \
+ *   npx firebase-tools@15 deploy --only database,functions:newHorses,functions:retention \
  *     --project hanna-vavilava-site
+ *
+ * `retention` was `subscribersCleanup` until E7.7 (#142) gave it the enquiries too. Its
+ * first deploy leaves the old job running, so delete that one once, by hand:
+ *
+ *   npx firebase-tools@15 functions:delete subscribersCleanup --region europe-central2 \
+ *     --project hanna-vavilava-site
+ *
+ * The error policy now names `retention`, so re-apply it over the live one. <POLICY> is
+ * the `name` that `gcloud monitoring policies list --project hanna-vavilava-site` prints:
+ *
+ *   gcloud monitoring policies update <POLICY> --project hanna-vavilava-site \
+ *     --policy-from-file monitoring/errors.policy.json
  *
  * Cloud Monitoring watches both of them, and it mails the developer, never Hanna. It
  * needs one email channel, an uptime check (a 405 on GET counts as up), and the two
@@ -86,7 +98,7 @@ import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { enquiryEmail, failedPath, parseEnquiry, sentPath } from './enquiry.js';
+import { enquiryEmail, expired, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import {
   announceEmail,
@@ -800,8 +812,12 @@ export const newHorses = onRequest(
   },
 );
 
-/* What the privacy notice promises: an unconfirmed signup is gone after 7 days. */
-export const subscribersCleanup = onSchedule(
+/*
+ * What the privacy notice promises, once a day in one job: an unconfirmed signup is
+ * gone after 7 days, and a handled enquiry six months after it was handled (E7.7).
+ * The mailbox and Telegram copies are the monthly routine in `/admin/poradnik`.
+ */
+export const retention = onSchedule(
   { schedule: '0 4 * * *', timeZone: 'Europe/Warsaw', region: 'europe-central2' },
   async () => {
     const list = getDatabase().ref('subscribers');
@@ -811,5 +827,13 @@ export const subscribersCleanup = onSchedule(
     );
     if (stale.length) await list.update(Object.fromEntries(stale.map((id) => [id, null])));
     logger.info(`notify: deleted ${stale.length} unconfirmed signup(s)`);
+
+    const enquiries = getDatabase().ref('enquiries');
+    const update = expired((await enquiries.get()).val());
+    const deleted = Object.values(update).filter((v) => v === null).length;
+    if (Object.keys(update).length) await enquiries.update(update);
+    logger.info(
+      `enquiry: deleted ${deleted}, started the clock on ${Object.keys(update).length - deleted}`,
+    );
   },
 );

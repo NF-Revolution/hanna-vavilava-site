@@ -15,7 +15,7 @@ export const from = 'Hanna Vavilava <konie@nfrevolution.com>';
 export const replyTo = 'kontakt@nfrevolution.com';
 const operator = 'CEWET TAS sp. z o.o., ul. Kąty Grodziskie 19J lok. 5, 03-289 Warszawa';
 
-/* An unconfirmed signup expires after this, and `subscribersCleanup` deletes it. */
+/* An unconfirmed signup expires after this, and `retention` (index.js) deletes it. */
 export const confirmWindow = 7 * 24 * 60 * 60 * 1000;
 
 const routes = {
