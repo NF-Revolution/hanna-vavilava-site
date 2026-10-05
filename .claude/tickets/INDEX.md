@@ -75,6 +75,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.6 point-of-collection     | #62                | done — `FormNotice.astro` in every send row, no checkbox, canvas v50        |
 | E7.4 technology statement    | #60                | done — `#cookies` section in the privacy notice, footer links, canvas v51   |
 | E7.8 no Russian              | #152               | done — footer languages and bio in both dictionaries, canvas v57            |
+| E7.7 retention purge         | #142               | done — daily `retention` job, `handledAt` + `sale`, monthly routine         |
 | E0.1 video hosting           | #1                 | decided — Cloudflare R2, setup is #69                                       |
 | E0.2 price display           | #2                 | decided — price per horse, `null` = on request                              |
 | E0.3 seller identity         | #3                 | decided — per-horse kind; operator values landed in #61                     |

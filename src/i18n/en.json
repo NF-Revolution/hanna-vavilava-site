@@ -555,6 +555,8 @@
     "enquiriesOpen": "Open enquiries",
     "backToPanel": "← Admin",
     "handled": "Handled",
+    "sale": "Sale — keep",
+    "retentionGuide": "Monthly clean-up: mailbox and Telegram",
     "horses": "Horses",
     "add": "Add horse",
     "empty": "No horses.",

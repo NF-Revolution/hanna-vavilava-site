@@ -1,6 +1,7 @@
 ---
 /*
- * The photo and X-ray intake guide (E3.6) — owner documentation, not site UI.
+ * The photo and X-ray intake guide (E3.6), and since E7.7 the monthly enquiry
+ * clean-up the privacy notice relies on — owner documentation, not site UI.
  * Standalone like /admin: noindex, not in routes.ts, no /en twin. No sign-in,
  * because nothing here is secret and a gate would need the Firebase script.
  *
@@ -24,7 +25,7 @@ const xrayMb = xrayMaxBytes / 1024 / 1024;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Zdjęcia i RTG — poradnik</title>
+    <title>Zdjęcia, RTG i zapytania — poradnik</title>
   </head>
   <body>
     <a class="skip-link" href="#main">
@@ -168,6 +169,37 @@ const xrayMb = xrayMaxBytes / 1024 / 1024;
         </li>
       </ul>
       <p>W panelu to pola RTG: Liczba zdjęć, Data badania, Zakres.</p>
+
+      <!--
+        ponytail: a written routine, because a bot cannot delete its Telegram messages
+        after 48 hours and the mailbox needs Microsoft Graph credentials. Graph plus a
+        user-session Telegram client is the upgrade if months get skipped. Five months,
+        not six: run monthly, a copy never outlives the six the privacy notice promises.
+      -->
+      <h2 id="zapytania">Zapytania — porządki co miesiąc</h2>
+      <p>
+        Polityka prywatności obiecuje, że zapytanie znika sześć miesięcy po załatwieniu. Z bazy
+        usuwa je strona sama, co noc. Kopie w skrzynce i na Telegramie usuwasz Ty — raz w miesiącu,
+        np. pierwszego dnia miesiąca.
+      </p>
+      <ol>
+        <li>
+          <b>Skrzynka kontakt@</b> — w Outlooku wyszukaj wiadomości od
+          <b>formularz@nfrevolution.com</b> starsze niż <b>5 miesięcy</b>, zaznacz wszystkie i usuń.
+          Potem opróżnij folder <b>Elementy usunięte</b>.
+        </li>
+        <li>
+          <b>Telegram</b> — w czacie z botem zaznacz powiadomienia starsze niż <b>5 miesięcy</b> i
+          usuń je. W prywatnym czacie możesz usunąć każdą wiadomość, w grupie trzeba być
+          administratorem.
+        </li>
+      </ol>
+      <p>
+        Zapytanie, które skończyło się sprzedażą konia, zaznacz w panelu jako
+        <b>Sprzedaż — nie usuwać</b>. Wtedy baza je zachowuje, bo wymagają tego przepisy podatkowe —
+        kopie ze skrzynki i Telegrama i tak usuń. Po 5 latach od końca roku sprzedaży usuń je
+        ręcznie w konsoli Firebase.
+      </p>
     </main>
   </body>
 </html>
