@@ -15,7 +15,7 @@ import WhatsApp from './icons/WhatsApp.astro';
 import { t, type Locale } from '../i18n';
 import { fill } from '../i18n/format';
 import { path } from '../i18n/routes';
-import { site, whatsappHref } from '../site';
+import { site, stables, whatsappHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -57,7 +57,9 @@ const echo = String.raw`const n=decodeURIComponent(location.hash.slice(1));if(/^
             <li class="step">
               <span class="lbl step-num">{String(i + 1).padStart(2, '0')}</span>
               <span class="lbl">{step.title}</span>
-              <p class="copy step-text">{fill(step.text, { phone: site.phone })}</p>
+              <p class="copy step-text">
+                {fill(step.text, { phone: site.phone, stables: stables.name })}
+              </p>
             </li>
           ))}
         </ol>

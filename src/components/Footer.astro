@@ -8,7 +8,7 @@
 import { t, htmlLang, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
 import { fill } from '../i18n/format';
-import { site, operator, whatsappHref, telegramHref, emailHref, phoneHref } from '../site';
+import { site, operator, stables, whatsappHref, telegramHref, emailHref, phoneHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -34,7 +34,9 @@ const contacts = [
       <a class="foot-wordmark" href={path(locale, 'home')}>
         {dict.brand.name}
       </a>
-      <p class="lbl foot-address">{dict.footer.location}</p>
+      <p class="lbl foot-address">
+        {fill(dict.footer.location, { stables: stables.name, town: stables.town })}
+      </p>
       <!-- The operator, not the seller of any one horse: that is a line on the horse's page (#3). -->
       <p class="lbl foot-address">
         {operator.name}

@@ -120,7 +120,7 @@
     "registry": "KRS {krs} · NIP {nip} · REGON {regon}",
     "court": "{court} · kapitał zakładowy {capital}",
     "stock": "Sprzedaję własne konie i oferuję konie klientów — dane właściciela przekazuję przed umową.",
-    "location": "40 km od Warszawy, Polska",
+    "location": "{stables}, {town} · 40 km od Warszawy, Polska",
     "languages": "Polski · English",
     "vetting": "Badanie przedzakupowe — weterynarza wybiera kupujący",
     "footage": "Pełne nagranie bez cięć na życzenie",
@@ -250,7 +250,7 @@
         },
         {
           "title": "Oglądanie",
-          "text": "Osobiście w stajni pod Warszawą, z trenerem, jeśli Państwo z nim pracują — albo przez zaufanego przedstawiciela, jeśli przyjazd nie jest możliwy."
+          "text": "Osobiście w stajni {stables} pod Warszawą, z trenerem, jeśli Państwo z nim pracują — albo przez zaufanego przedstawiciela, jeśli przyjazd nie jest możliwy."
         },
         {
           "title": "Badanie przedzakupowe",
@@ -300,7 +300,7 @@
         },
         {
           "q": "Ile trwa umówienie oglądania?",
-          "a": "Od trzech do pięciu dni roboczych. Konie są w treningu — potrzebuję jednego dnia na przygotowanie konia i uzgodnienie jeźdźca do prezentacji."
+          "a": "Od trzech do pięciu dni roboczych. Oglądanie odbywa się w stajni {stables}. Konie są w treningu — potrzebuję jednego dnia na przygotowanie konia i uzgodnienie jeźdźca do prezentacji."
         }
       ],
       "band": "Pytanie, na które nie ma tu odpowiedzi? Odpowiadam w ciągu godziny, {hours}.",
@@ -348,7 +348,7 @@
         },
         {
           "title": "Rozmowa i spotkanie",
-          "text": "Umówimy rozmowę telefoniczną i spotkanie w stajni."
+          "text": "Umówimy rozmowę telefoniczną i spotkanie w stajni {stables}."
         }
       ],
       "whatsapp": "Napisz teraz na WhatsApp",
