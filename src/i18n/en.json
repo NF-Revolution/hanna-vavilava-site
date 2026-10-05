@@ -545,6 +545,15 @@
     "noAccess": "This account has no access to the panel.",
     "enquiries": "Enquiries",
     "enquiriesEmpty": "No enquiries.",
+    "enquiriesWaiting": {
+      "one": "{count} new enquiry.",
+      "few": "{count} new enquiries.",
+      "many": "{count} new enquiries.",
+      "other": "{count} new enquiries."
+    },
+    "enquiriesNone": "No new enquiries.",
+    "enquiriesOpen": "Open enquiries",
+    "backToPanel": "← Admin",
     "handled": "Handled",
     "horses": "Horses",
     "add": "Add horse",

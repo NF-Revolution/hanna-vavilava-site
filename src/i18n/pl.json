@@ -545,6 +545,15 @@
     "noAccess": "To konto nie ma dostępu do panelu.",
     "enquiries": "Zapytania",
     "enquiriesEmpty": "Brak zapytań.",
+    "enquiriesWaiting": {
+      "one": "{count} nowe zapytanie.",
+      "few": "{count} nowe zapytania.",
+      "many": "{count} nowych zapytań.",
+      "other": "{count} nowego zapytania."
+    },
+    "enquiriesNone": "Brak nowych zapytań.",
+    "enquiriesOpen": "Otwórz zapytania",
+    "backToPanel": "← Panel",
     "handled": "Załatwione",
     "horses": "Konie",
     "add": "Dodaj konia",
