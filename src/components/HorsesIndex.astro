@@ -50,7 +50,7 @@ const imageVw = [61, 61, 61, 70];
             <Photo
               photo={horse.photos[0]}
               locale={locale}
-              sizes={`(max-width: 720px) 100vw, ${imageVw[i % 4]}vw`}
+              sizes={`(max-width: 1024px) 100vw, ${imageVw[i % 4]}vw`}
               hero={i === 0}
             />
           )}
@@ -99,7 +99,7 @@ const imageVw = [61, 61, 61, 70];
 
   .entry {
     display: grid;
-    min-height: 700px;
+    align-items: center;
     grid-template-columns: 880fr 560fr;
     grid-template-areas: 'fig text';
   }
@@ -126,12 +126,18 @@ const imageVw = [61, 61, 61, 70];
     background: var(--placeholder);
   }
 
+  /*
+   * The photo sets the row height, not the other way round (#160): uncropped, it
+   * shows the whole horse at every width. A row-sized slot narrower than the photo
+   * cut the head off a side shot, even at 1440.
+   * ponytail: a portrait cover would make a tall row; the admin guide asks for a
+   * landscape one. Cap it with a max-height and `object-fit` if that ever happens.
+   */
   .fig :global(picture),
   .fig :global(img) {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
   }
 
   .text {
@@ -188,18 +194,24 @@ const imageVw = [61, 61, 61, 70];
     align-self: flex-start;
   }
 
+  /* Stacked well before 720, so the photo column never turns narrow (#160). */
+  @media (max-width: 1024px) {
+    .entry,
+    .entry:nth-child(n) {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'fig' 'text';
+    }
+
+    .text,
+    .entry:nth-child(n) .text {
+      padding: 40px var(--gutter) 56px;
+    }
+  }
+
   @media (max-width: 720px) {
     /* The date does not fit beside the label at 390; the board drops it. */
     .as-of {
       display: none;
-    }
-
-    .entry,
-    .entry:nth-child(n) {
-      min-height: 0;
-      grid-template-columns: 1fr;
-      grid-template-rows: 420px auto;
-      grid-template-areas: 'fig' 'text';
     }
 
     .text,
