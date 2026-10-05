@@ -121,20 +121,26 @@ const imageVw = [61, 61, 61, 70];
   /*
    * The photo frame sets the row height, not the other way round (#160): a 3:2 cover
    * fills it uncropped, so the whole horse shows at every width. A row-sized slot
-   * narrower than the photo cut the head off a side shot, even at 1440. The shape
-   * is on the frame, not left to the <img>: Safari sized the row before the lazy
-   * photo had a height, and left bands or overlapping rows.
-   * ponytail: fixed 3:2 — a 4:3 upload loses about 5% top and bottom, a 16:9 one
-   * about 8% each side. Set a per-photo `aspect-ratio` from the size `Photo.astro`
-   * reads at build if covers stop being 3:2.
+   * narrower than the photo cut the head off a side shot, even at 1440.
+   * The height is written out in `vw` (the list runs edge to edge, so the column is
+   * a known share of the viewport), never left for the grid to derive. Safari does
+   * not re-size a grid row whose item takes its height from `aspect-ratio` or from
+   * the <img>. After a resize the rows went stale and the photos overlapped.
+   * ponytail: fixed 3:2. A 4:3 upload loses about 5% top and bottom, a 16:9 one
+   * about 8% each side. `vw` also counts a classic scrollbar, so the frame is about
+   * 1% too tall there. Use `cqw` with `container-type: inline-size` on `.entries`
+   * if either matters.
    */
   .fig {
     grid-area: fig;
     margin: 0;
-    min-height: 0;
-    aspect-ratio: 3 / 2;
+    height: calc(100vw * 880 / 1440 * 2 / 3);
     overflow: hidden;
     background: var(--placeholder);
+  }
+
+  .entry:nth-child(4n) .fig {
+    height: calc(100vw * 1000 / 1440 * 2 / 3);
   }
 
   .fig :global(picture),
@@ -205,6 +211,11 @@ const imageVw = [61, 61, 61, 70];
     .entry:nth-child(n) {
       grid-template-columns: 1fr;
       grid-template-areas: 'fig' 'text';
+    }
+
+    .fig,
+    .entry:nth-child(n) .fig {
+      height: calc(100vw * 2 / 3);
     }
 
     .text,
