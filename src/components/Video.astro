@@ -6,10 +6,10 @@
  *
  * The facade is the browser's own: `preload="none"` downloads nothing but the
  * poster until the visitor presses play, from the first-party media host, so
- * no third party sees the page and no cookie is set (#1). No script — a poster
- * button that swaps in <video autoplay> would cost ~250 B, and beside the
- * drawer and the gallery that breaks the 1 KB public-JS budget. The boards'
- * own play glyph gave way to the native control for the same reason.
+ * no third party sees the page and no cookie is set (#1). No script, and the
+ * boards' own play glyph gave way to the native control.
+ * ponytail: a poster button that swaps in <video autoplay> (~250 B) fits the
+ * 4 KB budget now; add it if the drawn glyph is wanted.
  *
  * The transcripts are text in the page, both languages with the page's own
  * first, because the boards draw "PL / EN" and it is the indexable asset #52

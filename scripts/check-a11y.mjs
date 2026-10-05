@@ -129,7 +129,9 @@ function checkPage(file, failures) {
     }
   }
   for (const [, tag, attrs, inner] of html.matchAll(/<(a|button)\b([^>]*)>([\s\S]*?)<\/\1>/g)) {
-    if (text(inner) === '' && !named(attrs) && !/\stitle\s*=\s*"[^"]+"/.test(attrs)) {
+    // A child image's alt names the control too, as on the gallery thumbnails (E4.13).
+    const imgAlt = /<img\b[^>]*\salt\s*=\s*"[^"]+"/.test(inner);
+    if (text(inner) === '' && !imgAlt && !named(attrs) && !/\stitle\s*=\s*"[^"]+"/.test(attrs)) {
       fail(`<${tag}> with no text and no accessible name`);
     }
   }

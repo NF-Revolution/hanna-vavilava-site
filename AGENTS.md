@@ -7,8 +7,10 @@ enquiry in front of Hanna within an hour.
 ## Stack
 
 Astro, static output, TypeScript strict. Plain CSS custom properties, no
-framework, no CSS library, and no hydrated islands — public pages ship under
-1 KB of JavaScript and it stays that way. The Realtime Database holds the horses and is
+framework, no CSS library, and no hydrated islands. Every public page works with
+JavaScript off, and the page's own inline JavaScript stays under 4 KB — Vite's
+`assetsInlineLimit`, the size past which Astro would split a script into its own
+request. The Realtime Database holds the horses and is
 read at build time; the admin panel is the only client-rendered route.
 
 ## Conventions
