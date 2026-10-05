@@ -50,7 +50,7 @@ const imageVw = [61, 61, 61, 70];
             <Photo
               photo={horse.photos[0]}
               locale={locale}
-              sizes={`(max-width: 720px) 100vw, ${imageVw[i % 4]}vw`}
+              sizes={`(max-width: 1024px) 100vw, ${imageVw[i % 4]}vw`}
               hero={i === 0}
             />
           )}
@@ -99,7 +99,7 @@ const imageVw = [61, 61, 61, 70];
 
   .entry {
     display: grid;
-    min-height: 700px;
+    align-items: center;
     grid-template-columns: 880fr 560fr;
     grid-template-areas: 'fig text';
   }
@@ -118,10 +118,21 @@ const imageVw = [61, 61, 61, 70];
     grid-template-areas: 'text fig';
   }
 
+  /*
+   * The photo frame sets the row height, not the other way round (#160): a 3:2 cover
+   * fills it uncropped, so the whole horse shows at every width. A row-sized slot
+   * narrower than the photo cut the head off a side shot, even at 1440. The shape
+   * is on the frame, not left to the <img>: Safari sized the row before the lazy
+   * photo had a height, and left bands or overlapping rows.
+   * ponytail: fixed 3:2 — a 4:3 upload loses about 5% top and bottom, a 16:9 one
+   * about 8% each side. Set a per-photo `aspect-ratio` from the size `Photo.astro`
+   * reads at build if covers stop being 3:2.
+   */
   .fig {
     grid-area: fig;
     margin: 0;
     min-height: 0;
+    aspect-ratio: 3 / 2;
     overflow: hidden;
     background: var(--placeholder);
   }
@@ -188,18 +199,24 @@ const imageVw = [61, 61, 61, 70];
     align-self: flex-start;
   }
 
+  /* Stacked well before 720, so the photo column never turns narrow (#160). */
+  @media (max-width: 1024px) {
+    .entry,
+    .entry:nth-child(n) {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'fig' 'text';
+    }
+
+    .text,
+    .entry:nth-child(n) .text {
+      padding: 40px var(--gutter) 56px;
+    }
+  }
+
   @media (max-width: 720px) {
     /* The date does not fit beside the label at 390; the board drops it. */
     .as-of {
       display: none;
-    }
-
-    .entry,
-    .entry:nth-child(n) {
-      min-height: 0;
-      grid-template-columns: 1fr;
-      grid-template-rows: 420px auto;
-      grid-template-areas: 'fig' 'text';
     }
 
     .text,
