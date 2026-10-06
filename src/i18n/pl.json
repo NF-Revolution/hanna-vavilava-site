@@ -262,6 +262,11 @@
           "text": "Umowa pisemna z opisem konia, ceną i stanem zdrowia na dzień sprzedaży. Termin odbioru ustalamy na piśmie i omawiamy bezpośrednio."
         }
       ],
+      "map": {
+        "head": "Gdzie stoją konie",
+        "title": "Mapa Google: {stables}",
+        "open": "Otwórz w Mapach Google"
+      },
       "band": {
         "one": "{count} koń w stajni teraz.",
         "few": "{count} konie w stajni teraz.",
@@ -388,7 +393,8 @@
           "Powiadomienia o nowych koniach: adres e-mail, język oraz czas zapisu i jego potwierdzenia. Wysyłamy na ten adres wiadomość z linkiem potwierdzającym, a po potwierdzeniu jedną wiadomość, kiedy dochodzi nowy koń na sprzedaż. Podstawą jest zgoda (art. 6 ust. 1 lit. a RODO), będąca też zgodą na marketing bezpośredni drogą elektroniczną. Zgodę można wycofać w każdej chwili linkiem w każdej wiadomości, bez wpływu na zgodność z prawem wysyłki przed jej wycofaniem.",
           "Ochrona formularza: adres IP i dane przeglądarki pomagają odróżnić człowieka od bota i ograniczyć liczbę zapytań z jednego adresu. Adres IP nie jest zapisywany. Podstawą jest prawnie uzasadniony interes administratora, czyli ochrona kanału kontaktu przed spamem (art. 6 ust. 1 lit. f RODO).",
           "Działanie strony: przy każdym wejściu serwer przetwarza adres IP i dane żądania, aby dostarczyć stronę i chronić ją przed nadużyciami (art. 6 ust. 1 lit. f RODO).",
-          "Statystyki odwiedzin: liczymy odsłony i kilka zdarzeń, na przykład wysłanie zapytania. Statystyki nie używają plików cookie i niczego nie zapisują na urządzeniu. Wizyta jest rozpoznawana po skrócie adresu IP i przeglądarki z solą zmienianą codziennie, więc nie da się jej powiązać z osobą ani z wizytą z innego dnia. Adres strony jest wysyłany bez części po znaku #. Podstawą jest prawnie uzasadniony interes: wiedza, które części strony działają (art. 6 ust. 1 lit. f RODO)."
+          "Statystyki odwiedzin: liczymy odsłony i kilka zdarzeń, na przykład wysłanie zapytania. Statystyki nie używają plików cookie i niczego nie zapisują na urządzeniu. Wizyta jest rozpoznawana po skrócie adresu IP i przeglądarki z solą zmienianą codziennie, więc nie da się jej powiązać z osobą ani z wizytą z innego dnia. Adres strony jest wysyłany bez części po znaku #. Podstawą jest prawnie uzasadniony interes: wiedza, które części strony działają (art. 6 ust. 1 lit. f RODO).",
+          "Mapa na stronie „O mnie”: mapa wczytuje się z serwerów Google, gdy przewiniesz do niej stronę. Google otrzymuje wtedy adres IP i dane przeglądarki i może zapisać na urządzeniu własne pliki cookie. Podstawą jest prawnie uzasadniony interes: pokazanie, gdzie stoją konie, zanim kupujący umówi oglądanie (art. 6 ust. 1 lit. f RODO). Dalej Google przetwarza te dane jako odrębny administrator, na zasadach swojej polityki prywatności. Pliki cookie stron trzecich można zablokować w przeglądarce; adres stajni i link do Map Google stoją obok mapy."
         ]
       },
       "processors": {
@@ -424,7 +430,8 @@
       "transfers": {
         "h": "Przekazywanie danych poza EOG",
         "p": [
-          "Część dostawców ma siedzibę w USA. Jeśli dane trafiają poza Europejski Obszar Gospodarczy, podstawą są Ramy ochrony danych UE–USA (Data Privacy Framework) albo standardowe klauzule umowne zatwierdzone przez Komisję Europejską. Telegram działa poza EOG, a powiadomienia w nim podlegają jego polityce prywatności."
+          "Część dostawców ma siedzibę w USA. Jeśli dane trafiają poza Europejski Obszar Gospodarczy, podstawą są Ramy ochrony danych UE–USA (Data Privacy Framework) albo standardowe klauzule umowne zatwierdzone przez Komisję Europejską. Telegram działa poza EOG, a powiadomienia w nim podlegają jego polityce prywatności.",
+          "Mapa Google na stronie „O mnie” przekazuje adres IP do Google LLC w USA. Podstawą są Ramy ochrony danych UE–USA, w których Google LLC uczestniczy."
         ]
       },
       "xray": {
@@ -453,7 +460,7 @@
         "p": [
           "Podanie danych jest dobrowolne, ale bez pól oznaczonych jako wymagane nie możemy odpowiedzieć na zapytanie. Zapis na powiadomienia jest osobny od zapytania i nie jest warunkiem żadnej odpowiedzi.",
           "Dane nie służą do zautomatyzowanego podejmowania decyzji ani do profilowania. Weryfikacja Turnstile tylko odsiewa automaty i nie wywołuje wobec nikogo skutków prawnych.",
-          "Linki do WhatsApp i Telegrama otwierają rozmowę w tych aplikacjach. To, co tam piszesz, przetwarzają one na własnych zasadach, jako odrębni administratorzy."
+          "Linki do WhatsApp i Telegrama otwierają rozmowę w tych aplikacjach. To, co tam piszesz, przetwarzają one na własnych zasadach, jako odrębni administratorzy. Tak samo link do Map Google przy adresie stajni otwiera serwis Google."
         ]
       },
       "device": {
@@ -461,7 +468,8 @@
         "p": [
           "Strona nie ustawia plików cookie i niczego nie zapisuje na Twoim urządzeniu, dlatego nie prosi o zgodę. Przeglądarka sama przechowuje kopie stron i zdjęć w pamięci podręcznej, aby szybciej je wczytać; możesz ją wyczyścić w dowolnej chwili.",
           "Filmy to zwykłe pliki z naszej subdomeny {media}, a nie odtwarzacz osadzony z cudzego serwisu. Film na stronie konia pobiera się dopiero po naciśnięciu odtwarzania; wcześniej tylko kadr tytułowy. Krótka pętla na stronie głównej pobiera się od razu, chyba że przeglądarka prosi o ograniczenie ruchu lub oszczędzanie danych albo połączenie jest wolne. W obu przypadkach przeglądarka pobiera film z Cloudflare R2, który — jak każdy serwer — widzi adres IP i nie ustawia plików cookie. Odtworzenie liczymy w statystykach jako zdarzenie, również bez plików cookie.",
-          "Gdy zaczniesz wypełniać formularz zapytania lub zapisu na powiadomienia, strona wczytuje Cloudflare Turnstile. Cloudflare może wtedy zapisać na urządzeniu własne pliki cookie bezpieczeństwa. Są one niezbędne, aby odróżnić człowieka od bota, więc nie wymagają zgody."
+          "Gdy zaczniesz wypełniać formularz zapytania lub zapisu na powiadomienia, strona wczytuje Cloudflare Turnstile. Cloudflare może wtedy zapisać na urządzeniu własne pliki cookie bezpieczeństwa. Są one niezbędne, aby odróżnić człowieka od bota, więc nie wymagają zgody.",
+          "Mapa na stronie „O mnie” wczytuje się z Google, gdy przewiniesz do niej stronę. Google może wtedy zapisać na urządzeniu własne pliki cookie, na zasadach swojej polityki prywatności. Nasza strona ich nie ustawia ani nie odczytuje."
         ]
       },
       "turnstile": "Formularze zapytań i zapisu na powiadomienia są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",

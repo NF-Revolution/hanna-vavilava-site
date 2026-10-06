@@ -53,6 +53,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`                     |
 | E4.14 list whole horse       | #160               | done — photo sets the row height, stack at 1024, canvas v58                 |
 | E4.15 name the stables       | #164               | done — `stables` in `site.ts`, `{stables}` in four lines, canvas v59        |
+| E4.16 map of the stables     | #165               | done — lazy Google map, Google named in the notice, canvas v63–v65          |
 | E4.17 directions link        | #166               | done — `directionsHref` from lat/lng, footer + sent step 02, canvas v61     |
 | E4.18 whole entry opens      | #172               | done — stretched `.more::after`, hover/focus/touch states, canvas v62       |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
@@ -563,3 +564,11 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   unhandled in both. The inbox has no sign-in form of its own: a signed-out or non-admin visit is
   sent to `/admin`, which loses a deep link after sign-in. A shared gate is the upgrade. The E2.7
   line above describes the old placement.
+- The Google map on the about page is a plain lazy iframe (E4.16, #165). It loads as the visitor
+  scrolls to it, so Google gets the IP address and may set its own cookies without a consent
+  step. A click-to-load placeholder was built first and the owner rejected it on sight: the map
+  shown at once is worth more to a buyer than the gate. The notice names Google, the IP, the
+  cookies, legitimate interest and the DPF transfer. This sits against the GA4 reasoning above
+  (cookies need consent under ePrivacy art. 5(3)); if a regulator or a complaint ever presses
+  it, the click-to-load `srcdoc` version is in the history of #175. The Privacy boards carry the
+  notice word for word, so any privacy copy change edits them too.
