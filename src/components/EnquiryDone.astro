@@ -15,7 +15,7 @@ import WhatsApp from './icons/WhatsApp.astro';
 import { t, type Locale } from '../i18n';
 import { fill } from '../i18n/format';
 import { path } from '../i18n/routes';
-import { site, stables, whatsappHref } from '../site';
+import { site, stables, whatsappHref, directionsHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -60,6 +60,13 @@ const echo = String.raw`const n=decodeURIComponent(location.hash.slice(1));if(/^
               <p class="copy step-text">
                 {fill(step.text, { phone: site.phone, stables: stables.name })}
               </p>
+              {/* ponytail: the meeting step is index 1; a `link` field on the step if another needs one. */}
+              {i === 1 && (
+                <a class="lbl more step-link" href={directionsHref}>
+                  {sent.directions}
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
             </li>
           ))}
         </ol>
@@ -170,6 +177,10 @@ const echo = String.raw`const n=decodeURIComponent(location.hash.slice(1));if(/^
     padding-bottom: 8px;
     box-sizing: border-box;
     border-bottom: 1px solid var(--ink);
+  }
+
+  .step-link {
+    align-self: flex-start;
   }
 
   @media (max-width: 720px) {

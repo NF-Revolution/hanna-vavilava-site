@@ -8,7 +8,16 @@
 import { t, htmlLang, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
 import { fill } from '../i18n/format';
-import { site, operator, stables, whatsappHref, telegramHref, emailHref, phoneHref } from '../site';
+import {
+  site,
+  operator,
+  stables,
+  whatsappHref,
+  telegramHref,
+  emailHref,
+  phoneHref,
+  directionsHref,
+} from '../site';
 
 interface Props {
   locale: Locale;
@@ -36,6 +45,11 @@ const contacts = [
       </a>
       <p class="lbl foot-address">
         {fill(dict.footer.location, { stables: stables.name, town: stables.town })}
+        <br />
+        <a class="foot-directions" href={directionsHref}>
+          {dict.footer.directions}
+          <span aria-hidden="true">→</span>
+        </a>
       </p>
       <!-- The operator, not the seller of any one horse: that is a line on the horse's page (#3). -->
       <p class="lbl foot-address">
@@ -145,6 +159,15 @@ const contacts = [
     margin: 0;
     line-height: 1.7;
     color: var(--ink-muted);
+  }
+
+  /* Its own 44px line under the stables' name, not a 17px link inside the sentence (#166). */
+  .foot-directions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--tap);
+    color: var(--ink);
   }
 
   .foot-mail {

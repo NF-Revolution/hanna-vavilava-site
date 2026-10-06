@@ -53,6 +53,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.9 404 page                | #39                | done — `NotFound.astro`, text list of horses, `noindex`                     |
 | E4.14 list whole horse       | #160               | done — photo sets the row height, stack at 1024, canvas v58                 |
 | E4.15 name the stables       | #164               | done — `stables` in `site.ts`, `{stables}` in four lines, canvas v59        |
+| E4.17 directions link        | #166               | done — `directionsHref` from lat/lng, footer + sent step 02, canvas v61     |
 | E4.18 whole entry opens      | #172               | done — stretched `.more::after`, hover/focus/touch states, canvas v62       |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |

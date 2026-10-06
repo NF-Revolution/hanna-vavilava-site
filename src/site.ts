@@ -115,6 +115,8 @@ export const telegramHref = (text?: string): string =>
 export const emailHref = (subject?: string, body?: string): string =>
   `mailto:${site.email}${subject ? `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body ?? '')}` : ''}`;
 export const phoneHref = `tel:${site.phone.replace(/[^\d+]/g, '')}`;
+/* Coordinates, not the address: it geocodes to the village and the gate is on ul. Długa (#166). */
+export const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${stables.lat},${stables.lng}`;
 
 /*
  * Livejumping has no stable per-horse page (#108), so a horse links to its name search,
