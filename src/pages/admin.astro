@@ -49,6 +49,7 @@ const sections: [legend: string, fields: Field[]][] = [
       ['breed', 'text'],
       ['pedigree', 'text'],
       ['headline', 'pair'],
+      ['description', 'pair'],
     ],
   ],
   [
@@ -69,18 +70,11 @@ const sections: [legend: string, fields: Field[]][] = [
         .map((k): Field => [`facts.${k}`, 'pair']),
     ],
   ],
-  [
-    a.sections.fit,
-    [
-      ['suits', 'lines'],
-      ['notFor', 'lines'],
-    ],
-  ],
+  [a.sections.fit, [['suits', 'lines']]],
   [
     a.sections.health,
     [
       ['health.vaccinations', 'pair'],
-      ['health.dewormedOn', 'date'],
       ['health.knownIssues', 'pair'],
     ],
   ],
@@ -94,14 +88,6 @@ const sections: [legend: string, fields: Field[]][] = [
     ],
   ],
   [
-    a.sections.viewing,
-    [
-      ['viewing.lead', 'pair'],
-      ['viewing.airport', 'pair'],
-      ['viewing.visitDay', 'pair'],
-    ],
-  ],
-  [
     a.sections.media,
     [
       ['videos', 'json'],
@@ -110,6 +96,9 @@ const sections: [legend: string, fields: Field[]][] = [
     ],
   ],
 ];
+
+/* The description is Hanna's one free text (E4.20), so it gets room to write. */
+const rows = (path: string, kind: Kind) => (path === 'description' ? 8 : kind === 'lines' ? 4 : 2);
 
 const hints: Record<string, string> = {
   price: a.priceHint,
@@ -212,15 +201,11 @@ const hints: Record<string, string> = {
                     </legend>
                     <label>
                       PL
-                      <textarea name={`${path}.pl`} rows={kind === 'lines' ? 4 : 2}></textarea>
+                      <textarea name={`${path}.pl`} rows={rows(path, kind)}></textarea>
                     </label>
                     <label>
                       EN
-                      <textarea
-                        name={`${path}.en`}
-                        lang="en"
-                        rows={kind === 'lines' ? 4 : 2}
-                      ></textarea>
+                      <textarea name={`${path}.en`} lang="en" rows={rows(path, kind)}></textarea>
                     </label>
                   </fieldset>
                 ) : kind === 'photos' ? (

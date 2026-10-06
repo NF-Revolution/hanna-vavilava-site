@@ -1,8 +1,8 @@
 ---
 /*
- * One horse video — the sales film or the uncut round (E3.4) — under its
- * heading row, "Film sprzedażowy" and "1:48 · <note>" (E4.5), with its
- * transcripts. The detail page mounts it.
+ * One horse video (E3.4) under its heading row, the clip's own title and
+ * "1:48 · <note>" (E4.5), with its transcripts. The detail page mounts each
+ * in its videos strip (E4.20).
  *
  * The facade is the browser's own: `preload="none"` downloads nothing but the
  * poster until the visitor presses play, from the first-party media host, so
@@ -60,6 +60,7 @@ const duration = [
   .filter(Boolean)
   .join(' ');
 const clock = `${minutes}:${String(seconds).padStart(2, '0')}`;
+const title = video.title[locale];
 const note = video.note[locale].trim();
 
 const contentUrl = `${media.base}/${video.key}`;
@@ -67,7 +68,7 @@ const modified = (await fetch(contentUrl, { method: 'HEAD' })).headers.get('last
 if (!modified) console.warn(`${contentUrl}: no Last-Modified, so no VideoObject`);
 const videoObject = modified && {
   '@type': 'VideoObject',
-  name: `${horse.name} — ${dict.video[video.kind]}`,
+  name: `${horse.name} — ${title}`,
   description: horse.headline[locale],
   contentUrl,
   thumbnailUrl: posterSrc,
@@ -82,10 +83,10 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
 ---
 
 <div class="video-head">
-  <h2 class="lbl">{dict.video[video.kind]}</h2>
+  <h3 class="lbl">{title}</h3>
   <p class="meta num">{[clock, note].filter(Boolean).join(' · ')}</p>
 </div>
-<figure class="video" data-kind={video.kind}>
+<figure class="video">
   <video
     controls
     preload="none"
@@ -93,9 +94,9 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
     poster={poster.src}
     width={width}
     height={height}
-    aria-label={fill(dict.video.label, { title: dict.video[video.kind], duration })}
+    aria-label={fill(dict.video.label, { title, duration })}
     data-event="video_play"
-    data-video={video.kind}
+    data-video={video.title.pl}
   >
     <source src={contentUrl} type="video/mp4" />
   </video>
@@ -147,11 +148,7 @@ const transcripts = [locale, ...locales.filter((other) => other !== locale)].fil
     height: auto;
     max-height: 640px;
     object-fit: contain;
-    background: var(--placeholder);
-  }
-
-  [data-kind='round'] video {
-    max-height: 480px;
+    background: var(--ground-dark);
   }
 
   /* Stays `list-item`: `flex` drops the disclosure marker and the space before the <span>. */

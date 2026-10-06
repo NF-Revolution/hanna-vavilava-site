@@ -16,33 +16,20 @@ const cascada = {
   price: 32000,
   seller: 'company',
   headline: t('Cztery starty w 125 cm w sezonie 2026'),
+  description: t('Ostrożna nad drągiem.\n\nSpokojna w stajni,\nskupiona na parkurze.'),
   facts: Object.fromEntries(
-    [
-      'breeding',
-      'trainingLevel',
-      'lastStart',
-      'starts',
-      'technique',
-      'rideability',
-      'temperament',
-      'handling',
-      'location',
-      'documents',
-    ].map((k) => [k, t(k)]),
+    ['breeding', 'trainingLevel', 'lastStart', 'starts', 'documents'].map((k) => [k, t(k)]),
   ),
   suits: [t('Jeździec amator startujący w 110–120 cm')],
-  notFor: [],
   health: {
     vaccinations: t('Grypa i tężec — 12.08.2026'),
-    dewormedOn: '2026-07-21',
     knownIssues: t('Brak'),
   },
   xrays: { count: 18, takenOn: '2026-03-04', scope: t('nogi przednie i tylne') },
-  viewing: { lead: t('3–5 dni'), airport: t('WAW — 55 min'), visitDay: t('…') },
   videos: [
     {
       key: 'cascada/sales-1a2b3c4d.mp4',
-      kind: 'sales',
+      title: t('Film sprzedażowy'),
       posterKey: 'cascada/sales-1a2b3c4d.jpg',
       durationS: 108,
       transcript: t('…'),
@@ -64,11 +51,11 @@ test('price on request is null, never zero', () => {
 });
 
 test('a horse read back from the database, nulls and empty lists dropped, still parses', () => {
-  const { price, xrays, suits, notFor, videos, photos, ...stored } = cascada;
+  const { price, xrays, suits, videos, photos, ...stored } = cascada;
   const horse = horseSchema.parse(stored);
   assert.equal(horse.price, null);
   assert.equal(horse.xrays, null);
-  assert.deepEqual([horse.suits, horse.notFor, horse.videos, horse.photos], [[], [], [], []]);
+  assert.deepEqual([horse.suits, horse.videos, horse.photos], [[], [], []]);
 });
 
 test('an owner field fails the parse', () => {
@@ -126,6 +113,12 @@ test('a PL list longer than its EN twin, or broken JSON, fails the parse', () =>
   const uneven = { ...fields, 'suits.pl': 'jeden\ndwa', 'suits.en': 'one' };
   assert.equal(horseSchema.safeParse(fromFields(uneven)).success, false);
   assert.equal(horseSchema.safeParse(fromFields({ ...fields, videos: '[{' })).success, false);
+});
+
+test('a horse from before E4.20, or a video without a title, fails the parse', () => {
+  assert.equal(horseSchema.safeParse({ ...cascada, notFor: [] }).success, false);
+  const videos = [{ ...cascada.videos[0], title: { pl: 'Film', en: '' } }];
+  assert.equal(horseSchema.safeParse({ ...cascada, videos }).success, false);
 });
 
 test('a photo without alt text in both languages fails the parse', () => {

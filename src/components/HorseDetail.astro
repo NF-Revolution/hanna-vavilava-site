@@ -1,8 +1,9 @@
 ---
 /*
- * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, sales
- * video, facts, the uncut round, suitability, health, gallery, viewing and the
- * other horses. A video or a gallery with nothing to show is left out (E4.5).
+ * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, the
+ * videos, the gallery, the description, facts, who it suits, health and the
+ * other horses. Media comes first, so a buyer sees the horse move before
+ * reading about it (E4.20). A section with nothing to show is left out (E4.5).
  * The enquiry, with this horse preselected, is the page's inverted band (E5.2),
  * and at 390 too: no script could carry the horse to the enquiry page.
  *
@@ -26,7 +27,7 @@ import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/forma
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
-import { livejumpingHref, site, whatsappHref } from '../site';
+import { directionsHref, livejumpingHref, site, stables, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -47,37 +48,64 @@ const url = new URL(path(locale, 'horse', slug), Astro.site).href;
 const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
 
 /*
- * The board's two columns of six, each closed by one of the sale rows (#2, #3).
- * A third slot links the value out; only Starts has one, to livejumping (#111).
+ * One table in two columns that share their row heights, so a tall row on one
+ * side never pushes the other out of line (E4.20): filled down the left column,
+ * then the right, with the sale rows last (#2, #3). Who the horse suits is a row
+ * of its own, a list. A third slot links the value on: Starts to livejumping in
+ * a new tab (#111), Location to directions to the stables, as the footer does
+ * (#166). Every horse stands there, so Location is the stables, not a field.
  */
-const factColumns: [string, string, string?][][] = [
+type Link = { href: string; text: string; newTab?: string };
+type Row = [label: string, value: string | string[], link?: Link];
+const facts: Row[] = [
+  [d.rows.pedigree, horse.pedigree],
+  [d.rows.breeding, f.breeding[locale]],
+  [d.rows.trainingLevel, f.trainingLevel[locale]],
+  [d.rows.level, `${horse.levelCm} cm`],
+  [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
   [
-    [d.rows.pedigree, horse.pedigree],
-    [d.rows.breeding, f.breeding[locale]],
-    [d.rows.trainingLevel, f.trainingLevel[locale]],
-    [d.rows.level, `${horse.levelCm} cm`],
-    [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
-    [
-      d.rows.starts,
-      f.starts?.[locale] ?? d.infoOnRequest,
-      horse.livejumpingName ? livejumpingHref(horse.livejumpingName) : undefined,
-    ],
-    [d.rows.price, price],
+    d.rows.starts,
+    f.starts?.[locale] ?? d.infoOnRequest,
+    horse.livejumpingName
+      ? {
+          href: livejumpingHref(horse.livejumpingName),
+          text: d.livejumping.link,
+          newTab: d.livejumping.newTab,
+        }
+      : undefined,
   ],
+  ...(horse.suits.length ? [[d.rows.suits, horse.suits.map((s) => s[locale])] as Row] : []),
   [
-    [d.rows.technique, f.technique[locale]],
-    [d.rows.rideability, f.rideability[locale]],
-    [d.rows.temperament, f.temperament[locale]],
-    [d.rows.handling, f.handling[locale]],
-    [d.rows.location, f.location[locale]],
-    [d.rows.documents, f.documents[locale]],
-    [d.rows.sale, d.saleKind[horse.seller]],
+    d.rows.location,
+    `${stables.name}, ${stables.street}, ${stables.postalCode} ${stables.town}`,
+    { href: directionsHref, text: dict.footer.directions },
   ],
+  [d.rows.documents, f.documents[locale]],
+  [d.rows.price, price],
+  [d.rows.sale, d.saleKind[horse.seller]],
 ];
+/* Rows per column: the left takes the extra one. */
+const half = (n: number) => `--rows: ${Math.ceil(n / 2)}`;
 
-/* ponytail: the first of each kind, as the boards draw one of each. */
-const salesVideo = horse.videos.find((v) => v.kind === 'sales');
-const roundVideo = horse.videos.find((v) => v.kind === 'round');
+/* The clip list under the player (E4.20): poster thumb, title, length. */
+const previews = await Promise.all(
+  horse.videos.map(async (video) => ({
+    poster: await getImage({
+      src: `${media.base}/${video.posterKey}`,
+      inferSize: true,
+      width: 320,
+      format: 'webp',
+    }),
+    title: video.title[locale],
+    clock: `${Math.floor(video.durationS / 60)}:${String(video.durationS % 60).padStart(2, '0')}`,
+  })),
+);
+
+/* Blank lines are paragraphs; a single line break stays one (`pre-line`). */
+const description = horse.description[locale]
+  .trim()
+  .split(/\n\s*\n/)
+  .filter(Boolean);
 
 const xrays = horse.xrays;
 const xrayDate = xrays && formatDate(locale, xrays.takenOn);
@@ -251,140 +279,152 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     </>
   ) : (
     <>
-      {salesVideo && (
+      {horse.videos.length > 0 && (
         <section class="band">
-          <Video video={salesVideo} locale={locale} horse={horse} />
-        </section>
-      )}
-      <section class="band">
-        <h2 class="lbl head">{d.facts}</h2>
-        <div class="cols">
-          {factColumns.map((rows) => (
-            <dl class="rows">
-              {rows.map(([label, value, href]) => (
-                <div>
-                  <dt class="lbl">{label}</dt>
-                  <dd class="num">
-                    {value}
-                    {href && (
-                      <a class="lbl fact-link" href={href} target="_blank" rel="noopener">
-                        <span>
-                          {d.livejumping.link}
-                          <span class="visually-hidden"> {d.livejumping.newTab}</span>
-                        </span>
-                        <span aria-hidden="true">&#8599;</span>
-                      </a>
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          ))}
-        </div>
-      </section>
-      {roundVideo && (
-        <section class="band">
-          <Video video={roundVideo} locale={locale} horse={horse} />
-        </section>
-      )}
-      <section class="band cols">
-        <div class="ruled">
-          <h2 class="lbl head">{d.suits}</h2>
-          <ul class="list">
-            {horse.suits.map((item) => (
-              <li class="copy">{item[locale]}</li>
-            ))}
-          </ul>
-        </div>
-        <div class="ruled">
-          <h2 class="lbl head">{d.notFor}</h2>
-          <ul class="list">
-            {horse.notFor.map((item) => (
-              <li class="copy">{item[locale]}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-      <section class="band">
-        <h2 class="lbl head">{d.health}</h2>
-        <div class="cols">
-          <dl class="rows">
-            <div>
-              <dt class="lbl">{d.rows.vaccinations}</dt>
-              <dd>{horse.health.vaccinations[locale]}</dd>
-            </div>
-            <div>
-              <dt class="lbl">{d.rows.dewormedOn}</dt>
-              <dd class="num">{formatDate(locale, horse.health.dewormedOn)}</dd>
-            </div>
-          </dl>
-          <dl class="rows">
-            {xrays && (
-              <div>
-                <dt class="lbl">{d.rows.xrays}</dt>
-                <dd class="num">
-                  {fill(d.xrays.summary, {
-                    films: plural(locale, d.xrays.films, xrays.count),
-                    date: xrayDate!,
-                    scope: xrays.scope[locale],
-                  })}
-                  {xrays.files.length === 0 ? (
-                    <span class="xray-pending">{d.xrays.pending}</span>
-                  ) : (
-                    xrays.files.map((file) => (
-                      <a
-                        class="lbl fact-link"
-                        href={`${media.base}/${file.key}`}
-                        download
-                        data-event="xray_download"
-                        data-horse={slug}
-                      >
-                        <span aria-hidden="true">&#8595;</span>
-                        <span>
-                          {d.xrays.download}
-                          <span class="visually-hidden">
-                            {' '}
-                            {fill(d.xrays.downloadDate, { date: xrayDate! })}
-                          </span>{' '}
-                          PDF{file.label?.[locale] && ` · ${file.label[locale]}`} ·{' '}
-                          {formatSize(locale, file.bytes)}
-                        </span>
-                      </a>
-                    ))
-                  )}
-                </dd>
+          <h2 class="lbl head">{d.videos}</h2>
+          {/*
+           * One player, then the clip list (E4.20). A preview links to its clip's
+           * id, and CSS shows the `:target` clip, or the first when none is, so the
+           * swap needs no script. The script only pauses a clip as it is hidden.
+           */}
+          <div class="stage">
+            {horse.videos.map((video, i) => (
+              <div class="clip" id={`clip-${i + 1}`}>
+                <Video video={video} locale={locale} horse={horse} />
               </div>
-            )}
-            <div>
-              <dt class="lbl">{d.rows.knownIssues}</dt>
-              <dd>{horse.health.knownIssues[locale]}</dd>
-            </div>
-          </dl>
-        </div>
-        <p class="copy note">{d.vetNote}</p>
-      </section>
+            ))}
+          </div>
+          {horse.videos.length > 1 && (
+            <>
+              <ul class="previews" tabindex="0" aria-label={d.videos}>
+                {previews.map((preview, i) => (
+                  <li>
+                    <a href={`#clip-${i + 1}`}>
+                      <img
+                        src={preview.poster.src}
+                        width={preview.poster.attributes.width}
+                        height={preview.poster.attributes.height}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span class="lbl">{preview.title}</span>
+                      <span class="meta num">{preview.clock}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <script>
+                addEventListener('hashchange', () =>
+                  document
+                    .querySelectorAll<HTMLVideoElement>('.stage video')
+                    .forEach((v) => v.pause()),
+                );
+              </script>
+            </>
+          )}
+        </section>
+      )}
       {horse.photos.length > 0 && (
         <section class="band">
           <h2 class="lbl head">{d.gallery}</h2>
           <Gallery photos={horse.photos} locale={locale} />
         </section>
       )}
+      {description.length > 0 && (
+        <section class="band">
+          <h2 class="lbl head">{d.description}</h2>
+          <div class="copy story">
+            {description.map((para) => (
+              <p>{para}</p>
+            ))}
+          </div>
+        </section>
+      )}
       <section class="band">
-        <h2 class="lbl head">{d.viewing}</h2>
-        <div class="cols cols-3">
-          {(
-            [
-              [d.rows.lead, horse.viewing.lead],
-              [d.rows.airport, horse.viewing.airport],
-              [d.rows.visitDay, horse.viewing.visitDay],
-            ] as const
-          ).map(([label, value]) => (
-            <div class="ruled">
-              <h3 class="lbl head">{label}</h3>
-              <p class="copy">{value[locale]}</p>
+        <h2 class="lbl head">{d.facts}</h2>
+        <dl class="table" style={half(facts.length)}>
+          {facts.map(([label, value, link]) => (
+            <div>
+              <dt class="lbl">{label}</dt>
+              <dd class="num">
+                {Array.isArray(value) ? (
+                  <ul class="list">
+                    {value.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  value
+                )}
+                {link && (
+                  <a
+                    class="lbl fact-link"
+                    href={link.href}
+                    target={link.newTab && '_blank'}
+                    rel={link.newTab && 'noopener'}
+                  >
+                    <span>
+                      {link.text}
+                      {link.newTab && <span class="visually-hidden"> {link.newTab}</span>}
+                    </span>
+                    <span aria-hidden="true">{link.newTab ? '↗' : '→'}</span>
+                  </a>
+                )}
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
+      </section>
+      <section class="band">
+        <h2 class="lbl head">{d.health}</h2>
+        <dl class="table" style={half(xrays ? 3 : 2)}>
+          <div>
+            <dt class="lbl">{d.rows.vaccinations}</dt>
+            <dd>{horse.health.vaccinations[locale]}</dd>
+          </div>
+          <div>
+            <dt class="lbl">{d.rows.knownIssues}</dt>
+            <dd>{horse.health.knownIssues[locale]}</dd>
+          </div>
+          {xrays && (
+            <div>
+              <dt class="lbl">{d.rows.xrays}</dt>
+              <dd class="num">
+                {fill(d.xrays.summary, {
+                  films: plural(locale, d.xrays.films, xrays.count),
+                  date: xrayDate!,
+                  scope: xrays.scope[locale],
+                })}
+                {xrays.files.length === 0 ? (
+                  <span class="xray-pending">{d.xrays.pending}</span>
+                ) : (
+                  xrays.files.map((file) => (
+                    <a
+                      class="lbl fact-link"
+                      href={`${media.base}/${file.key}`}
+                      download
+                      data-event="xray_download"
+                      data-horse={slug}
+                    >
+                      <span aria-hidden="true">&#8595;</span>
+                      <span>
+                        {d.xrays.download}
+                        <span class="visually-hidden">
+                          {' '}
+                          {fill(d.xrays.downloadDate, { date: xrayDate! })}
+                        </span>{' '}
+                        PDF{file.label?.[locale] && ` · ${file.label[locale]}`} ·{' '}
+                        {formatSize(locale, file.bytes)}
+                      </span>
+                    </a>
+                  ))
+                )}
+              </dd>
+            </div>
+          )}
+        </dl>
+        <p class="copy note">{d.vetNote}</p>
       </section>
       <section class="enquire dk" id="enquiry">
         <div class="enquire-intro">
@@ -619,49 +659,96 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     font-weight: inherit;
   }
 
-  .cols {
+  /* One clip on show: the `:target` one, else the first. */
+  .clip {
+    display: none;
+    scroll-margin-top: 24px;
+  }
+
+  .clip:target,
+  .stage:not(:has(.clip:target)) > .clip:first-child {
+    display: block;
+  }
+
+  .previews {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+
+  .previews li {
+    flex: 0 0 220px;
+    scroll-snap-align: start;
+  }
+
+  .previews a {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 8px;
+  }
+
+  .previews img {
+    display: block;
+    width: 100%;
+    height: 124px;
+    object-fit: cover;
+    background: var(--placeholder);
+  }
+
+  .previews .meta {
+    color: var(--ink-muted);
+  }
+
+  .story {
+    max-width: 68ch;
+  }
+
+  .story p {
+    margin: 0 0 18px;
+    white-space: pre-line;
+  }
+
+  .story p:last-child {
+    margin-bottom: 0;
+  }
+
+  /*
+   * Two columns on shared row tracks, filled down then across (`--rows` per
+   * column), so paired rows line up. Each row draws the line above it as a
+   * shadow and the one below as a border; they meet on the same pixel, and the
+   * first row of either column gets its top line with no index to target.
+   */
+  .table {
+    margin: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 80px;
+    grid-template-rows: repeat(var(--rows), auto);
+    grid-auto-flow: column;
+    column-gap: 80px;
   }
 
-  .cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0 60px;
-  }
-
-  .ruled {
-    border-top: 1px solid var(--ink);
-    padding-top: 28px;
-  }
-
-  .ruled p {
-    margin: 0;
-  }
-
-  .rows {
-    margin: 0;
-  }
-
-  .rows > div {
+  .table > div {
     display: flex;
     gap: 28px;
     padding: 18px 0;
-    border-top: 1px solid var(--rule);
-  }
-
-  .rows > div:last-child {
     border-bottom: 1px solid var(--rule);
+    box-shadow: 0 -1px 0 var(--rule);
   }
 
-  .rows dt {
+  .table dt {
     width: 200px;
     flex-shrink: 0;
     padding-top: 3px;
     color: var(--ink-muted);
   }
 
-  .rows dd {
+  .table dd {
     margin: 0;
     font-size: 15px;
     line-height: 1.55;
@@ -671,9 +758,6 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
   }
 
   .xray-pending {
@@ -891,43 +975,38 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       margin-bottom: 12px;
     }
 
-    .cols,
-    .cols-3 {
+    .previews {
+      margin-top: 14px;
+    }
+
+    .previews li {
+      flex-basis: 140px;
+    }
+
+    .previews img {
+      height: 79px;
+    }
+
+    .table {
       grid-template-columns: 1fr;
-      gap: 26px;
+      grid-template-rows: none;
+      grid-auto-flow: row;
     }
 
-    /* Stacked, the two fact columns read as one table. */
-    .cols:has(> .rows) {
-      gap: 0;
-    }
-
-    .cols > .rows:first-child > div:last-child {
-      border-bottom: 0;
-    }
-
-    .ruled {
-      padding-top: 18px;
-    }
-
-    .rows > div {
+    .table > div {
       flex-direction: column;
       gap: 7px;
       padding: 15px 0;
     }
 
-    .rows dt {
+    .table dt {
       width: auto;
       padding-top: 0;
     }
 
-    .rows dd {
+    .table dd {
       font-size: 14px;
       line-height: 1.5;
-    }
-
-    .list {
-      gap: 11px;
     }
 
     .others {
