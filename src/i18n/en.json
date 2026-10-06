@@ -121,6 +121,7 @@
     "court": "Registry court: {court} · share capital {capital}",
     "stock": "I sell my own horses and offer horses owned by clients — the owner's details are given before contract.",
     "location": "{stables}, {town} · 40 km from Warsaw, Poland",
+    "directions": "Directions",
     "languages": "Polski · English",
     "vetting": "Pre-purchase exam — the buyer chooses the vet",
     "footage": "Full uncut footage on request",
@@ -352,7 +353,8 @@
         }
       ],
       "whatsapp": "Message me on WhatsApp now",
-      "back": "Back to the horses"
+      "back": "Back to the horses",
+      "directions": "Directions"
     },
     "enquiryFailed": {
       "title": "Enquiry not sent — Hanna Vavilava",
