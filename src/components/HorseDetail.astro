@@ -167,6 +167,24 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
         class="hero-img"
       />
     )}
+    <div class="hero-veil">
+      <a class="hero-cue" href="#details">
+        <span class="visually-hidden">{d.scrollCue}</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 22"
+          width="48"
+          height="66"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="0.8"
+        >
+          <path d="M2 2l6 5 6-5" />
+          <path d="M2 8l6 5 6-5" />
+          <path d="M2 14l6 5 6-5" />
+        </svg>
+      </a>
+    </div>
     <div class="hero-text">
       <div class="hero-id">
         <h1 class="hero-name">{horse.name}</h1>
@@ -190,25 +208,26 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           </a>
         </div>
       )}
-      <a class="hero-cue" href="#details">
-        <span class="visually-hidden">{d.scrollCue}</span>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 16 22"
-          width="16"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.25"
-        >
-          <path d="M2 2l6 5 6-5" />
-          <path d="M2 8l6 5 6-5" />
-          <path d="M2 14l6 5 6-5" />
-        </svg>
-      </a>
     </div>
   </section>
-
+  <script>
+    /*
+     * The scroll cue (E4.19) shows only to a visitor who has stayed at the top
+     * for four seconds, and goes for good on the first scroll — a back-button
+     * restore and the cue's own jump included.
+     */
+    const hero = document.querySelector('.hero')!;
+    let moved = scrollY > 0;
+    addEventListener(
+      'scroll',
+      () => {
+        moved = true;
+        hero.classList.remove('cue-on');
+      },
+      { once: true, passive: true },
+    );
+    setTimeout(() => moved || hero.classList.add('cue-on'), 4000);
+  </script>
   <SubBar id="details">
     <p slot="label" class="lbl crumb">
       <a href={path(locale, 'horses')}>{dict.nav.horses}</a>
@@ -427,7 +446,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 
   /*
    * At 390 the sticky WhatsApp bar (MobileBar, 81px) sits over the hero's foot
-   * on a horse for sale, so its text and the scroll cue are padded clear of it (#149).
+   * on a horse for sale, so its text is padded clear of it (#149).
    */
 
   .hero {
@@ -501,22 +520,40 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   }
 
   /*
-   * The scroll cue (E4.19): a plain link past the hero, so it works without
-   * JavaScript. It sits in the text's bottom padding, on the same scrim, centred
-   * between the name and the offer. Motion is fades only: the chevrons pulse
-   * top to bottom. Negative delays start them mid-cycle, so nothing flashes, and
-   * base.css cuts the loop under reduced motion, leaving them static and solid.
+   * The scroll cue (E4.19): a visitor who is still at the top after a few
+   * seconds gets the photo dimmed and a large link past the hero in its middle.
+   * The script below adds `.cue-on` and takes it away on the first scroll; with
+   * no JavaScript the cue never shows and the page reads as it always did. The
+   * veil sits under the hero text, so the name and the offer stay on top.
+   * Motion is fades only: the chevrons pulse top to bottom. Negative delays
+   * start them mid-cycle, and base.css cuts the loop under reduced motion,
+   * leaving them static and solid.
    */
-  .hero-cue {
+  .hero-veil {
     position: absolute;
-    left: 50%;
-    bottom: 8px;
-    translate: -50% 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--tap);
-    height: var(--tap);
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgb(14 14 13 / 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.8s ease-out,
+      visibility 0.8s;
+  }
+
+  .cue-on .hero-veil {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* The drop shadow holds the chevrons at 3:1 on a pale photo, through the veil. */
+  .hero-cue {
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 96px;
+    filter: drop-shadow(0 0 8px rgb(14 14 13 / 0.6));
   }
 
   .hero-cue path {
@@ -811,16 +848,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       flex-direction: column;
       align-items: stretch;
       gap: 18px;
-      /* 24px under the text, plus a row for the cue, plus the bar when there is one. */
-      padding: 120px var(--gutter-mobile) calc(68px + var(--bar, 0px));
+      padding: 120px var(--gutter-mobile) 24px;
     }
 
     .hero-barred .hero-text {
-      --bar: calc(81px + env(safe-area-inset-bottom));
-    }
-
-    .hero-cue {
-      bottom: calc(12px + var(--bar, 0px));
+      padding-bottom: calc(24px + 81px + env(safe-area-inset-bottom));
     }
 
     .hero-name {
