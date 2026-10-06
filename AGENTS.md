@@ -80,5 +80,5 @@ Two different things live under `.claude/tickets/`, and they are not the same fi
 ## Commands
 
     npm run dev      # dev server
-    npm run ci       # format check, types, build, internal link check
+    npm run ci       # format check, types, build, internal link check, a11y, budgets
     npm run fonts    # re-download the webfonts and regenerate fonts.css

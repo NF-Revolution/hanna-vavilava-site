@@ -89,6 +89,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E7.5 seller identity footer  | #61                | done — `operator` in `site.ts`, footer legal block, KSH art. 206 lines      |
 | E0.4 X-rays                  | #4                 | decided — PDF study, public download                                        |
 | E0.5 domain and mailbox      | #5                 | decided — nfrevolution.com now, hannavavilava.com at E8.1                   |
+| E8.3 performance budget      | #65                | done — `npm run budget`: 4 KB JS, 1 MB images, poster LCP proxy             |
 | everything else              | see the milestones | not started                                                                 |
 
 ## Decisions made along the way
@@ -563,6 +564,15 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   is no longer an exception: a horse page with photos carries about 1.4 KB plus the 821 B
   beacon. Turnstile's `api.js` stays the one exception, because it is third-party and loads
   only on a form's first focus. The E6.6 and E5.6 lines above describe the old 1 KB budget.
+- The performance budget is enforced by `scripts/check-budget.mjs` (E8.3, #65), in `npm run ci`
+  and after the preview and deploy builds, which have real photos and the real beacon. The JS
+  count includes inline scripts plus any `/_astro/*.js` Astro split out, with `ld+json` skipped.
+  A build without the beacon reserves 1 KB for it. Images are capped at 1 MB per page, counting
+  each non-lazy `<img>` at its largest candidate. Lazy gallery photos are not counted, because
+  they load when the dialog opens. Poster LCP under 1 s is checked by a proxy, not measured:
+  the homepage poster must be `fetchpriority="high"` and not lazy, and its smallest candidate
+  must be at most 120 KB. It was 66 KB at the time of this change. Lighthouse CI is the upgrade
+  if the proxy lets a slow poster through.
 - The enquiry inbox moved to `/admin/zapytania` (E2.14, #158); `/admin` keeps only a live count of
   unhandled enquiries and a link, so the list no longer pushes the horse editor down. Both read
   `handled` through `isHandled` in `src/enquiry.ts`, so a record with no flag counts as
