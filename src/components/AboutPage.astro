@@ -21,6 +21,29 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 const page = dict.pages.about;
+
+/*
+ * The map (#165) loads on click: Google's cookies need consent (ePrivacy art.
+ * 5(3)), so the frame starts as a placeholder of our own whose one link navigates
+ * it to Google. No JS, no banner, and Google sees nothing until the press. The
+ * pin is the coordinates, not the address — the gate is on ul. Długa.
+ * ponytail: the keyless `output=embed` URL is undocumented (it 301s to
+ * `/maps/embed?pb=…`); if it breaks, the Maps Embed API with a referrer-restricted
+ * key is the upgrade, and the place link beside the frame works meanwhile.
+ */
+const mapSrc = `https://www.google.com/maps?q=${stables.lat},${stables.lng}&z=14&hl=${locale}&output=embed`;
+const mapPlaceholder =
+  '<!doctype html><meta name="referrer" content="no-referrer-when-downgrade"><style>' +
+  "@font-face{font-family:Archivo;font-weight:300 500;src:url(/fonts/archivo-latin-ext.woff2) format('woff2')}" +
+  "@font-face{font-family:Archivo;font-weight:300 500;src:url(/fonts/archivo-latin.woff2) format('woff2');unicode-range:U+0000-00FF}" +
+  'html,body,a{height:100%;margin:0}' +
+  "body{background:#e9e8e3;color:#0e0e0d;font:15px/1.62 Archivo,'Helvetica Neue',Helvetica,Arial,sans-serif}" +
+  'a{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;color:inherit;text-align:center;text-decoration:none}' +
+  'a:focus-visible{outline:2px solid #0e0e0d;outline-offset:-6px}' +
+  'b{font-weight:400;font-size:10px;letter-spacing:.24em;text-transform:uppercase;border:1px solid;padding:14px 28px}' +
+  'a:hover b{background:#0e0e0d;color:#f2f1ed}' +
+  'span{max-width:40ch;color:#6b6a64;font-size:13px}</style>' +
+  `<a href="${mapSrc.replaceAll('&', '&amp;')}"><b>${page.map.load}</b><span>${page.map.note}</span></a>`;
 ---
 
 <Page
@@ -65,6 +88,28 @@ const page = dict.pages.about;
         </li>
       ))}
     </ol>
+  </section>
+
+  <section class="map">
+    <div>
+      <h2 class="lbl head">{page.map.head}</h2>
+      <address class="copy">
+        {stables.name}
+        <br />
+        {stables.street}
+        <br />
+        {stables.postalCode} {stables.town}
+      </address>
+      <a class="copy open" href={stables.mapsHref}>
+        {page.map.open}
+      </a>
+    </div>
+    <iframe
+      title={fill(page.map.title, { stables: stables.name })}
+      srcdoc={mapPlaceholder}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
   </section>
 
   <CtaBand
@@ -170,6 +215,39 @@ const page = dict.pages.about;
     color: var(--ink-muted);
   }
 
+  /* ---- The map ---- */
+
+  /* The intro's columns: the address under the portrait, the map under the bio. */
+  .map {
+    display: grid;
+    grid-template-columns: min(480px, 40%) minmax(0, 1fr);
+    align-items: start;
+    gap: 80px;
+    border-top: 1px solid var(--rule);
+    padding: 68px var(--gutter) 80px;
+  }
+
+  address {
+    margin: 0 0 16px;
+    font-style: normal;
+  }
+
+  .open {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    text-decoration: underline;
+  }
+
+  /* A fixed ratio, so neither the placeholder nor Google's map shifts the page. */
+  iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    background: var(--placeholder);
+  }
+
   @media (max-width: 720px) {
     /* No room beside the label at 390, and the bio's first line says the same. */
     .sub-meta {
@@ -217,6 +295,16 @@ const page = dict.pages.about;
 
     .step-text {
       flex-basis: 100%;
+    }
+
+    .map {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding: 44px var(--gutter-mobile) 52px;
+    }
+
+    iframe {
+      aspect-ratio: 4 / 3;
     }
   }
 </style>

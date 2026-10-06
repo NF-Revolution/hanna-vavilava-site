@@ -262,6 +262,13 @@
           "text": "A written contract with the horse's description, the price and its health on the day of sale. The collection date is agreed in writing and discussed directly."
         }
       ],
+      "map": {
+        "head": "Where the horses are",
+        "title": "Google map: {stables}",
+        "load": "Show the map",
+        "note": "The map loads from Google’s servers. Google will see the IP address and may set cookies.",
+        "open": "Open in Google Maps"
+      },
       "band": {
         "one": "{count} horse in the stable now.",
         "few": "{count} horses in the stable now.",
@@ -388,7 +395,8 @@
           "New-horse emails: the email address, the language, and when the signup was made and confirmed. We send that address one message with a confirmation link and, once confirmed, one message whenever a new horse comes up for sale. The basis is consent (Art. 6(1)(a) GDPR), which is also the consent to direct marketing by electronic means. It can be withdrawn at any time with the link in every email, without affecting the lawfulness of what was sent before.",
           "Protecting the forms: the IP address and browser data help tell a person from a bot and limit the number of enquiries from one address. The IP address is not stored. The basis is the controller's legitimate interest in keeping spam off the contact channel (Art. 6(1)(f) GDPR).",
           "Running the site: on every visit the server processes the IP address and request data to deliver the page and protect it from abuse (Art. 6(1)(f) GDPR).",
-          "Visit statistics: page views and a few events are counted, sending an enquiry for example. The statistics use no cookies and store nothing on the device. A visit is recognised by a hash of the IP address and browser with a salt that changes daily, so it cannot be linked to a person or to a visit on another day. The page address is sent without the part after the # sign. The basis is legitimate interest: knowing which parts of the site work (Art. 6(1)(f) GDPR)."
+          "Visit statistics: page views and a few events are counted, sending an enquiry for example. The statistics use no cookies and store nothing on the device. A visit is recognised by a hash of the IP address and browser with a salt that changes daily, so it cannot be linked to a person or to a visit on another day. The page address is sent without the part after the # sign. The basis is legitimate interest: knowing which parts of the site work (Art. 6(1)(f) GDPR).",
+          "The map on the About page: nothing is sent to Google until you press “Show the map”. Once you do, your browser loads the map from Google’s servers. Google then receives the IP address and browser data and may store its own cookies on the device. The basis is the consent given by pressing the button (Art. 6(1)(a) GDPR and Art. 399 of the Polish Electronic Communications Law). Without it, the stables’ address and a link to Google Maps remain beside the map. Consent can be withdrawn by deleting Google’s cookies in the browser, without affecting the lawfulness of what happened before. From then on Google processes the data as a separate controller, under its own privacy policy."
         ]
       },
       "processors": {
@@ -424,7 +432,8 @@
       "transfers": {
         "h": "Transfers outside the EEA",
         "p": [
-          "Some of these providers are based in the United States. Where data leaves the European Economic Area, the basis is the EU–US Data Privacy Framework or the standard contractual clauses approved by the European Commission. Telegram operates outside the EEA, and notifications there are governed by its own privacy policy."
+          "Some of these providers are based in the United States. Where data leaves the European Economic Area, the basis is the EU–US Data Privacy Framework or the standard contractual clauses approved by the European Commission. Telegram operates outside the EEA, and notifications there are governed by its own privacy policy.",
+          "The Google map on the About page transfers the IP address to Google LLC in the United States. The basis is the EU–US Data Privacy Framework, in which Google LLC participates."
         ]
       },
       "xray": {
@@ -453,15 +462,16 @@
         "p": [
           "Providing data is voluntary, but without the fields marked as required an enquiry cannot be answered. The new-horse signup is separate from any enquiry and no answer depends on it.",
           "The data is not used for automated decision-making or profiling. The Turnstile check only filters out bots and has no legal effect on anyone.",
-          "The WhatsApp and Telegram links open a chat in those apps. What you write there they process on their own terms, as separate controllers."
+          "The WhatsApp and Telegram links open a chat in those apps. What you write there they process on their own terms, as separate controllers. Likewise, the Google Maps link beside the stables’ address opens Google’s service."
         ]
       },
       "device": {
         "h": "Cookies and device storage",
         "p": [
-          "This site sets no cookies and stores nothing on your device, which is why it asks for no consent. Your browser keeps its own cached copies of pages and photos to load them faster; you can clear them at any time.",
+          "This site sets no cookies and stores nothing on your device, which is why it shows no consent banner. Your browser keeps its own cached copies of pages and photos to load them faster; you can clear them at any time.",
           "The videos are plain files from our own subdomain, {media}, not a player embedded from someone else's service. A film on a horse's page is downloaded only once you press play; before that, only its still frame. The short loop on the homepage downloads straight away, unless the browser asks for reduced motion or data saving, or the connection is slow. Either way, your browser downloads the film from Cloudflare R2, which sees the IP address like any server and sets no cookie. The play is counted in the statistics as an event, also without cookies.",
-          "When you start filling in an enquiry or new-horse signup form, the page loads Cloudflare Turnstile. Cloudflare may then store its own security cookies on the device. They are strictly necessary to tell a person from a bot, so they need no consent."
+          "When you start filling in an enquiry or new-horse signup form, the page loads Cloudflare Turnstile. Cloudflare may then store its own security cookies on the device. They are strictly necessary to tell a person from a bot, so they need no consent.",
+          "The map on the About page loads from Google only once you press “Show the map”. Until then it is a plain frame from our own site, with no connection to Google. After the press, Google may store its own cookies on the device. They are the only cookies on this site that need consent, and pressing the button is that consent."
         ]
       },
       "turnstile": "The enquiry and new-horse signup forms are protected from spam by Cloudflare Turnstile. When someone starts filling in a form, Cloudflare processes their IP address and browser data to tell a person from a bot. The basis is legitimate interest: keeping spam off the channel buyers use to reach Hanna (Art. 6(1)(f) GDPR). An enquiry that fails the check is never stored.",
