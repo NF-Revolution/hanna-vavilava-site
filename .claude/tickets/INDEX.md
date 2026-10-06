@@ -311,7 +311,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   with an R2 API token scoped to the bucket (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`),
   because `CLOUDFLARE_TOKEN` is a REST bearer token and cannot sign S3. The bucket's CORS
   rules are `r2.cors.json`, applied by hand. The panel reads every key back with a `HEAD`
-  on the public host before the row exists. A removed file goes on Save, not on click: Save
+  on the public host before the row exists. The rules allow `GET` as well, because
+  Cloudflare's cache fetches a `HEAD` from R2 as a `GET` and R2 then sends no
+  `Access-Control-Allow-Origin` for a method it does not allow. A removed file goes on Save, not on click: Save
   deletes and purges (the stored keys plus this session's uploads) minus the kept keys
   through `xrayDelete`, then writes the record, so a failed delete changes nothing and a
   retry counts a 404 as done. Cancel deletes this session's unsaved uploads. The size limit
