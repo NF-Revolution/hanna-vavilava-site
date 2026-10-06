@@ -1,6 +1,6 @@
 # E4.20 — followup
 
-Reopened 2026-10-06 — in flight; 1 shipped cycle(s) at the bottom.
+Shipped 2026-10-06 — see the last `## Outcome` at the bottom.
 
 Issue #179.
 
@@ -17,7 +17,7 @@ Issue #179.
 - Trap: another session's `astro preview` held 4331; serve dist with `python3 -m http.server`.
 - Review round 2: clear. Waiting on owner sign-off on 1440 + 390 real-photo shots before push
   (memory rule for photo framing).
-  next: owner approves shots, then finalize cycle 2, push, comment on #181.
+  next: none — shipped.
 
 - Plan approved with a read-time upgrade shim (`storedHorse = z.preprocess(upgrade, horseSchema)`)
   plus committed migration script, because preview and deploy builds read the live DB.
@@ -82,3 +82,45 @@ Nested `facts`/`health`/video objects are non-strict, so extra keys there are si
 top-level keys fail the parse. Local `main` can be stale in a worktree; diff against `origin/main`.
 **Files that mattered:** `src/horse.ts`, `src/components/HorseDetail.astro`,
 `src/components/Video.astro`, `src/pages/admin.astro`, `tests/horse.test.mjs`.
+
+## What was built — 2026-10-06
+
+**Problem.** Owner review of cycle 1: facts columns misaligned, "Dla kogo" orphaned under them,
+gallery grew with every photo, 85%-wide video cards read wrong.
+
+**Steps.**
+
+1. `HorseDetail.astro` facts: one `<dl class="table" style="--rows:N">`, `grid-auto-flow:
+column` on `repeat(var(--rows), auto)` rows, so paired rows share height; `N = ceil(n/2)`.
+   Order: pedigree, breeding, trainingLevel, level, lastStart, starts | suits (`rows.suits`,
+   a `<ul>`, omitted when empty), location, documents, price, sale. Lines: each row
+   `border-bottom` + `box-shadow: 0 -1px`. 390: one column, row flow. Suits section and
+   `detail.suits` gone; `.cols`, `.rows`, `.ruled`, `.reel` CSS gone.
+2. Health: same table — vaccinations, knownIssues | xrays.
+3. `Gallery.astro`: cover `a.gallery-thumb.gallery-cover` (620 / 260 px) + `ul.gallery-strip`
+   of thumbs (160×110 / 96×72), sideways scroll-snap. Thumbs keep photo order, so the
+   lightbox script's index mapping is unchanged.
+4. Videos: `.stage` of `.clip#clip-N`, CSS shows `:target` else first; `ul.previews`
+   (poster `getImage` 320w, title, `m:ss`) only with >1 clip; `hashchange` pauses all
+   `.stage video`. Video letterbox `--ground-dark`.
+5. Canvas v69: both detail boards redrawn (board marks the selected preview/thumb; code has
+   no active state).
+
+**Acceptance.** checks green (types, build, links, a11y, horse tests 14/14); horse page inline
+JS 1959 B; owner approved real-photo shots at 1440 and 390 before push.
+
+## Outcome — 2026-10-06
+
+**Approach:** shared-row-track grid for both tables, and cover-plus-strip for photos and clips,
+all in CSS. Every photo and clip stays reachable with JS off.
+**Bugs met:** `querySelectorAll('.stage video')` typed as `Element`, so `.pause` failed `astro
+check`. Fixed with `querySelectorAll<HTMLVideoElement>`.
+**Rejected:** a fixed thumb row with "+N zdjęć" (owner picked the scroll strip); a thumb that
+swaps the big photo (owner picked the lightbox); per-index `:target` rules for an active
+preview (not worth it yet); `nth-child` borders per column (cannot read the CSS var).
+**Traps for next time:** headless Chrome has a ~500 px minimum window, so shoot 390 through an
+iframe wrapper. Another session's `astro preview` can hold the port, so serve `dist` with
+`python3 -m http.server`. The fixture has no videos, so only a live-data build exercises
+the player.
+**Files that mattered:** `src/components/HorseDetail.astro`, `src/components/Gallery.astro`,
+`src/components/Video.astro`, `src/i18n/pl.json`.
