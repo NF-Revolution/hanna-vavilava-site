@@ -3,6 +3,7 @@
 Shipped 2026-10-06 — see the last `## Outcome` at the bottom.
 
 Issue [#65](https://github.com/NF-Revolution/hanna-vavilava-site/issues/65) ·
+PR [#180](https://github.com/NF-Revolution/hanna-vavilava-site/pull/180) ·
 branch `65-e83-performance-budget-in-ci`
 
 ## What was built — 2026-10-06
