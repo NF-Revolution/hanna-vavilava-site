@@ -6,11 +6,13 @@
  */
 interface Props {
   label?: string;
+  /* An anchor for a link that jumps past the hero (E4.19). */
+  id?: string;
 }
-const { label } = Astro.props;
+const { label, id } = Astro.props;
 ---
 
-<div class="subbar">
+<div class="subbar" id={id}>
   <div class="subbar-left">
     <!-- The sub-bar label is the page title, so it is the page's one h1. -->
     {label && <h1 class="lbl subbar-label">{label}</h1>}

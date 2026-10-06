@@ -57,6 +57,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.16 map of the stables     | #165               | done — lazy Google map, Google named in the notice, canvas v63–v65          |
 | E4.17 directions link        | #166               | done — `directionsHref` from lat/lng, footer + sent step 02, canvas v61     |
 | E4.18 whole entry opens      | #172               | done — stretched `.more::after`, hover/focus/touch states, canvas v62       |
+| E4.19 hero scroll cue        | #176               | done — centred cue on a veil after 4 s at top, hides on scroll, canvas v67  |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |

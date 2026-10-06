@@ -167,6 +167,24 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
         class="hero-img"
       />
     )}
+    <div class="hero-veil">
+      <a class="hero-cue" href="#details">
+        <span class="visually-hidden">{d.scrollCue}</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 22"
+          width="48"
+          height="66"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="0.8"
+        >
+          <path d="M2 2l6 5 6-5" />
+          <path d="M2 8l6 5 6-5" />
+          <path d="M2 14l6 5 6-5" />
+        </svg>
+      </a>
+    </div>
     <div class="hero-text">
       <div class="hero-id">
         <h1 class="hero-name">{horse.name}</h1>
@@ -192,8 +210,25 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       )}
     </div>
   </section>
-
-  <SubBar>
+  <script>
+    /*
+     * The scroll cue (E4.19) shows only to a visitor who has stayed at the top
+     * for four seconds, and goes for good on the first scroll — a back-button
+     * restore and the cue's own jump included.
+     */
+    const hero = document.querySelector('.hero')!;
+    let moved = scrollY > 0;
+    addEventListener(
+      'scroll',
+      () => {
+        moved = true;
+        hero.classList.remove('cue-on');
+      },
+      { once: true, passive: true },
+    );
+    setTimeout(() => moved || hero.classList.add('cue-on'), 4000);
+  </script>
+  <SubBar id="details">
     <p slot="label" class="lbl crumb">
       <a href={path(locale, 'horses')}>{dict.nav.horses}</a>
       <span aria-hidden="true">/</span>
@@ -482,6 +517,72 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     box-sizing: border-box;
     background: var(--ink-inv);
     color: var(--ground-dark);
+  }
+
+  /*
+   * The scroll cue (E4.19): a visitor who is still at the top after a few
+   * seconds gets the photo dimmed and a large link past the hero in its middle.
+   * The script below adds `.cue-on` and takes it away on the first scroll; with
+   * no JavaScript the cue never shows and the page reads as it always did. The
+   * veil sits under the hero text, so the name and the offer stay on top.
+   * Motion is fades only: the chevrons pulse top to bottom. Negative delays
+   * start them mid-cycle, and base.css cuts the loop under reduced motion,
+   * leaving them static and solid.
+   */
+  .hero-veil {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgb(14 14 13 / 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.8s ease-out,
+      visibility 0.8s;
+  }
+
+  .cue-on .hero-veil {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* The drop shadow holds the chevrons at 3:1 on a pale photo, through the veil. */
+  .hero-cue {
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 96px;
+    filter: drop-shadow(0 0 8px rgb(14 14 13 / 0.6));
+  }
+
+  .hero-cue path {
+    animation: hero-cue 1.8s ease-in-out infinite;
+  }
+
+  .hero-cue path:nth-child(1) {
+    animation-delay: -0.4s;
+  }
+
+  .hero-cue path:nth-child(2) {
+    animation-delay: -0.2s;
+  }
+
+  @keyframes hero-cue {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+
+  /* Smooth only on this page, and only for visitors who have not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:has(.hero-cue)) {
+      scroll-behavior: smooth;
+    }
   }
 
   .crumb {

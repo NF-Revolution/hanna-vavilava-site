@@ -140,6 +140,7 @@
   },
   "detail": {
     "facts": "Fakty",
+    "scrollCue": "Przewiń do szczegółów",
     "suits": "Dla kogo ten koń jest",
     "notFor": "Dla kogo nie jest",
     "health": "Zdrowie i dokumentacja weterynaryjna",
