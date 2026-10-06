@@ -8,8 +8,6 @@
     "close": "Zamknij podgląd"
   },
   "video": {
-    "sales": "Film sprzedażowy",
-    "round": "Pełny przejazd, bez cięć",
     "label": "{title} — {duration}",
     "minutes": {
       "one": "{count} minuta",
@@ -139,12 +137,12 @@
     "link": "Konie na sprzedaż ({count})"
   },
   "detail": {
+    "videos": "Filmy",
+    "description": "Opis",
     "facts": "Fakty",
     "scrollCue": "Przewiń do szczegółów",
     "suits": "Dla kogo ten koń jest",
-    "notFor": "Dla kogo nie jest",
     "health": "Zdrowie i dokumentacja weterynaryjna",
-    "viewing": "Oglądanie",
     "others": "Pozostałe konie",
     "gallery": "Galeria",
     "cta": {
@@ -165,20 +163,12 @@
       "lastStart": "Ostatni start",
       "starts": "Liczba startów",
       "price": "Cena",
-      "technique": "Technika skoku",
-      "rideability": "Rideability",
-      "temperament": "Temperament",
-      "handling": "Obsługa",
       "location": "Lokalizacja",
       "documents": "Dokumenty",
       "sale": "Sprzedaż",
       "vaccinations": "Szczepienia",
-      "dewormedOn": "Odrobaczanie",
       "xrays": "Zdjęcia RTG",
-      "knownIssues": "Znane kwestie",
-      "lead": "Termin",
-      "airport": "Najbliższe lotnisko",
-      "visitDay": "W dniu wizyty"
+      "knownIssues": "Znane kwestie"
     },
     "saleKind": {
       "company": "Sprzedaż firmowa · faktura VAT",
@@ -633,7 +623,6 @@
       "fit": "Dla kogo",
       "health": "Zdrowie",
       "xrays": "RTG",
-      "viewing": "Oglądanie",
       "media": "Media"
     },
     "fields": {
@@ -649,29 +638,20 @@
       "seller": "Sprzedawca",
       "status": "Status",
       "headline": "Nagłówek",
+      "description": "Opis",
       "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
       "facts.trainingLevel": "Poziom wyszkolenia",
       "facts.lastStart": "Ostatni start",
       "facts.starts": "Starty",
-      "facts.technique": "Technika",
-      "facts.rideability": "Jezdność",
-      "facts.temperament": "Temperament",
-      "facts.handling": "Obsługa",
-      "facts.location": "Lokalizacja",
       "facts.documents": "Dokumenty",
       "suits": "Pasuje do",
-      "notFor": "Nie dla",
       "health.vaccinations": "Szczepienia",
-      "health.dewormedOn": "Odrobaczenie",
       "health.knownIssues": "Znane problemy",
       "xrays.count": "Liczba zdjęć",
       "xrays.takenOn": "Data badania",
       "xrays.scope": "Zakres",
       "xrays.files": "Pliki",
-      "viewing.lead": "Termin oglądania",
-      "viewing.airport": "Lotnisko",
-      "viewing.visitDay": "Dzień wizyty",
       "videos": "Filmy",
       "photos": "Zdjęcia",
       "phoneCover": "Okładka na telefon"

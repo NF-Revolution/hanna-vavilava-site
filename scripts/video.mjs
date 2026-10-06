@@ -1,10 +1,10 @@
 /*
  * The one encode pipeline for every video the site plays (E3.2): the homepage
- * hero loop and the per-horse sales and full-round clips. Encodes, cuts the
+ * hero loop and the per-horse clips. Encodes, cuts the
  * poster, reads the duration, uploads to R2 and prints the JSON to paste.
  *
  *   npm run video -- <input> hero                [--poster 0] [--no-upload]
- *   npm run video -- <input> sales|round <slug>  [--poster 1] [--no-upload]
+ *   npm run video -- <input> clip <slug>         [--poster 1] [--no-upload]
  *
  * Video never goes through the admin panel (#20): iPhone footage is often HEVC,
  * which Chrome and Firefox will not play, and a transcode does not belong in a
@@ -24,13 +24,9 @@ const { values, positionals } = parseArgs({
 });
 const [input, kind, slug] = positionals;
 const hero = kind === 'hero';
-if (
-  !input ||
-  !['hero', 'sales', 'round'].includes(kind) ||
-  (!hero && !/^[a-z0-9-]+$/.test(slug ?? ''))
-) {
+if (!input || !['hero', 'clip'].includes(kind) || (!hero && !/^[a-z0-9-]+$/.test(slug ?? ''))) {
   console.error(
-    'Usage: npm run video -- <input> hero | <input> sales|round <slug>  [--poster <s>] [--no-upload]',
+    'Usage: npm run video -- <input> hero | <input> clip <slug>  [--poster <s>] [--no-upload]',
   );
   process.exit(1);
 }
@@ -167,11 +163,11 @@ if (hero) {
   );
 } else {
   console.error(
-    `Add this to ${slug}'s Videos in the admin, and fill in the transcript and the note:`,
+    `Add this to ${slug}'s Videos in the admin, and fill in the title, the transcript and the note:`,
   );
   const video = {
     key: keys.mp4,
-    kind,
+    title: { pl: '', en: '' },
     posterKey: keys.jpg,
     durationS,
     transcript: { pl: '', en: '' },

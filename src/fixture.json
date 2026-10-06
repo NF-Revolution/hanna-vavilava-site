@@ -14,32 +14,16 @@
         "pl": "PLACEHOLDER",
         "en": "PLACEHOLDER"
       },
+      "description": {
+        "pl": "PLACEHOLDER",
+        "en": "PLACEHOLDER"
+      },
       "facts": {
         "breeding": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
         "trainingLevel": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "technique": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "rideability": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "temperament": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "handling": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "location": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
@@ -54,49 +38,40 @@
           "en": "PLACEHOLDER"
         }
       ],
-      "notFor": [
-        {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      ],
       "health": {
         "vaccinations": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
-        "dewormedOn": "2026-09-01",
         "knownIssues": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         }
       },
       "xrays": null,
-      "viewing": {
-        "lead": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "airport": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "visitDay": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      },
       "videos": [],
       "photos": [
         {
           "key": "photos/red-bull/8b1f2baa.jpg",
-          "alt": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-          "caption": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+          "alt": {
+            "pl": "PLACEHOLDER",
+            "en": "PLACEHOLDER"
+          },
+          "caption": {
+            "pl": "PLACEHOLDER",
+            "en": "PLACEHOLDER"
+          }
         },
         {
           "key": "photos/red-bull/c7856957.jpg",
-          "alt": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" },
-          "caption": { "pl": "PLACEHOLDER", "en": "PLACEHOLDER" }
+          "alt": {
+            "pl": "PLACEHOLDER",
+            "en": "PLACEHOLDER"
+          },
+          "caption": {
+            "pl": "PLACEHOLDER",
+            "en": "PLACEHOLDER"
+          }
         }
       ]
     },
@@ -114,32 +89,16 @@
         "pl": "PLACEHOLDER",
         "en": "PLACEHOLDER"
       },
+      "description": {
+        "pl": "PLACEHOLDER",
+        "en": "PLACEHOLDER"
+      },
       "facts": {
         "breeding": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
         "trainingLevel": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "technique": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "rideability": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "temperament": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "handling": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "location": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
@@ -154,18 +113,11 @@
           "en": "PLACEHOLDER"
         }
       ],
-      "notFor": [
-        {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      ],
       "health": {
         "vaccinations": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
-        "dewormedOn": "2026-09-01",
         "knownIssues": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
@@ -184,20 +136,6 @@
             "bytes": 18000000
           }
         ]
-      },
-      "viewing": {
-        "lead": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "airport": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "visitDay": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
       },
       "videos": [],
       "photos": [],

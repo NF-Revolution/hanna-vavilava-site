@@ -87,7 +87,7 @@ Video goes through `scripts/video.mjs`, never the admin panel. It needs ffmpeg. 
 encodes the clip, cuts the poster, uploads everything this way, and prints the JSON to paste:
 
     npm run video -- <file> hero                  # homepage loop: MP4 + WebM + poster
-    npm run video -- <file> sales|round <slug>    # a horse's clip: MP4 + poster
+    npm run video -- <file> clip <slug>           # a horse's clip: MP4 + poster
 
 The hero's JSON replaces `hero` in `src/media.ts`, and a rebuild puts it on the homepage.
 A horse's clip goes into its Videos in the admin.

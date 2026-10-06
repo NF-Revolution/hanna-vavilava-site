@@ -58,6 +58,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.17 directions link        | #166               | done — `directionsHref` from lat/lng, footer + sent step 02, canvas v61     |
 | E4.18 whole entry opens      | #172               | done — stretched `.more::after`, hover/focus/touch states, canvas v62       |
 | E4.19 hero scroll cue        | #176               | done — centred cue on a veil after 4 s at top, hides on scroll, canvas v67  |
+| E4.20 media-first detail     | #179               | done — video strip, one description, 5 fewer fields, canvas v68             |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |
@@ -574,3 +575,9 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   (cookies need consent under ePrivacy art. 5(3)); if a regulator or a complaint ever presses
   it, the click-to-load `srcdoc` version is in the history of #175. The Privacy boards carry the
   notice word for word, so any privacy copy change edits them too.
+- The horse detail page is media first (E4.20, #179): videos in one CSS scroll-snap strip of any
+  number of titled clips, then the gallery, then one free `description`. The site was not live,
+  so the owner chose no migration path: the live `/horses` was rewritten in place once and the
+  schema stays strict on the new shape. Once the site is live, a schema change that breaks a
+  stored horse breaks every open pull request's preview and Publish on main until the database
+  matches, so it needs a read-time upgrade or an additive step instead.

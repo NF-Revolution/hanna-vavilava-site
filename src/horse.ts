@@ -50,6 +50,8 @@ export const horseSchema = z.strictObject({
   /* Decides the VAT invoice, the price label and the sale-kind line (#3). */
   seller: z.enum(['company', 'private']),
   headline: text,
+  /* One free text, Hanna's own story of the horse (E4.20). A blank line is a paragraph. */
+  description: text,
   /*
    * The exact `s_kon` spelling on livejumping.com, e.g. `LOTUS BLUE B&C`. The starts
    * sync (E2.12) fills `facts.starts` and `facts.lastStart` from it; empty is not synced.
@@ -63,20 +65,13 @@ export const horseSchema = z.strictObject({
     /* Written only by the starts sync (E2.12); `null` shows "on request" on the page. */
     lastStart: text.nullable().default(null),
     starts: text.nullable().default(null),
-    technique: text,
-    rideability: text,
-    temperament: text,
-    handling: text,
-    location: text,
     documents: text,
   }),
 
   suits: z.array(text).default([]),
-  notFor: z.array(text).default([]),
 
   health: z.object({
     vaccinations: text,
-    dewormedOn: z.string(),
     knownIssues: text,
   }),
   /* `null`: no study, the row is omitted. `files: []`: the study exists, the films are not out yet (#4). */
@@ -98,17 +93,12 @@ export const horseSchema = z.strictObject({
     .nullable()
     .default(null),
 
-  viewing: z.object({
-    lead: text,
-    airport: text,
-    visitDay: text,
-  }),
-
   videos: z
     .array(
       z.object({
         key,
-        kind: z.enum(['sales', 'round']),
+        /* The clip's heading and its VideoObject name (E4.20). Never empty. */
+        title: z.object({ pl: z.string().trim().min(1), en: z.string().trim().min(1) }),
         posterKey: key,
         durationS: z.number().int().positive(),
         transcript: text,

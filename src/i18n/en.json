@@ -8,8 +8,6 @@
     "close": "Close preview"
   },
   "video": {
-    "sales": "Sales video",
-    "round": "Full round, no cuts",
     "label": "{title} — {duration}",
     "minutes": {
       "one": "{count} minute",
@@ -139,12 +137,12 @@
     "link": "Horses for sale ({count})"
   },
   "detail": {
+    "videos": "Videos",
+    "description": "Description",
     "facts": "Facts",
     "scrollCue": "Scroll to details",
     "suits": "Who this horse is for",
-    "notFor": "Who it is not for",
     "health": "Health and veterinary records",
-    "viewing": "Viewing",
     "others": "Other horses",
     "gallery": "Gallery",
     "cta": {
@@ -165,20 +163,12 @@
       "lastStart": "Last start",
       "starts": "Starts",
       "price": "Price",
-      "technique": "Jumping technique",
-      "rideability": "Rideability",
-      "temperament": "Temperament",
-      "handling": "Handling",
       "location": "Location",
       "documents": "Documents",
       "sale": "Sale",
       "vaccinations": "Vaccinations",
-      "dewormedOn": "Deworming",
       "xrays": "X-rays",
-      "knownIssues": "Known issues",
-      "lead": "Lead time",
-      "airport": "Nearest airport",
-      "visitDay": "On the day"
+      "knownIssues": "Known issues"
     },
     "saleKind": {
       "company": "Company sale · VAT invoice",
@@ -633,7 +623,6 @@
       "fit": "Who it suits",
       "health": "Health",
       "xrays": "X-rays",
-      "viewing": "Viewing",
       "media": "Media"
     },
     "fields": {
@@ -649,29 +638,20 @@
       "seller": "Seller",
       "status": "Status",
       "headline": "Headline",
+      "description": "Description",
       "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
       "facts.trainingLevel": "Training level",
       "facts.lastStart": "Last start",
       "facts.starts": "Starts",
-      "facts.technique": "Technique",
-      "facts.rideability": "Rideability",
-      "facts.temperament": "Temperament",
-      "facts.handling": "Handling",
-      "facts.location": "Location",
       "facts.documents": "Documents",
       "suits": "Suits",
-      "notFor": "Not for",
       "health.vaccinations": "Vaccinations",
-      "health.dewormedOn": "Dewormed on",
       "health.knownIssues": "Known issues",
       "xrays.count": "Number of films",
       "xrays.takenOn": "Study date",
       "xrays.scope": "Scope",
       "xrays.files": "Files",
-      "viewing.lead": "Viewing lead time",
-      "viewing.airport": "Airport",
-      "viewing.visitDay": "Visit day",
       "videos": "Videos",
       "photos": "Photos",
       "phoneCover": "Phone cover"

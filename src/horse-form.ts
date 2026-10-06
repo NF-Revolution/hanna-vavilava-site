@@ -13,7 +13,7 @@
 type Fields = Record<string, unknown>;
 
 /* Lists of PL/EN pairs, edited as two textareas with one item per line. */
-const LINES = ['suits', 'notFor'];
+const LINES = ['suits'];
 const JSON_PATHS = ['videos'];
 
 export function toFields(horse: object): Fields {

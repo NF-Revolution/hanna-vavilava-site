@@ -1,8 +1,9 @@
 ---
 /*
- * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, sales
- * video, facts, the uncut round, suitability, health, gallery, viewing and the
- * other horses. A video or a gallery with nothing to show is left out (E4.5).
+ * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, the
+ * videos, the gallery, the description, facts, who it suits, health and the
+ * other horses. Media comes first, so a buyer sees the horse move before
+ * reading about it (E4.20). A section with nothing to show is left out (E4.5).
  * The enquiry, with this horse preselected, is the page's inverted band (E5.2),
  * and at 390 too: no script could carry the horse to the enquiry page.
  *
@@ -26,7 +27,7 @@ import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/forma
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
-import { livejumpingHref, site, whatsappHref } from '../site';
+import { directionsHref, livejumpingHref, site, stables, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -47,37 +48,48 @@ const url = new URL(path(locale, 'horse', slug), Astro.site).href;
 const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
 
 /*
- * The board's two columns of six, each closed by one of the sale rows (#2, #3).
- * A third slot links the value out; only Starts has one, to livejumping (#111).
+ * The board's two columns of five, each closed by one of the sale rows (#2, #3).
+ * A third slot links the value on: Starts to livejumping in a new tab (#111),
+ * Location to directions to the stables, as the footer does (#166). Every horse
+ * stands there, so Location is the stables, not a field (E4.20).
  */
-const factColumns: [string, string, string?][][] = [
+type Link = { href: string; text: string; newTab?: string };
+const factColumns: [string, string, Link?][][] = [
   [
     [d.rows.pedigree, horse.pedigree],
     [d.rows.breeding, f.breeding[locale]],
     [d.rows.trainingLevel, f.trainingLevel[locale]],
     [d.rows.level, `${horse.levelCm} cm`],
+    [d.rows.price, price],
+  ],
+  [
     [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
     [
       d.rows.starts,
       f.starts?.[locale] ?? d.infoOnRequest,
-      horse.livejumpingName ? livejumpingHref(horse.livejumpingName) : undefined,
+      horse.livejumpingName
+        ? {
+            href: livejumpingHref(horse.livejumpingName),
+            text: d.livejumping.link,
+            newTab: d.livejumping.newTab,
+          }
+        : undefined,
     ],
-    [d.rows.price, price],
-  ],
-  [
-    [d.rows.technique, f.technique[locale]],
-    [d.rows.rideability, f.rideability[locale]],
-    [d.rows.temperament, f.temperament[locale]],
-    [d.rows.handling, f.handling[locale]],
-    [d.rows.location, f.location[locale]],
+    [
+      d.rows.location,
+      `${stables.name}, ${stables.street}, ${stables.postalCode} ${stables.town}`,
+      { href: directionsHref, text: dict.footer.directions },
+    ],
     [d.rows.documents, f.documents[locale]],
     [d.rows.sale, d.saleKind[horse.seller]],
   ],
 ];
 
-/* ponytail: the first of each kind, as the boards draw one of each. */
-const salesVideo = horse.videos.find((v) => v.kind === 'sales');
-const roundVideo = horse.videos.find((v) => v.kind === 'round');
+/* Blank lines are paragraphs; a single line break stays one (`pre-line`). */
+const description = horse.description[locale]
+  .trim()
+  .split(/\n\s*\n/)
+  .filter(Boolean);
 
 const xrays = horse.xrays;
 const xrayDate = xrays && formatDate(locale, xrays.takenOn);
@@ -251,9 +263,43 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     </>
   ) : (
     <>
-      {salesVideo && (
+      {horse.videos.length > 0 && (
         <section class="band">
-          <Video video={salesVideo} locale={locale} horse={horse} />
+          <h2 class="lbl head" id="videos">
+            {d.videos}
+          </h2>
+          {/*
+           * Any number of clips in one scroll-snap strip, CSS only (E4.20). The next
+           * clip peeks in at the edge; with more than one the strip takes focus, so
+           * the arrow keys scroll it.
+           */}
+          <ul
+            class="reel"
+            tabindex={horse.videos.length > 1 ? 0 : undefined}
+            aria-labelledby="videos"
+          >
+            {horse.videos.map((video) => (
+              <li>
+                <Video video={video} locale={locale} horse={horse} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {horse.photos.length > 0 && (
+        <section class="band">
+          <h2 class="lbl head">{d.gallery}</h2>
+          <Gallery photos={horse.photos} locale={locale} />
+        </section>
+      )}
+      {description.length > 0 && (
+        <section class="band">
+          <h2 class="lbl head">{d.description}</h2>
+          <div class="copy story">
+            {description.map((para) => (
+              <p>{para}</p>
+            ))}
+          </div>
         </section>
       )}
       <section class="band">
@@ -261,18 +307,23 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
         <div class="cols">
           {factColumns.map((rows) => (
             <dl class="rows">
-              {rows.map(([label, value, href]) => (
+              {rows.map(([label, value, link]) => (
                 <div>
                   <dt class="lbl">{label}</dt>
                   <dd class="num">
                     {value}
-                    {href && (
-                      <a class="lbl fact-link" href={href} target="_blank" rel="noopener">
+                    {link && (
+                      <a
+                        class="lbl fact-link"
+                        href={link.href}
+                        target={link.newTab && '_blank'}
+                        rel={link.newTab && 'noopener'}
+                      >
                         <span>
-                          {d.livejumping.link}
-                          <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                          {link.text}
+                          {link.newTab && <span class="visually-hidden"> {link.newTab}</span>}
                         </span>
-                        <span aria-hidden="true">&#8599;</span>
+                        <span aria-hidden="true">{link.newTab ? '↗' : '→'}</span>
                       </a>
                     )}
                   </dd>
@@ -282,24 +333,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           ))}
         </div>
       </section>
-      {roundVideo && (
-        <section class="band">
-          <Video video={roundVideo} locale={locale} horse={horse} />
-        </section>
-      )}
       <section class="band cols">
         <div class="ruled">
           <h2 class="lbl head">{d.suits}</h2>
           <ul class="list">
             {horse.suits.map((item) => (
-              <li class="copy">{item[locale]}</li>
-            ))}
-          </ul>
-        </div>
-        <div class="ruled">
-          <h2 class="lbl head">{d.notFor}</h2>
-          <ul class="list">
-            {horse.notFor.map((item) => (
               <li class="copy">{item[locale]}</li>
             ))}
           </ul>
@@ -312,10 +350,6 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
             <div>
               <dt class="lbl">{d.rows.vaccinations}</dt>
               <dd>{horse.health.vaccinations[locale]}</dd>
-            </div>
-            <div>
-              <dt class="lbl">{d.rows.dewormedOn}</dt>
-              <dd class="num">{formatDate(locale, horse.health.dewormedOn)}</dd>
             </div>
           </dl>
           <dl class="rows">
@@ -362,29 +396,6 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           </dl>
         </div>
         <p class="copy note">{d.vetNote}</p>
-      </section>
-      {horse.photos.length > 0 && (
-        <section class="band">
-          <h2 class="lbl head">{d.gallery}</h2>
-          <Gallery photos={horse.photos} locale={locale} />
-        </section>
-      )}
-      <section class="band">
-        <h2 class="lbl head">{d.viewing}</h2>
-        <div class="cols cols-3">
-          {(
-            [
-              [d.rows.lead, horse.viewing.lead],
-              [d.rows.airport, horse.viewing.airport],
-              [d.rows.visitDay, horse.viewing.visitDay],
-            ] as const
-          ).map(([label, value]) => (
-            <div class="ruled">
-              <h3 class="lbl head">{label}</h3>
-              <p class="copy">{value[locale]}</p>
-            </div>
-          ))}
-        </div>
       </section>
       <section class="enquire dk" id="enquiry">
         <div class="enquire-intro">
@@ -625,9 +636,38 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     gap: 0 80px;
   }
 
-  .cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0 60px;
+  .reel {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+
+  .reel > li {
+    flex: 0 0 85%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .reel > li:only-child {
+    flex-basis: 100%;
+  }
+
+  .story {
+    max-width: 68ch;
+  }
+
+  .story p {
+    margin: 0 0 18px;
+    white-space: pre-line;
+  }
+
+  .story p:last-child {
+    margin-bottom: 0;
   }
 
   .ruled {
@@ -891,10 +931,13 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       margin-bottom: 12px;
     }
 
-    .cols,
-    .cols-3 {
+    .cols {
       grid-template-columns: 1fr;
       gap: 26px;
+    }
+
+    .reel {
+      gap: 12px;
     }
 
     /* Stacked, the two fact columns read as one table. */
