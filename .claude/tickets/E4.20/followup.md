@@ -1,10 +1,23 @@
 # E4.20 — followup
 
-Shipped 2026-10-06 — see the last `## Outcome` at the bottom.
+Reopened 2026-10-06 — in flight; 1 shipped cycle(s) at the bottom.
 
 Issue #179.
 
-## 2026-10-06
+## 2026-10-06 — cycle 2
+
+- Owner on preview: "UI looks like shit". Facts misaligned (right rows taller from links,
+  Dla kogo orphaned), gallery grows with photos, 85% video cards wrong.
+- Built: facts + health as one `dl.table` grid, `grid-auto-flow: column` on shared row tracks
+  (`--rows` inline var), lines = border-bottom + `box-shadow: 0 -1px` (no nth-child per column
+  needed). Dla kogo = a fact row. Gallery = cover + scroll strip, script untouched (index order
+  kept). Videos = `:target` stage + preview strip, ~150 B `hashchange` pause script.
+- Trap: headless Chrome (new) has a ~500 px minimum window, so a 390 screenshot is clipped.
+  Shoot through an iframe wrapper `<iframe style="width:390px">` instead.
+- Trap: another session's `astro preview` held 4331; serve dist with `python3 -m http.server`.
+- Review round 2: clear. Waiting on owner sign-off on 1440 + 390 real-photo shots before push
+  (memory rule for photo framing).
+  next: owner approves shots, then finalize cycle 2, push, comment on #181.
 
 - Plan approved with a read-time upgrade shim (`storedHorse = z.preprocess(upgrade, horseSchema)`)
   plus committed migration script, because preview and deploy builds read the live DB.

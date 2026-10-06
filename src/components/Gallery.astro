@@ -1,7 +1,8 @@
 ---
 /*
- * The horse gallery (E3.5): a two-column grid of thumbnails and one <dialog>
- * that shows them full size. With JavaScript off each thumbnail is a link to
+ * The horse gallery (E3.5): the cover large, the rest in one strip of thumbnails
+ * that scrolls sideways, so the section never grows with the photo count
+ * (E4.20), and one <dialog> that shows them full size. With JavaScript off each thumbnail is a link to
  * the full image, built into dist/ — never the Storage URL, which visitors do
  * not read (E2.5). With it on, showModal() gives the focus trap, Escape and
  * inertness; the script adds open-at-the-photo, left/right on desktop and
@@ -41,15 +42,25 @@ const full = await Promise.all(
 const number = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
-<ul class="gallery">
-  {photos.map((photo, i) => (
-    <li>
-      <a class="gallery-thumb" href={full[i].src}>
-        <Photo photo={photo} locale={locale} sizes="50vw" />
-      </a>
-    </li>
-  ))}
-</ul>
+{/* Big first, then the strip, so `.gallery-thumb` index `i` is still photo `i` for the script. */}
+<a class="gallery-thumb gallery-cover" href={full[0].src}>
+  <Photo photo={photos[0]} locale={locale} sizes="100vw" />
+</a>
+{photos.length > 1 && (
+  <ul
+    class="gallery-strip"
+    tabindex={photos.length > 2 ? 0 : undefined}
+    aria-label={dict.detail.gallery}
+  >
+    {photos.slice(1).map((photo, i) => (
+      <li>
+        <a class="gallery-thumb" href={full[i + 1].src}>
+          <Photo photo={photo} locale={locale} sizes="160px" />
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
 
 <dialog id="hv-gallery" class="lightbox" aria-label={dict.gallery.preview}>
   <form method="dialog">
@@ -112,19 +123,33 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
 </script>
 
 <style>
-  .gallery {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px;
-  }
-
   .gallery-thumb {
     display: block;
-    height: 470px;
-    background: var(--ground-light);
+    background: var(--placeholder);
+  }
+
+  .gallery-cover {
+    height: 620px;
+  }
+
+  .gallery-strip {
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 0;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+
+  .gallery-strip li {
+    flex: 0 0 160px;
+    scroll-snap-align: start;
+  }
+
+  .gallery-strip .gallery-thumb {
+    height: 110px;
   }
 
   .gallery-thumb :global(img),
@@ -209,8 +234,16 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
   }
 
   @media (max-width: 720px) {
-    .gallery-thumb {
-      height: 190px;
+    .gallery-cover {
+      height: 260px;
+    }
+
+    .gallery-strip li {
+      flex-basis: 96px;
+    }
+
+    .gallery-strip .gallery-thumb {
+      height: 72px;
     }
 
     .lightbox-slides {
