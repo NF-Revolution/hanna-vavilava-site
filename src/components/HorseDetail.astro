@@ -190,10 +190,26 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           </a>
         </div>
       )}
+      <a class="hero-cue" href="#details">
+        <span class="visually-hidden">{d.scrollCue}</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 22"
+          width="16"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.25"
+        >
+          <path d="M2 2l6 5 6-5" />
+          <path d="M2 8l6 5 6-5" />
+          <path d="M2 14l6 5 6-5" />
+        </svg>
+      </a>
     </div>
   </section>
 
-  <SubBar>
+  <SubBar id="details">
     <p slot="label" class="lbl crumb">
       <a href={path(locale, 'horses')}>{dict.nav.horses}</a>
       <span aria-hidden="true">/</span>
@@ -411,7 +427,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 
   /*
    * At 390 the sticky WhatsApp bar (MobileBar, 81px) sits over the hero's foot
-   * on a horse for sale, so its text is padded clear of it (#149).
+   * on a horse for sale, so its text and the scroll cue are padded clear of it (#149).
    */
 
   .hero {
@@ -482,6 +498,54 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     box-sizing: border-box;
     background: var(--ink-inv);
     color: var(--ground-dark);
+  }
+
+  /*
+   * The scroll cue (E4.19): a plain link past the hero, so it works without
+   * JavaScript. It sits in the text's bottom padding, on the same scrim, centred
+   * between the name and the offer. Motion is fades only: the chevrons pulse
+   * top to bottom. Negative delays start them mid-cycle, so nothing flashes, and
+   * base.css cuts the loop under reduced motion, leaving them static and solid.
+   */
+  .hero-cue {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .hero-cue path {
+    animation: hero-cue 1.8s ease-in-out infinite;
+  }
+
+  .hero-cue path:nth-child(1) {
+    animation-delay: -0.4s;
+  }
+
+  .hero-cue path:nth-child(2) {
+    animation-delay: -0.2s;
+  }
+
+  @keyframes hero-cue {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+
+  /* Smooth only on this page, and only for visitors who have not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:has(.hero-cue)) {
+      scroll-behavior: smooth;
+    }
   }
 
   .crumb {
@@ -747,11 +811,16 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       flex-direction: column;
       align-items: stretch;
       gap: 18px;
-      padding: 120px var(--gutter-mobile) 24px;
+      /* 24px under the text, plus a row for the cue, plus the bar when there is one. */
+      padding: 120px var(--gutter-mobile) calc(68px + var(--bar, 0px));
     }
 
     .hero-barred .hero-text {
-      padding-bottom: calc(24px + 81px + env(safe-area-inset-bottom));
+      --bar: calc(81px + env(safe-area-inset-bottom));
+    }
+
+    .hero-cue {
+      bottom: calc(12px + var(--bar, 0px));
     }
 
     .hero-name {

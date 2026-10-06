@@ -140,6 +140,7 @@
   },
   "detail": {
     "facts": "Facts",
+    "scrollCue": "Scroll to details",
     "suits": "Who this horse is for",
     "notFor": "Who it is not for",
     "health": "Health and veterinary records",
