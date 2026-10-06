@@ -97,7 +97,9 @@ const imageVw = [61, 61, 61, 70];
     padding: 0;
   }
 
+  /* The entry is the link's box: see `.more::after`. */
   .entry {
+    position: relative;
     display: grid;
     align-items: center;
     grid-template-columns: 880fr 560fr;
@@ -203,6 +205,56 @@ const imageVw = [61, 61, 61, 70];
     padding-bottom: 9px;
     border-bottom: 1px solid var(--ink);
     align-self: flex-start;
+  }
+
+  /*
+   * The whole entry opens the horse (#172): the link's own box stretches over the
+   * <li>, so there is still one tab stop named "more: <horse>". Wrapping the entry
+   * in the <a> would make the name, facts, price and blurb the link name instead.
+   * ponytail: the overlay covers the blurb too, so its text cannot be selected.
+   * Lift `.blurb` above it (`position: relative; z-index: 1`) if that matters
+   * more than a click on the blurb opening the horse.
+   */
+  .more::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Hovering anywhere on the entry is hovering the link: the rule doubles. */
+  .more:hover {
+    box-shadow: 0 1px 0 var(--ink);
+  }
+
+  /* Inset, because the list runs edge to edge and an outer ring falls off-screen. */
+  .more:focus-visible {
+    outline: none;
+  }
+
+  .more:focus-visible::after {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .fig :global(img) {
+      transition: transform 0.6s ease-out;
+    }
+
+    .entry:hover .fig :global(img),
+    .entry:has(.more:focus-visible) .fig :global(img) {
+      transform: scale(1.03);
+    }
+  }
+
+  /* No hover on touch, so the link has to look like one at rest. */
+  @media (hover: none) {
+    .more {
+      align-self: stretch;
+      justify-content: space-between;
+      padding: 0 16px;
+      border: 1px solid var(--ink);
+    }
   }
 
   /* Stacked well before 720, so the photo column never turns narrow (#160). */
