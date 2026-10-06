@@ -7,7 +7,7 @@
           "https://hanna-vavilava-site.firebaseapp.com",
           "http://localhost:4321"
         ],
-        "methods": ["PUT", "HEAD"],
+        "methods": ["PUT", "HEAD", "GET"],
         "headers": ["content-type", "content-disposition", "cache-control"]
       },
       "maxAgeSeconds": 3600
