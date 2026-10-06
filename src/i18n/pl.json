@@ -265,8 +265,6 @@
       "map": {
         "head": "Gdzie stoją konie",
         "title": "Mapa Google: {stables}",
-        "load": "Pokaż mapę",
-        "note": "Mapa wczyta się z serwerów Google. Google zobaczy adres IP i może zapisać pliki cookie.",
         "open": "Otwórz w Mapach Google"
       },
       "band": {
@@ -396,7 +394,7 @@
           "Ochrona formularza: adres IP i dane przeglądarki pomagają odróżnić człowieka od bota i ograniczyć liczbę zapytań z jednego adresu. Adres IP nie jest zapisywany. Podstawą jest prawnie uzasadniony interes administratora, czyli ochrona kanału kontaktu przed spamem (art. 6 ust. 1 lit. f RODO).",
           "Działanie strony: przy każdym wejściu serwer przetwarza adres IP i dane żądania, aby dostarczyć stronę i chronić ją przed nadużyciami (art. 6 ust. 1 lit. f RODO).",
           "Statystyki odwiedzin: liczymy odsłony i kilka zdarzeń, na przykład wysłanie zapytania. Statystyki nie używają plików cookie i niczego nie zapisują na urządzeniu. Wizyta jest rozpoznawana po skrócie adresu IP i przeglądarki z solą zmienianą codziennie, więc nie da się jej powiązać z osobą ani z wizytą z innego dnia. Adres strony jest wysyłany bez części po znaku #. Podstawą jest prawnie uzasadniony interes: wiedza, które części strony działają (art. 6 ust. 1 lit. f RODO).",
-          "Mapa na stronie „O mnie”: dopóki nie naciśniesz „Pokaż mapę”, nic nie trafia do Google. Po naciśnięciu przeglądarka wczytuje mapę z serwerów Google. Google otrzymuje wtedy adres IP i dane przeglądarki i może zapisać na urządzeniu własne pliki cookie. Podstawą jest zgoda wyrażona naciśnięciem przycisku (art. 6 ust. 1 lit. a RODO oraz art. 399 ustawy – Prawo komunikacji elektronicznej). Bez niej adres stajni i link do Map Google pozostają dostępne obok mapy. Zgodę można wycofać, usuwając pliki cookie Google w przeglądarce, bez wpływu na zgodność z prawem wcześniejszego przetwarzania. Dalej Google przetwarza te dane jako odrębny administrator, na zasadach swojej polityki prywatności."
+          "Mapa na stronie „O mnie”: mapa wczytuje się z serwerów Google, gdy przewiniesz do niej stronę. Google otrzymuje wtedy adres IP i dane przeglądarki i może zapisać na urządzeniu własne pliki cookie. Podstawą jest prawnie uzasadniony interes: pokazanie, gdzie stoją konie, zanim kupujący umówi oglądanie (art. 6 ust. 1 lit. f RODO). Dalej Google przetwarza te dane jako odrębny administrator, na zasadach swojej polityki prywatności. Pliki cookie stron trzecich można zablokować w przeglądarce; adres stajni i link do Map Google stoją obok mapy."
         ]
       },
       "processors": {
@@ -468,10 +466,10 @@
       "device": {
         "h": "Pliki cookie i pamięć urządzenia",
         "p": [
-          "Strona nie ustawia plików cookie i niczego nie zapisuje na Twoim urządzeniu, dlatego nie wyświetla banera zgody. Przeglądarka sama przechowuje kopie stron i zdjęć w pamięci podręcznej, aby szybciej je wczytać; możesz ją wyczyścić w dowolnej chwili.",
+          "Strona nie ustawia plików cookie i niczego nie zapisuje na Twoim urządzeniu, dlatego nie prosi o zgodę. Przeglądarka sama przechowuje kopie stron i zdjęć w pamięci podręcznej, aby szybciej je wczytać; możesz ją wyczyścić w dowolnej chwili.",
           "Filmy to zwykłe pliki z naszej subdomeny {media}, a nie odtwarzacz osadzony z cudzego serwisu. Film na stronie konia pobiera się dopiero po naciśnięciu odtwarzania; wcześniej tylko kadr tytułowy. Krótka pętla na stronie głównej pobiera się od razu, chyba że przeglądarka prosi o ograniczenie ruchu lub oszczędzanie danych albo połączenie jest wolne. W obu przypadkach przeglądarka pobiera film z Cloudflare R2, który — jak każdy serwer — widzi adres IP i nie ustawia plików cookie. Odtworzenie liczymy w statystykach jako zdarzenie, również bez plików cookie.",
           "Gdy zaczniesz wypełniać formularz zapytania lub zapisu na powiadomienia, strona wczytuje Cloudflare Turnstile. Cloudflare może wtedy zapisać na urządzeniu własne pliki cookie bezpieczeństwa. Są one niezbędne, aby odróżnić człowieka od bota, więc nie wymagają zgody.",
-          "Mapa na stronie „O mnie” wczytuje się z Google dopiero po naciśnięciu „Pokaż mapę”. Wcześniej to zwykła ramka z naszej strony, bez żadnego połączenia z Google. Po naciśnięciu Google może zapisać na urządzeniu własne pliki cookie. To jedyne pliki cookie na tej stronie, które wymagają zgody, a jest nią naciśnięcie przycisku."
+          "Mapa na stronie „O mnie” wczytuje się z Google, gdy przewiniesz do niej stronę. Google może wtedy zapisać na urządzeniu własne pliki cookie, na zasadach swojej polityki prywatności. Nasza strona ich nie ustawia ani nie odczytuje."
         ]
       },
       "turnstile": "Formularze zapytań i zapisu na powiadomienia są chronione przed spamem usługą Cloudflare Turnstile. Gdy ktoś zacznie wypełniać formularz, Cloudflare przetwarza jego adres IP i dane przeglądarki, aby odróżnić człowieka od bota. Podstawą jest prawnie uzasadniony interes: ochrona kanału, którym kupujący piszą do Hanny (art. 6 ust. 1 lit. f RODO). Zapytanie, które nie przejdzie tej weryfikacji, nie jest zapisywane.",
