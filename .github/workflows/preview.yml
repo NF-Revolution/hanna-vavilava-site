@@ -1,12 +1,15 @@
 name: preview
 
 # A Hosting preview channel per pull request, so a change can be walked
-# through on a real URL next to the artboards before it reaches main.
+# through on a real URL next to the artboards before it reaches main, and
+# deleted when the pull request closes: a site holds at most 50 channels (E1.12).
 on:
   pull_request:
+    types: [opened, synchronize, reopened, closed]
 
 # One channel per pull request, so two pushes must not race it. Without this,
 # the second build can finish first and the comment advertises the older commit.
+# Closing cancels a deploy still running, which would recreate the channel.
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -19,7 +22,7 @@ jobs:
     # contribution. Skip rather than fail in both cases. Setting the variable
     # turns the first half back on, no edit needed.
     if: >-
-      ${{ vars.FIREBASE_PROJECT_ID != '' &&
+      ${{ github.event.action != 'closed' && vars.FIREBASE_PROJECT_ID != '' &&
       github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
@@ -45,3 +48,35 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           expires: 14d
+
+  cleanup:
+    # Same guard as the deploy: a fork pull request never got a channel.
+    if: >-
+      ${{ github.event.action == 'closed' && vars.FIREBASE_PROJECT_ID != '' &&
+      github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      # The channel commands refuse to run without a firebase.json. The base
+      # branch has one whether the pull request merged or was abandoned.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          sparse-checkout: firebase.json
+          sparse-checkout-cone-mode: false
+      # The action names the channel pr<N>-<first 20 characters of the branch>.
+      # Matching the pr<N>- prefix in the live list finds it without copying
+      # that truncation rule. No match means it expired: nothing to delete.
+      # A failed list (bad credentials) still fails the job.
+      - env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PROJECT: ${{ vars.FIREBASE_PROJECT_ID }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/service-account.json"
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          firebase() { npx -y firebase-tools@15 "$@" --project "$PROJECT" --site hanna-vavilava-site; }
+          channels=$(firebase hosting:channel:list --json)
+          ids=$(jq -r --arg prefix "pr$PR-" \
+            '.result.channels[].name | sub(".*/"; "") | select(startswith($prefix))' <<<"$channels")
+          for id in $ids; do firebase hosting:channel:delete "$id" --force; done
+          echo "Deleted: ${ids:-none}"

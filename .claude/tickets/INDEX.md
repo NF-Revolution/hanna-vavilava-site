@@ -22,6 +22,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E1.4 preview channel         | #9                 | done — a channel per PR, 14d, verified on #76                               |
 | E1.10 accessibility baseline | #15                | done                                                                        |
 | E1.11 media bucket           | #69                | done — `hanna-vavilava-media` on `hv-media.nfrevolution.com`                |
+| E1.12 preview channel delete | #134               | done — `cleanup` job in `preview.yml` deletes `pr<N>-*` on close            |
 | E1.13 drawer outside click   | #167               | done — click beside the panel closes it, press start checked                |
 | E2.1 database shape, rules   | #16                | done — `src/horse.ts`, admin-only rules, `npm test`                         |
 | E2.2 build-time loader       | #17                | done — `src/content.config.ts`, fixture fallback, prod seeded               |
