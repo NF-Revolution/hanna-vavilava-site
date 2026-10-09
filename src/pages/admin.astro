@@ -168,13 +168,6 @@ const hints: Record<string, string> = {
           </p>
           <p id="list-error" role="alert"></p>
           <p>
-            <button type="button" id="preview">
-              {a.preview}
-            </button>
-            <small>{a.previewHint}</small>
-          </p>
-          <p id="preview-status" role="status"></p>
-          <p>
             <button type="button" id="publish">
               {a.publish}
             </button>
@@ -306,10 +299,15 @@ const hints: Record<string, string> = {
             <button type="submit" id="save">
               {a.save}
             </button>
+            <button type="button" id="preview">
+              {a.preview}
+            </button>
             <button type="button" id="cancel">
               {a.cancel}
             </button>
           </div>
+          <small>{a.previewHint}</small>
+          <p id="preview-status" role="status"></p>
         </form>
 
         <template id="row">
@@ -406,6 +404,7 @@ const hints: Record<string, string> = {
   import { horseSchema } from '../horse';
   import { fromFields, halfPairs, toFields } from '../horse-form';
   import { plural } from '../i18n/format';
+  import { path } from '../i18n/routes';
   import { admin } from '../i18n/pl.json';
   import { media, xrayMaxBytes } from '../media';
   import { downscale, photoKey } from '../photo';
@@ -749,6 +748,8 @@ const hints: Record<string, string> = {
     xrayInput.disabled = true;
     xrayList.replaceChildren();
     for (const file of storedXrays()) addXray(file);
+    // A build still running keeps its line: its link names the horse it was started for.
+    if (!previewButton.disabled) previewStatus.textContent = '';
     slugInput.value = slug ?? '';
     slugInput.readOnly = slug !== null;
     editorTitle.textContent = slug ? (horses[slug].name ?? slug) : admin.newHorse;
@@ -774,11 +775,18 @@ const hints: Record<string, string> = {
     );
   }
 
-  editor.addEventListener('submit', async (event) => {
-    event.preventDefault();
+  /*
+   * Checks and writes the form. Returns the slug as saved, or nothing with the reasons
+   * on screen. The editor stays open on that horse, so a new one becomes an existing one.
+   */
+  async function saveHorse(): Promise<string | undefined> {
     errors.replaceChildren();
+    if (!editor.reportValidity()) return;
     const slug = slugInput.value;
-    if (editing === null && Object.hasOwn(horses, slug)) return fail([admin.slugTaken]);
+    if (editing === null && Object.hasOwn(horses, slug)) {
+      fail([admin.slugTaken]);
+      return;
+    }
 
     const fields = Object.fromEntries(
       controls().map((el) => [
@@ -842,12 +850,21 @@ const hints: Record<string, string> = {
       if (gone.length) await xrayDelete({ keys: gone });
       // Through JSON: the Realtime Database rejects `undefined` anywhere in a write.
       await set(ref(db, `horses/${slug}`), JSON.parse(JSON.stringify(result.data)));
-      close();
+      editing = slug;
+      slugInput.readOnly = true;
+      uploaded = new Set();
+      editorTitle.textContent = result.data.name;
+      return slug;
     } catch {
       fail([admin.saveFailed]);
     } finally {
       save.disabled = false;
     }
+  }
+
+  editor.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (await saveHorse()) close();
   });
 
   /*
@@ -894,9 +911,10 @@ const hints: Record<string, string> = {
   });
 
   /*
-   * Preview (E2.15): the Function dispatches `draft.yml`, which builds what is saved to
-   * the `draft` channel. The channel's URL ends in a hash Firebase picks, so the panel
-   * reads it from the `draft` environment's newest deployment status.
+   * Preview (E2.15, E2.16): the editor saves first, because the build reads the database,
+   * then the Function dispatches `draft.yml`, which builds what is saved to the `draft`
+   * channel. The channel's URL ends in a hash Firebase picks, so the panel reads it from
+   * the `draft` environment's newest deployment status.
    */
   const previewButton = $<HTMLButtonElement>('preview');
   const previewStatus = $('preview-status');
@@ -909,19 +927,36 @@ const hints: Record<string, string> = {
     return status?.environment_url || undefined;
   }
 
+  const newTab = (href: string, text: string) =>
+    Object.assign(document.createElement('a'), {
+      href,
+      target: '_blank',
+      rel: 'noopener',
+      textContent: text,
+    });
+
   previewButton.addEventListener('click', async () => {
     previewButton.disabled = true;
-    previewStatus.textContent = admin.publishSending;
+    previewStatus.textContent = '';
     try {
+      // The slug as saved, so a link never names a page the build does not have.
+      const slug = await saveHorse();
+      if (!slug) return;
+      const name = horses[slug]?.name ?? slug;
+      previewStatus.textContent = admin.publishSending;
       const { data } = await previewCall();
       previewStatus.textContent = admin.previewBuilding;
-      const url = (await deployed('draft.yml', data.at)) && (await draftUrl());
-      if (!url) throw new Error('no preview URL');
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.textContent = admin.previewDone;
-      previewStatus.replaceChildren(link);
+      const base = (await deployed('draft.yml', data.at)) && (await draftUrl());
+      if (!base) throw new Error('no preview URL');
+      previewStatus.replaceChildren(
+        newTab(
+          new URL(path('pl', 'horse', slug), base).href,
+          admin.previewHorse.replace('{name}', name),
+        ),
+        ' · ',
+        newTab(new URL(path('pl', 'horses'), base).href, admin.previewList),
+        ` ${admin.previewReady}`,
+      );
     } catch {
       previewStatus.textContent = admin.previewFailed;
     } finally {
