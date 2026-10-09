@@ -29,6 +29,15 @@ For each ticket, read its code from `gh issue view <N> --json title` (`E2.9` →
 
     claude --bg -w <worktree> --permission-mode plan "/ticket-implement #<N>"
 
+Write one literal command per ticket, with the worktree and number typed in, chained with
+`&&`. Never a loop over `"e5-1 40"`-style pairs with `set -- $p`: the shell is zsh, which
+does not word-split `$p`, so every session starts as `/ticket-implement #` with no number
+and exits silently.
+
+Then check before reporting: `/usr/bin/git worktree list` shows each worktree, and
+`claude logs <id> | head -3` shows `/ticket-implement #<N>` with the number. A launch that
+printed a session id has not necessarily started one.
+
 Return one line per ticket — code, session id — and point at `claude agents` and
 `claude attach <id>`. Each session checks its own blockers (§3). Once the pull requests
 merge, `worktree-clean` removes the sessions, worktrees and branches.
