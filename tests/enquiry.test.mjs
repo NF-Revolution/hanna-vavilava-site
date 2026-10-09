@@ -190,6 +190,17 @@ test('the endpoint stores a real enquiry, drops a bot silently and limits an add
   assert.equal(trapped.status, 303);
   assert.equal(trapped.headers.get('location'), '/zapytanie/wyslane');
   assert.equal((await post({ ...valid, elapsed: '800' })).status, 303);
+  // A post from a Hosting channel, the `draft` preview's here, is a test (E2.15): sent page, nothing written.
+  const draft = await fetch('http://127.0.0.1:5001/demo-hv/europe-central2/submitEnquiry', {
+    method: 'POST',
+    redirect: 'manual',
+    headers: {
+      'Fastly-Client-IP': '203.0.113.4',
+      Origin: 'https://hanna-vavilava-site--draft-a1b2c3d4.web.app',
+    },
+    body: new URLSearchParams({ ...human, ...valid, elapsed: '9000' }),
+  });
+  assert.equal(draft.headers.get('location'), '/en/enquiry/sent');
   assert.equal(Object.keys(await enquiries()).length, before + 2);
 
   assert.equal(await failed({ ...valid, whatsapp: '600' }), '/en/enquiry/not-sent');

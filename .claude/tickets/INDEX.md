@@ -37,6 +37,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E2.12 livejumping starts     | #110               | done — `refreshStarts` button + `startsWeekly`, not deployed                |
 | E2.13 starts height, season  | #122               | done — string `wysokosc_p`, one season reads as a sentence                  |
 | E2.14 enquiry inbox page     | #158               | done — `/admin/zapytania` lists, `/admin` counts unhandled live             |
+| E2.15 preview build          | #184               | done — `preview` callable, `draft.yml` to channel `draft`, not deployed     |
 | E3.1 responsive picture      | #25                | done — `Photo.astro`, size inferred at build, CI checks size                |
 | E3.5 gallery lightbox        | #29                | done — `Gallery.astro`, mounted on the detail page by E4.5                  |
 | E3.6 photo intake guide      | #30                | done — `/admin/poradnik`, Polish, limits imported from code                 |
@@ -593,3 +594,13 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   schema stays strict on the new shape. Once the site is live, a schema change that breaks a
   stored horse breaks every open pull request's preview and Publish on main until the database
   matches, so it needs a read-time upgrade or an additive step instead.
+- Preview (E2.15, #184) builds the saved database to one Hosting channel `draft`, through
+  `draft.yml` and its own concurrency group. It does none of Publish's jobs: no
+  `/site/updated` stamp, no sold-X-ray delete, no announcement, never live. The channel URL
+  ends in a hash Firebase picks, and it picks a new one after the 30-day expiry. So the URL lives
+  on the `draft` GitHub environment's deployment, which the admin reads after the run. It does
+  not live in `src/site.ts`.
+- A form posted from any Hosting channel (E2.15) is a test. That covers the `draft` preview and
+  every pull request's channel. `submitEnquiry` and the notify signup treat it as the honeypot:
+  the sent page, with nothing stored, mailed or messaged. They recognise a channel by `--` in
+  `Origin` or `X-Forwarded-Host`. Before this, a test enquiry from a PR preview reached Hanna.
