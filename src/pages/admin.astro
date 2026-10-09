@@ -168,6 +168,13 @@ const hints: Record<string, string> = {
           </p>
           <p id="list-error" role="alert"></p>
           <p>
+            <button type="button" id="preview">
+              {a.preview}
+            </button>
+            <small>{a.previewHint}</small>
+          </p>
+          <p id="preview-status" role="status"></p>
+          <p>
             <button type="button" id="publish">
               {a.publish}
             </button>
@@ -852,11 +859,11 @@ const hints: Record<string, string> = {
   const publishCall = httpsCallable<void, { at: number }>(functions, 'publish');
   // ponytail: the unauthenticated Actions API — 60 requests an hour per IP, and the repo
   // must stay public. A second callable reading runs with the PAT is the upgrade.
-  const runs =
-    'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site/actions/workflows/deploy.yml/runs?event=repository_dispatch&per_page=1';
+  const repo = 'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site';
 
-  /* Resolves true when the first deploy run created after `since` succeeds. Gives up after 15 minutes. */
-  async function deployed(since: number) {
+  /* Resolves true when the first `workflow` run created after `since` succeeds. Gives up after 15 minutes. */
+  async function deployed(workflow: string, since: number) {
+    const runs = `${repo}/actions/workflows/${workflow}/runs?event=repository_dispatch&per_page=1`;
     for (let i = 0; i < 60; i++) {
       await new Promise((resolve) => setTimeout(resolve, 15_000));
       const run = await fetch(runs, { cache: 'no-store' })
@@ -876,13 +883,49 @@ const hints: Record<string, string> = {
     try {
       const { data } = await publishCall();
       publishStatus.textContent = admin.publishBuilding;
-      publishStatus.textContent = (await deployed(data.at))
+      publishStatus.textContent = (await deployed('deploy.yml', data.at))
         ? admin.publishDone
         : admin.publishFailed;
     } catch {
       publishStatus.textContent = admin.publishFailed;
     } finally {
       publishButton.disabled = false;
+    }
+  });
+
+  /*
+   * Preview (E2.15): the Function dispatches `draft.yml`, which builds what is saved to
+   * the `draft` channel. The channel's URL ends in a hash Firebase picks, so the panel
+   * reads it from the `draft` environment's newest deployment status.
+   */
+  const previewButton = $<HTMLButtonElement>('preview');
+  const previewStatus = $('preview-status');
+  const previewCall = httpsCallable<void, { at: number }>(functions, 'preview');
+
+  async function draftUrl(): Promise<string | undefined> {
+    const json = (url: string) => fetch(url, { cache: 'no-store' }).then((r) => r.json());
+    const [deployment] = await json(`${repo}/deployments?environment=draft&per_page=1`);
+    const [status] = await json(deployment.statuses_url);
+    return status?.environment_url || undefined;
+  }
+
+  previewButton.addEventListener('click', async () => {
+    previewButton.disabled = true;
+    previewStatus.textContent = admin.publishSending;
+    try {
+      const { data } = await previewCall();
+      previewStatus.textContent = admin.previewBuilding;
+      const url = (await deployed('draft.yml', data.at)) && (await draftUrl());
+      if (!url) throw new Error('no preview URL');
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.textContent = admin.previewDone;
+      previewStatus.replaceChildren(link);
+    } catch {
+      previewStatus.textContent = admin.previewFailed;
+    } finally {
+      previewButton.disabled = false;
     }
   });
 

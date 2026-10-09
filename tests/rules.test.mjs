@@ -112,9 +112,12 @@ const callFn = (name, auth, data = null) =>
   }).then((r) => r.status);
 const publish = (auth) => callFn('publish', auth);
 
-test('Publish refuses anonymous and non-admin callers and stamps nothing', async () => {
+test('Publish and Preview refuse anonymous and non-admin callers and stamp nothing', async () => {
   assert.equal(await publish(null), 403);
   assert.equal(await publish(user), 403);
+  // 403 is `permission-denied` thrown before the dispatch. A dispatch would answer 500.
+  assert.equal(await callFn('preview', null), 403);
+  assert.equal(await callFn('preview', user), 403);
   const updated = await fetch(
     `http://${host}/site/updated.json?ns=hanna-vavilava-site-default-rtdb`,
     { headers: { Authorization: 'Bearer owner' } },

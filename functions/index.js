@@ -266,6 +266,15 @@ async function release() {
   const updated = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format();
   await getDatabase().ref('site/updated').set(updated);
 
+  return { updated, at: await dispatch('publish') };
+}
+
+/*
+ * Starts a workflow: `publish` runs `deploy.yml`, `preview` runs `draft.yml`. Returns the
+ * time just before the dispatch. The panel finds the run by it, so the time comes from the
+ * server's clock, not the browser's.
+ */
+async function dispatch(event_type) {
   const at = Date.now();
   const res = await fetch(
     'https://api.github.com/repos/NF-Revolution/hanna-vavilava-site/dispatches',
@@ -276,12 +285,11 @@ async function release() {
         Authorization: `Bearer ${token.value()}`,
         'User-Agent': 'hanna-vavilava-site',
       },
-      body: JSON.stringify({ event_type: 'publish' }),
+      body: JSON.stringify({ event_type }),
     },
   );
   if (!res.ok) throw new HttpsError('internal', `GitHub answered ${res.status}`);
-  // The panel matches the deploy run by this time, so it is the server's clock, not the browser's.
-  return { updated, at };
+  return at;
 }
 
 export const publish = onCall(
@@ -291,6 +299,18 @@ export const publish = onCall(
     return release();
   },
 );
+
+/*
+ * Preview (E2.15): `draft.yml` builds the saved database to the `draft` channel. Only the
+ * dispatch. It does not stamp `/site/updated` and does not delete sold X-rays: that delete
+ * cannot be undone, and both belong to Publish. Deploy it by hand once:
+ *
+ *   npx firebase-tools@15 deploy --only functions:preview --project hanna-vavilava-site
+ */
+export const preview = onCall({ region: 'europe-central2', secrets: [token] }, async (request) => {
+  adminOnly(request);
+  return { at: await dispatch('preview') };
+});
 
 /*
  * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
@@ -443,6 +463,17 @@ const matches = (header, secret) => {
   return want.length > 0 && got.length === want.length && timingSafeEqual(got, want);
 };
 const isProbe = (req) => matches(req.get('x-probe'), probeToken.value());
+
+/*
+ * A form posted from a Hosting channel is a test: the `draft` preview (E2.15) or a pull
+ * request's. The rewrites still send it here, so it ends where the honeypot does, on the
+ * sent page, with nothing stored, mailed or messaged. A channel host is always
+ * `<site>--<channel>-<hash>.web.app`, and no live host contains `--`.
+ * ponytail: the check reads headers a script can drop. Dropping them only lets a test
+ * through and never stops a buyer. A build-time flag on the form is the upgrade.
+ */
+const fromChannel = (req) =>
+  [req.get('origin'), req.get('x-forwarded-host')].some((host) => host?.includes('--'));
 const hits = new Map();
 let verified = 0;
 let windowStart = Date.now();
@@ -531,7 +562,7 @@ export const submitEnquiry = onRequest(
       return;
     }
 
-    if (body.website || (body.elapsed && Number(body.elapsed) < 3000)) {
+    if (body.website || (body.elapsed && Number(body.elapsed) < 3000) || fromChannel(req)) {
       res.redirect(303, sentPath[body.locale === 'en' ? 'en' : 'pl']);
       return;
     }
@@ -667,7 +698,7 @@ async function subscribe(req, res) {
   const count = (signupHits.get(ip) ?? 0) + 1;
   signupHits.set(ip, count);
   if (count > perHour) return res.redirect(303, to.failed);
-  if (body.website) return res.redirect(303, to.sent);
+  if (body.website || fromChannel(req)) return res.redirect(303, to.sent);
 
   const signup = parseSignup(body);
   if (!signup) return res.redirect(303, to.failed);

@@ -1,0 +1,61 @@
+name: draft
+
+# Runs on the repository_dispatch the admin panel's Preview button sends (E2.15).
+# Builds the database as it stands to the one `draft` channel, so Hanna sees a
+# saved horse on the real pages before Publish. It does none of Publish's jobs:
+# it never deploys live, never runs the new-horse announcement, and the Function
+# stamps no `/site/updated`.
+on:
+  repository_dispatch:
+    types: [preview]
+  workflow_dispatch:
+
+# Its own group, so a preview never cancels a publish or a push deploy, and a
+# second preview cancels the first.
+concurrency:
+  group: draft
+  cancel-in-progress: true
+
+jobs:
+  draft:
+    # Same guard as `deploy.yml`: without a project there is nothing to deploy to.
+    if: ${{ vars.FIREBASE_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    # The channel URL ends in a hash Firebase picks when it creates the channel, and
+    # it picks a new one after an expiry. GitHub records the real URL on the `draft`
+    # environment's deployment, and the admin panel reads it there.
+    environment:
+      name: draft
+      url: ${{ steps.deploy.outputs.details_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # The deploy's image cache, so a preview does not re-encode every photo.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-assets-${{ github.sha }}
+          restore-keys: astro-assets-
+
+      # No HOSTING_CHANNEL, so the build is noindex and sends no analytics (`src/site.ts`).
+      # Publish still runs the link check and the budget, so this build skips them.
+      - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      # Every preview resets the 30 days, so a channel nobody previews expires and
+      # stops counting against the 50-channel limit (E1.12). No repoToken: there is
+      # no pull request to comment on.
+      - id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: draft
+          expires: 30d
