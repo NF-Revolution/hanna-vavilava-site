@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { rows, searchTerm, startFacts } from '../functions/starts.js';
+import { bundleName, rows, searchTerm, startFacts } from '../functions/starts.js';
 
 /*
  * Lotus Blue's 2026 rows as the live API returned them on 2026-09-28 (#122), newest first,
@@ -81,4 +81,16 @@ test('the search term stops before the first symbol, which livejumping cannot se
   assert.equal(searchTerm('LOTUS BLUE B&C'), 'LOTUS BLUE B');
   assert.equal(searchTerm('CASCADA'), 'CASCADA');
   assert.equal(searchTerm('ŻAR 2'), 'ŻAR 2');
+});
+
+test('the main bundle is read from its script tag, whatever Angular names it', () => {
+  // livejumping.com/ap/ as served on 2026-10-12, and the differential-loading tags before it.
+  const now = `<script src="runtime.df8cb15a5244d7ee4fff.js" defer></script>
+<script src="polyfills.14df3b9dd0d5d7532dd5.js" defer></script>
+<script src="main.7876af2d05848c54ce41.js" defer></script>`;
+  const before = `<script src="runtime-es2015.0dae8cbc97194c7caed4.js" type="module"></script>
+<script src="main-es2015.1b8d3a1c3e9f0d2b4a6c.js" type="module"></script>`;
+  assert.equal(bundleName(now), 'main.7876af2d05848c54ce41.js');
+  assert.equal(bundleName(before), 'main-es2015.1b8d3a1c3e9f0d2b4a6c.js');
+  assert.equal(bundleName('<script src="runtime.df8cb15a.js"></script>'), undefined);
 });

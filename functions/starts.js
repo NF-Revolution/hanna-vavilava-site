@@ -14,8 +14,16 @@ async function text(url) {
   return res.text();
 }
 
+/*
+ * The main bundle, read from its script tag so any Angular naming matches: `main.<hash>.js`
+ * (since 2026-10), `main-es2015.<hash>.js` (before) and esbuild's `main-<HASH>.js` (E2.17).
+ * ponytail: still scrapes their HTML, so the next rename throws the same way and stores
+ * nothing. A failing `startsWeekly` log line is the only alarm; alert on it if this repeats.
+ */
+export const bundleName = (html) => html.match(/src="(main[\w.-]*\.js)"/)?.[1];
+
 export async function apiKey() {
-  const bundle = (await text(`${site}/ap/`)).match(/main-es2015\.[a-f0-9]+\.js/)?.[0];
+  const bundle = bundleName(await text(`${site}/ap/`));
   if (!bundle) throw new Error('livejumping bundle not found');
   const key = (await text(`${site}/ap/${bundle}`)).match(/api:\{key:"([^"]+)"/)?.[1];
   if (!key) throw new Error('livejumping key not found in the bundle');
