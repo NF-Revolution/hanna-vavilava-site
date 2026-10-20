@@ -28,6 +28,18 @@ export function formatDate(_locale: Locale, iso: string): string {
   return dateFormat.format(new Date(iso));
 }
 
+/* "10–11.10.2026", one date when both are the same day — the same digits as formatDate. */
+export function formatDateRange(_locale: Locale, from: string, to: string): string {
+  return dateFormat.formatRange(new Date(from), new Date(to));
+}
+
+/* "2." in Polish, "2nd" in English, before the word for place. */
+const suffix = { one: 'st', two: 'nd', few: 'rd', other: 'th' } as Record<string, string>;
+const ordinals = new Intl.PluralRules('en', { type: 'ordinal' });
+export function ordinal(locale: Locale, n: number): string {
+  return locale === 'en' ? `${n}${suffix[ordinals.select(n)]}` : `${n}.`;
+}
+
 export function formatPrice(locale: Locale, eur: number): string {
   return new Intl.NumberFormat(htmlLang[locale], {
     style: 'currency',

@@ -1,0 +1,222 @@
+[
+  {
+    "id_zawodow": 18630,
+    "data": "2026-10-11",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120",
+    "miejsce": "11",
+    "ukonczyl": 1,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-10-10",
+    "data_do": "2026-10-11",
+    "wyniki": "[{\"Id_kolumny\":\"9027\",\"Wartosc\":\"4\"},{\"Id_kolumny\":\"9028\",\"Wartosc\":\"71,50\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"9027\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"9028\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 18630,
+    "data": "2026-10-11",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "P",
+    "wysokosc_p": "110",
+    "miejsce": "2",
+    "ukonczyl": 1,
+    "nagroda": "350",
+    "waluta": "PLN",
+    "data_od": "2026-10-10",
+    "data_do": "2026-10-11",
+    "wyniki": "[{\"Id_kolumny\":\"9023\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"9024\",\"Wartosc\":\"61,97\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"9023\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"9024\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 18630,
+    "data": "2026-10-10",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "P",
+    "wysokosc_p": "110/110",
+    "miejsce": "4",
+    "ukonczyl": 1,
+    "nagroda": "200",
+    "waluta": "PLN",
+    "data_od": "2026-10-10",
+    "data_do": "2026-10-11",
+    "wyniki": "[{\"Id_kolumny\":\"8983\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"8984\",\"Wartosc\":\"51,71\"},{\"Id_kolumny\":\"8985\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"8986\",\"Wartosc\":\"35,30\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"8983\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8984\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8985\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"},{\"Id_kolumny\":\"8986\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"}]",
+    "zawody": {
+      "nazwa": "HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 18285,
+    "data": "2026-10-04",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120",
+    "miejsce": "",
+    "ukonczyl": 0,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-10-03",
+    "data_do": "2026-10-04",
+    "wyniki": "[{\"Id_kolumny\":\"8959\",\"Wartosc\":\" ELI\"},{\"Id_kolumny\":\"8960\",\"Wartosc\":\"\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"8959\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8960\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "JESIENNE ZAWODY W SIELANCE - ZAWODY REGIONALNE I TOWARZYSKIE",
+      "miejsce": "WARKA SIELANKA"
+    }
+  },
+  {
+    "id_zawodow": 18181,
+    "data": "2026-09-12",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "C",
+    "wysokosc_p": "130/130",
+    "miejsce": "",
+    "ukonczyl": 0,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-09-12",
+    "data_do": "2026-09-13",
+    "wyniki": "[{\"Id_kolumny\":\"915\",\"Wartosc\":\" REZ\"},{\"Id_kolumny\":\"916\",\"Wartosc\":\"\"},{\"Id_kolumny\":\"917\",\"Wartosc\":\"\"},{\"Id_kolumny\":\"918\",\"Wartosc\":\"\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"915\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"916\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"917\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"},{\"Id_kolumny\":\"918\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"}]",
+    "zawody": {
+      "nazwa": "Zawody Regionalne i Towarzyskie w Skokach przez przeszkody",
+      "miejsce": "Bobrowy Staw"
+    }
+  },
+  {
+    "id_zawodow": 18181,
+    "data": "2026-09-12",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120/120",
+    "miejsce": "2",
+    "ukonczyl": 1,
+    "nagroda": "300",
+    "waluta": "PLN",
+    "data_od": "2026-09-12",
+    "data_do": "2026-09-13",
+    "wyniki": "[{\"Id_kolumny\":\"907\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"908\",\"Wartosc\":\"53,07\"},{\"Id_kolumny\":\"909\",\"Wartosc\":\"4\"},{\"Id_kolumny\":\"910\",\"Wartosc\":\"37,50\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"907\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"908\",\"Kolumna\":\"I Faza\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"909\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"},{\"Id_kolumny\":\"910\",\"Kolumna\":\"II Faza\",\"Ukryta\":\"0\",\"Runda\":\"2\"}]",
+    "zawody": {
+      "nazwa": "Zawody Regionalne i Towarzyskie w Skokach przez przeszkody",
+      "miejsce": "Bobrowy Staw"
+    }
+  },
+  {
+    "id_zawodow": 18051,
+    "data": "2026-09-05",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Oliwia Wieczorek",
+    "klasa": "L 100",
+    "wysokosc_p": "100",
+    "miejsce": "9",
+    "ukonczyl": 1,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-09-03",
+    "data_do": "2026-09-06",
+    "wyniki": "[{\"Id_kolumny\":\"8556\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"8557\",\"Wartosc\":\"66,40\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"8556\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8557\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "THE ONE EQUESTRIAN CHAMPIONSHIP - ZAWODY REGIONALNE I TOWARZYSKIE W  SKOKACH PRZEZ PRZESZKODY - PULA NAGRÓD 150.000zł",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 18051,
+    "data": "2026-09-04",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120",
+    "miejsce": "35",
+    "ukonczyl": 1,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-09-03",
+    "data_do": "2026-09-06",
+    "wyniki": "[{\"Id_kolumny\":\"8528\",\"Wartosc\":\"7\"},{\"Id_kolumny\":\"8529\",\"Wartosc\":\"97,07\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"8528\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8529\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "THE ONE EQUESTRIAN CHAMPIONSHIP - ZAWODY REGIONALNE I TOWARZYSKIE W  SKOKACH PRZEZ PRZESZKODY - PULA NAGRÓD 150.000zł",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 18051,
+    "data": "2026-09-03",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120",
+    "miejsce": "35",
+    "ukonczyl": 1,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-09-03",
+    "data_do": "2026-09-06",
+    "wyniki": "[{\"Id_kolumny\":\"8501\",\"Wartosc\":\"4\"},{\"Id_kolumny\":\"8502\",\"Wartosc\":\"72,76\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"8501\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"8502\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "THE ONE EQUESTRIAN CHAMPIONSHIP - ZAWODY REGIONALNE I TOWARZYSKIE W  SKOKACH PRZEZ PRZESZKODY - PULA NAGRÓD 150.000zł",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 16904,
+    "data": "2026-07-31",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "N",
+    "wysokosc_p": "120",
+    "miejsce": "1",
+    "ukonczyl": 1,
+    "nagroda": "600",
+    "waluta": "PLN",
+    "data_od": "2026-07-31",
+    "data_do": "2026-08-02",
+    "wyniki": "[{\"Id_kolumny\":\"197\",\"Wartosc\":\"0\"},{\"Id_kolumny\":\"198\",\"Wartosc\":\"70,78\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"197\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"198\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "Zawody Regionalne i Towarzyskie",
+      "miejsce": "Beckersport"
+    }
+  },
+  {
+    "id_zawodow": 16904,
+    "data": "2026-07-31",
+    "s_kon": "LOTUS BLUE B&C",
+    "s_zawodnik": "Hanna Vavilava",
+    "klasa": "P",
+    "wysokosc_p": "110",
+    "miejsce": "13",
+    "ukonczyl": 1,
+    "nagroda": "",
+    "waluta": "PLN",
+    "data_od": "2026-07-31",
+    "data_do": "2026-08-02",
+    "wyniki": "[{\"Id_kolumny\":\"195\",\"Wartosc\":\"8\"},{\"Id_kolumny\":\"196\",\"Wartosc\":\"97,59\"}]",
+    "kolumny": "[{\"Id_kolumny\":\"195\",\"Kolumna\":\"Punkty\",\"Ukryta\":\"0\",\"Runda\":\"1\"},{\"Id_kolumny\":\"196\",\"Kolumna\":\"Czas\",\"Ukryta\":\"0\",\"Runda\":\"1\"}]",
+    "zawody": {
+      "nazwa": "Zawody Regionalne i Towarzyskie",
+      "miejsce": "Beckersport"
+    }
+  }
+]

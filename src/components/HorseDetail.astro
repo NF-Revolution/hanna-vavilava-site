@@ -23,7 +23,15 @@ import EnquiryForm from './EnquiryForm.astro';
 import NotifyForm from './NotifyForm.astro';
 import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
-import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
+import {
+  fill,
+  formatDate,
+  formatDateRange,
+  formatPrice,
+  formatSize,
+  ordinal,
+  plural,
+} from '../i18n/format';
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
@@ -62,7 +70,6 @@ const facts: Row[] = [
   [d.rows.breeding, f.breeding[locale]],
   [d.rows.trainingLevel, f.trainingLevel[locale]],
   [d.rows.level, `${horse.levelCm} cm`],
-  [d.rows.lastStart, f.lastStart?.[locale] ?? d.infoOnRequest],
   [
     d.rows.starts,
     f.starts?.[locale] ?? d.infoOnRequest,
@@ -84,6 +91,13 @@ const facts: Row[] = [
   [d.rows.price, price],
   [d.rows.sale, d.saleKind[horse.seller]],
 ];
+/*
+ * The last show (E4.21, variant A on #190): one row across both columns under the
+ * table, so its rounds stretch no paired row. The show, then every round newest first.
+ */
+const show = f.lastShow;
+const showWhen = show && [show.venue, formatDateRange(locale, show.from, show.to)];
+
 /* Rows per column: the left takes the extra one. */
 const half = (n: number) => `--rows: ${Math.ceil(n / 2)}`;
 
@@ -374,6 +388,36 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
               </dd>
             </div>
           ))}
+        </dl>
+        <dl class="table wide">
+          <div>
+            <dt class="lbl">{d.lastShow.label}</dt>
+            <dd class="num">
+              {show ? (
+                <>
+                  {show.name || show.venue}
+                  <span class="meta show-when">{showWhen!.filter(Boolean).join(' · ')}</span>
+                  <ol class="rounds">
+                    {show.rounds.map((r) => (
+                      <li>
+                        <span class="round-date">{formatDate(locale, r.date)}</span>
+                        <span class="round-name">
+                          {r.twoPhase ? `${r.round} · ${d.lastShow.twoPhase}` : r.round}
+                        </span>
+                        <span class="round-place">
+                          {r.place && `${ordinal(locale, r.place)} ${d.lastShow.place}`}
+                        </span>
+                        <span class="round-result">{r.result}</span>
+                        <span class="round-prize">{r.prize}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                d.infoOnRequest
+              )}
+            </dd>
+          </div>
         </dl>
       </section>
       <section class="band">
@@ -752,6 +796,72 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     margin: 0;
     font-size: 15px;
     line-height: 1.55;
+  }
+
+  .wide {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .wide dd {
+    flex: 1;
+  }
+
+  .show-when {
+    display: block;
+    margin-top: 4px;
+    color: var(--ink-muted);
+  }
+
+  /* Date, class, placing, result, prize: columns at 1440, two lines at 390. */
+  .rounds {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+
+  .rounds li {
+    display: grid;
+    grid-template-columns: 110px 260px 140px 1fr 120px;
+    gap: 24px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .round-prize {
+    text-align: right;
+  }
+
+  /* The five columns need about 1200px of page; narrower, each round is two lines. */
+  @media (max-width: 1199px) {
+    .rounds li {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: 'place name prize' 'date result result';
+      gap: 2px 8px;
+    }
+
+    .round-place {
+      grid-area: place;
+    }
+
+    .round-name {
+      grid-area: name;
+    }
+
+    .round-prize {
+      grid-area: prize;
+    }
+
+    .round-date,
+    .round-result {
+      grid-area: date;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .round-result {
+      grid-area: result;
+    }
   }
 
   .list {

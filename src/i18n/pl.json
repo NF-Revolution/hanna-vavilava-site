@@ -154,12 +154,16 @@
       "newTab": "(livejumping.com, otwiera się w nowej karcie)"
     },
     "infoOnRequest": "Informacja na zapytanie",
+    "lastShow": {
+      "label": "Ostatnie zawody",
+      "twoPhase": "dwufazowy",
+      "place": "miejsce"
+    },
     "rows": {
       "pedigree": "Pochodzenie",
       "breeding": "Hodowla",
       "trainingLevel": "Poziom treningu",
       "level": "Poziom konkursowy",
-      "lastStart": "Ostatni start",
       "starts": "Liczba startów",
       "price": "Cena",
       "suits": "Dla kogo",
@@ -649,7 +653,7 @@
       "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
       "facts.trainingLevel": "Poziom wyszkolenia",
-      "facts.lastStart": "Ostatni start",
+      "facts.lastShow": "Ostatnie zawody",
       "facts.starts": "Starty",
       "facts.documents": "Dokumenty",
       "suits": "Pasuje do",
