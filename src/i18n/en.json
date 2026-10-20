@@ -154,12 +154,16 @@
       "newTab": "(livejumping.com, opens in a new tab)"
     },
     "infoOnRequest": "Information on request",
+    "lastShow": {
+      "label": "Last competition",
+      "twoPhase": "two-phase",
+      "place": "place"
+    },
     "rows": {
       "pedigree": "Pedigree",
       "breeding": "Breeding",
       "trainingLevel": "Training level",
       "level": "Competition level",
-      "lastStart": "Last start",
       "starts": "Starts",
       "price": "Price",
       "suits": "Who it suits",
@@ -649,7 +653,7 @@
       "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
       "facts.trainingLevel": "Training level",
-      "facts.lastStart": "Last start",
+      "facts.lastShow": "Last competition",
       "facts.starts": "Starts",
       "facts.documents": "Documents",
       "suits": "Suits",

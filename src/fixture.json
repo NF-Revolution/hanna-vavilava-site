@@ -30,6 +30,35 @@
         "documents": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
+        },
+        "lastShow": {
+          "name": "HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT",
+          "venue": "Beckersport",
+          "from": "2026-10-10",
+          "to": "2026-10-11",
+          "rounds": [
+            {
+              "date": "2026-10-11",
+              "round": "N 120 cm",
+              "place": 11,
+              "result": "4 / 71,50"
+            },
+            {
+              "date": "2026-10-11",
+              "round": "P 110 cm",
+              "place": 2,
+              "result": "0 / 61,97",
+              "prize": "350 PLN"
+            },
+            {
+              "date": "2026-10-10",
+              "round": "P 110 cm",
+              "twoPhase": true,
+              "place": 4,
+              "result": "0 / 51,71 · 0 / 35,30",
+              "prize": "200 PLN"
+            }
+          ]
         }
       },
       "suits": [

@@ -18,7 +18,7 @@ const cascada = {
   headline: t('Cztery starty w 125 cm w sezonie 2026'),
   description: t('Ostrożna nad drągiem.\n\nSpokojna w stajni,\nskupiona na parkurze.'),
   facts: Object.fromEntries(
-    ['breeding', 'trainingLevel', 'lastStart', 'starts', 'documents'].map((k) => [k, t(k)]),
+    ['breeding', 'trainingLevel', 'starts', 'documents'].map((k) => [k, t(k)]),
   ),
   suits: [t('Jeździec amator startujący w 110–120 cm')],
   health: {
@@ -137,4 +137,19 @@ test('a pair with one half filled names the blank half; two empty halves pass', 
   assert.deepEqual(halfPairs(horse), []);
   assert.deepEqual(halfPairs({ ...horse, headline: { pl: 'Klacz', en: ' ' } }), ['headline.en']);
   assert.deepEqual(halfPairs({ ...horse, headline: { pl: '', en: '' } }), []);
+});
+
+test('a last show round-trips unchanged, so a panel Save is not a sync change (#190)', () => {
+  const lastShow = {
+    name: 'HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT',
+    venue: 'Beckersport',
+    from: '2026-10-10',
+    to: '2026-10-11',
+    rounds: [
+      { date: '2026-10-11', round: 'N 120 cm', place: 11, result: '4 / 71,50' },
+      { date: '2026-10-10', round: 'P 110 cm', twoPhase: true, prize: '200 PLN' },
+    ],
+  };
+  const horse = horseSchema.parse({ ...cascada, facts: { ...cascada.facts, lastShow } });
+  assert.deepEqual(horse.facts.lastShow, lastShow);
 });

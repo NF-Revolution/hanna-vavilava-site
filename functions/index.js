@@ -98,6 +98,7 @@ import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { enquiryEmail, expired, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import {
@@ -314,7 +315,7 @@ export const preview = onCall({ region: 'europe-central2', secrets: [token] }, a
 
 /*
  * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
- * these two facts. No `livejumpingName`, no matching rows, or no finished round
+ * these two facts, the count and the last show (E4.21). No `livejumpingName`, no matching rows, or no finished round
  * leaves the fact `null`, which the page shows as "on request". A horse livejumping
  * fails on keeps its stored facts and does not stop the others; a missing key
  * throws for the whole run. Only a fact whose text changed is written.
@@ -323,6 +324,10 @@ export const preview = onCall({ region: 'europe-central2', secrets: [token] }, a
  * change list is where Hanna sees it. A panel Save of a horse left open across the
  * Monday run writes the old facts back, and the next run puts them right.
  */
+/* One line for the panel's change list: the count's Polish text, or the show and its round count. */
+const summary = (fact) =>
+  fact?.pl ?? (fact?.rounds ? `${fact.name || fact.venue} · ${fact.rounds.length}` : '');
+
 async function syncStarts() {
   const db = getDatabase();
   const horses = (await db.ref('horses').get()).val() ?? {};
@@ -335,18 +340,19 @@ async function syncStarts() {
   for (const [slug, horse] of unsold) {
     const name = horse.name ?? slug;
     try {
-      let facts = { starts: null, lastStart: null };
+      let facts = { starts: null, lastShow: null };
       if (horse.livejumpingName) {
         const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
         if (starts.length) facts = startFacts(starts);
       }
       const write = {};
-      for (const field of ['starts', 'lastStart']) {
+      for (const field of ['starts', 'lastShow']) {
         const to = facts[field];
         const from = horse.facts?.[field] ?? null;
-        if (to?.pl === from?.pl && to?.en === from?.en) continue;
+        // Key order is the database's, not ours; absent keys are absent on both sides.
+        if (isDeepStrictEqual(to, from)) continue;
         write[`horses/${slug}/facts/${field}`] = to;
-        changes.push({ name, field, from: from?.pl ?? '', to: to?.pl ?? '' });
+        changes.push({ name, field, from: summary(from), to: summary(to) });
       }
       if (Object.keys(write).length) await db.ref().update(write);
     } catch (e) {

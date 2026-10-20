@@ -52,25 +52,62 @@ async function fetchYear(key, name, year) {
   return results.data;
 }
 
+const iso = (value) => String(value ?? '').match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+
+/*
+ * The result as livejumping prints it (E4.21): `wyniki` holds one value per column of the
+ * class, `kolumny` says which round each column belongs to. Values join with ` / ` inside
+ * a round and rounds with ` · ` — `4 / 71,50`, `0 / 51,71 · 0 / 35,30`, ` ELI` → `ELI`.
+ * Hidden columns and empty values are left out.
+ */
+export function result(row) {
+  const values = JSON.parse(row.wyniki || '[]');
+  const columns = JSON.parse(row.kolumny || '[]');
+  if (!Array.isArray(values) || !Array.isArray(columns))
+    throw new Error(`unexpected livejumping result: ${row.wyniki}`);
+  const hidden = new Set(columns.filter((c) => c?.Ukryta === '1').map((c) => c.Id_kolumny));
+  const round = new Map(columns.map((c) => [c?.Id_kolumny, c?.Runda]));
+  const rounds = new Map();
+  for (const v of values) {
+    const value = String(v?.Wartosc ?? '').trim();
+    if (!value || hidden.has(v?.Id_kolumny)) continue;
+    const r = round.get(v?.Id_kolumny) ?? '1';
+    rounds.set(r, [...(rounds.get(r) ?? []), value]);
+  }
+  return [...rounds.values()].map((round) => round.join(' / ')).join(' · ');
+}
+
 /* The search is a substring match, so only the exact `s_kon` is this horse. */
 export function rows(raw, name) {
   return raw
     .filter((row) => row?.s_kon === name)
     .map((row) => {
-      const date = String(row.data ?? '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+      const date = iso(row.data);
+      const prize = Number(row.nagroda);
       const finished = Number(row.ukonczyl);
+      const show = Number(row.id_zawodow);
       // A string, one height per phase: `"120"`, or `"120/120"` for a two-phase round.
       const phases = String(row.wysokosc_p ?? '').trim();
-      if (!date || (finished !== 0 && finished !== 1))
+      const valid = /^[1-9]\d*(\/[1-9]\d*)*$/.test(phases);
+      if (!date || (finished !== 0 && finished !== 1) || !Number.isInteger(show) || show < 1)
         throw new Error(`unexpected livejumping row: ${JSON.stringify(row)}`);
       return {
-        date: date[0],
+        date,
         finished: finished === 1,
         klasa: String(row.klasa ?? '').trim(),
-        height: /^[1-9]\d*(\/[1-9]\d*)*$/.test(phases)
-          ? [...new Set(phases.split('/'))].join('/')
-          : null,
+        height: valid ? [...new Set(phases.split('/'))].join('/') : null,
+        twoPhase: valid && phases.includes('/'),
         place: Number(row.miejsce) || null,
+        // The competition (E4.21): one id per show, shared by every round of it.
+        show,
+        showName: String(row.zawody?.nazwa ?? '')
+          .replace(/\s+/g, ' ')
+          .trim(),
+        venue: String(row.zawody?.miejsce ?? '').trim(),
+        from: iso(row.data_od) ?? date,
+        to: iso(row.data_do) ?? date,
+        result: result(row),
+        prize: prize > 0 ? `${prize} ${row.waluta || 'PLN'}` : null,
       };
     });
 }
@@ -85,14 +122,21 @@ export async function fetchStarts(key, name, born) {
   return all;
 }
 
-const ordinal = (n) =>
-  n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th'));
+/* "N 120 cm". Some classes already carry the height (`L 100`), which is not printed twice. */
+function roundName({ klasa, height }) {
+  const name = height && klasa.endsWith(` ${height}`) ? klasa.slice(0, -height.length - 1) : klasa;
+  return [name, height && `${height} cm`].filter(Boolean).join(' ');
+}
 
 /*
  * Every row is a start — every rider, and withdrawn (`REZ`) or unfinished rounds too.
- * The last start is the latest round the horse finished, never a withdrawal; `null`
- * when there is none, which the page shows as "on request". One season reads as a
- * sentence, since `7 · 2026: 7` says the same number twice.
+ * One season reads as a sentence, since `7 · 2026: 7` says the same number twice.
+ *
+ * The last show (E4.21) is the show of the latest round the horse finished, so a show of
+ * only eliminations never stands in for it (owner's rule on #190); inside it every round
+ * is listed, newest first, eliminations too. `null` when there is no finished round, which
+ * the page shows as "on request". Language-neutral, so the page words it: an absent key
+ * is an absent value, as the database stores it.
  */
 export function startFacts(starts) {
   const seasons = {};
@@ -114,22 +158,23 @@ export function startFacts(starts) {
   }
 
   // A stable sort: two rounds on one day keep the API's order, newest first.
-  const last = starts.filter((s) => s.finished).sort((a, b) => b.date.localeCompare(a.date))[0];
-  let lastStart = null;
-  if (last) {
-    const [y, m, d] = last.date.split('-');
-    // Some classes already carry the height (`L 100`), which is not printed twice.
-    const klasa =
-      last.height && last.klasa.endsWith(` ${last.height}`)
-        ? last.klasa.slice(0, -last.height.length - 1)
-        : last.klasa;
-    const round = [klasa, last.height && `${last.height} cm`].filter(Boolean).join(' ');
-    // "12.09.2026" in both languages, as the site prints every date (E7.2).
-    const line = (place) => [`${d}.${m}.${y}`, round, place].filter(Boolean).join(' · ');
-    lastStart = {
-      pl: line(last.place && `${last.place}. miejsce`),
-      en: line(last.place && `${ordinal(last.place)} place`),
-    };
-  }
-  return { starts: count, lastStart };
+  const newest = [...starts].sort((a, b) => b.date.localeCompare(a.date));
+  const last = newest.find((s) => s.finished);
+  const lastShow = last && {
+    name: last.showName,
+    venue: last.venue,
+    from: last.from,
+    to: last.to,
+    rounds: newest
+      .filter((s) => s.show === last.show)
+      .map((s) => ({
+        date: s.date,
+        round: roundName(s),
+        ...(s.twoPhase && { twoPhase: true }),
+        ...(s.place && { place: s.place }),
+        ...(s.result && { result: s.result }),
+        ...(s.prize && { prize: s.prize }),
+      })),
+  };
+  return { starts: count, lastShow: lastShow ?? null };
 }

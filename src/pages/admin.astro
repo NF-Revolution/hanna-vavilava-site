@@ -36,7 +36,7 @@ type Kind =
 type Field = [path: string, kind: Kind, required?: boolean];
 
 /* Facts only the starts sync writes (E2.12); the form never shows them. */
-const synced = ['lastStart', 'starts'];
+const synced = ['starts', 'lastShow'];
 
 const sections: [legend: string, fields: Field[]][] = [
   [
@@ -808,8 +808,8 @@ const hints: Record<string, string> = {
     const stored = editing !== null ? horses[editing].facts : undefined;
     horse.facts = {
       ...horse.facts,
-      lastStart: stored?.lastStart ?? null,
       starts: stored?.starts ?? null,
+      lastShow: stored?.lastShow ?? null,
     };
     const result = horseSchema.safeParse({ ...horse, order });
     if (!result.success) {
@@ -970,7 +970,7 @@ const hints: Record<string, string> = {
    */
   const refreshButton = $<HTMLButtonElement>('refresh-starts');
   const refreshStatus = $('refresh-status');
-  type Change = { name: string; field: 'starts' | 'lastStart'; from: string; to: string };
+  type Change = { name: string; field: 'starts' | 'lastShow'; from: string; to: string };
   const refreshCall = httpsCallable<
     void,
     { changes: Change[]; errors: { name: string; message: string }[] }
