@@ -77,6 +77,13 @@ Two different things live under `.claude/tickets/`, and they are not the same fi
   what" while we were building and answers nothing afterwards, and git history keeps it.
   `.claude/tickets/E1.10/` is the worked example, in its finished shape.
 
+## Product team
+
+Five product hires work beside engineering: the product owner, the marketing lead, the
+market researcher, the copywriter and the enquiry assistant. `.claude/product/roster.md` is
+their spec — charter, memory rules and each role's job — and their agents live in
+`.claude/agents/`.
+
 ## Commands
 
     npm run dev      # dev server
