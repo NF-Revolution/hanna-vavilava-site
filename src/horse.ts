@@ -54,7 +54,7 @@ export const horseSchema = z.strictObject({
   description: text,
   /*
    * The exact `s_kon` spelling on livejumping.com, e.g. `LOTUS BLUE B&C`. The starts
-   * sync (E2.12) fills `facts.starts` and `facts.lastShow` from it; empty is not synced.
+   * sync (E2.12) fills `facts.starts` and `facts.cleanRounds` from it; empty is not synced.
    */
   livejumpingName: z.string().trim().default(''),
 
@@ -65,27 +65,23 @@ export const horseSchema = z.strictObject({
     /* Written only by the starts sync (E2.12); `null` shows "on request" on the page. */
     starts: text.nullable().default(null),
     /*
-     * The latest show with a finished round, every round of it newest first (E4.21).
-     * Language-neutral, worded by the page; a value livejumping had none for is absent.
+     * Example results (E4.22): up to three clean rounds from the highest level the horse
+     * jumped clean, newest first. Language-neutral, worded by the page; a value livejumping
+     * had none for is absent. `null` hides the row.
      */
-    lastShow: z
-      .object({
-        name: z.string(),
-        venue: z.string(),
-        from: z.string(),
-        to: z.string(),
-        rounds: z.array(
-          z.object({
-            date: z.string(),
-            round: z.string(),
-            // No defaults: a panel Save writes the parse back, and the sync compares it key for key.
-            twoPhase: z.boolean().optional(),
-            place: z.number().int().positive().optional(),
-            result: z.string().optional(),
-            prize: z.string().optional(),
-          }),
-        ),
-      })
+    cleanRounds: z
+      .array(
+        z.object({
+          date: z.string(),
+          venue: z.string(),
+          round: z.string(),
+          // No defaults: a panel Save writes the parse back, and the sync compares it key for key.
+          twoPhase: z.boolean().optional(),
+          place: z.number().int().positive().optional(),
+          result: z.string(),
+          prize: z.string().optional(),
+        }),
+      )
       .nullable()
       .default(null),
     documents: text,

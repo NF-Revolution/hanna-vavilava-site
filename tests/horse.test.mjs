@@ -139,17 +139,18 @@ test('a pair with one half filled names the blank half; two empty halves pass', 
   assert.deepEqual(halfPairs({ ...horse, headline: { pl: '', en: '' } }), []);
 });
 
-test('a last show round-trips unchanged, so a panel Save is not a sync change (#190)', () => {
-  const lastShow = {
-    name: 'HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT',
-    venue: 'Beckersport',
-    from: '2026-10-10',
-    to: '2026-10-11',
-    rounds: [
-      { date: '2026-10-11', round: 'N 120 cm', place: 11, result: '4 / 71,50' },
-      { date: '2026-10-10', round: 'P 110 cm', twoPhase: true, prize: '200 PLN' },
-    ],
-  };
-  const horse = horseSchema.parse({ ...cascada, facts: { ...cascada.facts, lastShow } });
-  assert.deepEqual(horse.facts.lastShow, lastShow);
+test('example results round-trip unchanged, so a panel Save is not a sync change (#194)', () => {
+  const cleanRounds = [
+    { date: '2026-10-11', venue: 'Beckersport', round: 'P 110 cm', place: 2, result: '0 / 61,97' },
+    {
+      date: '2026-10-10',
+      venue: '',
+      round: 'P 110 cm',
+      twoPhase: true,
+      result: '0 · 0',
+      prize: '200 PLN',
+    },
+  ];
+  const horse = horseSchema.parse({ ...cascada, facts: { ...cascada.facts, cleanRounds } });
+  assert.deepEqual(horse.facts.cleanRounds, cleanRounds);
 });
