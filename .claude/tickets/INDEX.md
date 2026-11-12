@@ -60,6 +60,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.18 whole entry opens      | #172               | done — stretched `.more::after`, hover/focus/touch states, canvas v62       |
 | E4.19 hero scroll cue        | #176               | done — centred cue on a veil after 4 s at top, hides on scroll, canvas v67  |
 | E4.20 media-first detail     | #179               | done — video strip, one description, 5 fewer fields, canvas v68             |
+| E4.22 example results        | #194               | done — clean rounds, top height, max 3, `facts.cleanRounds`, canvas v76     |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |
@@ -594,6 +595,10 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   schema stays strict on the new shape. Once the site is live, a schema change that breaks a
   stored horse breaks every open pull request's preview and Publish on main until the database
   matches, so it needs a read-time upgrade or an additive step instead.
+- The horse page shows example results, not the last show (E4.22, #194): clean rounds only, from
+  the single highest obstacle height the horse jumped clean, newest first, at most three, from
+  every season; no clean round hides the row. Height, not the class letter, is the level, because
+  livejumping always gives it and named classes do not parse.
 - Preview (E2.15, #184) builds the saved database to one Hosting channel `draft`, through
   `draft.yml` and its own concurrency group. It does none of Publish's jobs: no
   `/site/updated` stamp, no sold-X-ray delete, no announcement, never live. The channel URL

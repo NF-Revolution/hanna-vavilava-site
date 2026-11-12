@@ -6,10 +6,10 @@ import { bundleName, result, rows, searchTerm, startFacts } from '../functions/s
 /*
  * Lotus Blue's 2026 rows as the live API returned them on 2026-09-28 (#122), newest first,
  * plus a decoy and a 2025 start. `wysokosc_p` is a string, two-phase rounds `"120/120"`,
- * and a class can already carry the height (`L 100`).
+ * and a class can already carry the height (`L 100`). Every row here is a clean round
+ * unless `faults` says otherwise.
  */
 const row = (data, s_zawodnik, klasa, wysokosc_p, miejsce, ukonczyl, s_kon = 'LOTUS BLUE B&C') => ({
-  id_zawodow: Number(data.replaceAll('-', '')) || 1,
   data,
   s_kon,
   s_zawodnik,
@@ -17,6 +17,11 @@ const row = (data, s_zawodnik, klasa, wysokosc_p, miejsce, ukonczyl, s_kon = 'LO
   wysokosc_p,
   miejsce,
   ukonczyl,
+  wyniki: JSON.stringify([{ Wartosc: '0' }]),
+});
+const faults = (r, ...values) => ({
+  ...r,
+  wyniki: JSON.stringify(values.map((Wartosc) => ({ Wartosc }))),
 });
 const sample = [
   row('2026-09-12', 'Hanna Vavilava', 'C', '130/130', '', 0),
@@ -45,49 +50,79 @@ const live = lotus(
   JSON.parse(readFileSync(new URL('./livejumping-lotus-2026.json', import.meta.url))),
 );
 
-test('the last show is every round of the newest show with a finished round', () => {
-  // Sielanka (04.10, one round, ELI) is newer, but has no finished round; Beckersport ran two days.
-  assert.deepEqual(startFacts(live).lastShow, {
-    name: 'HALOWE ZAWODY REGIONALNE I TOWARZYSKIE - BECKERSPORT',
-    venue: 'Beckersport',
-    from: '2026-10-10',
-    to: '2026-10-11',
-    rounds: [
-      { date: '2026-10-11', round: 'N 120 cm', place: 11, result: '4 / 71,50' },
-      { date: '2026-10-11', round: 'P 110 cm', place: 2, result: '0 / 61,97', prize: '350 PLN' },
-      {
-        date: '2026-10-10',
-        round: 'P 110 cm',
-        twoPhase: true,
-        place: 4,
-        result: '0 / 51,71 · 0 / 35,30',
-        prize: '200 PLN',
-      },
-    ],
-  });
-});
-
-test('a withdrawn round inside the last show is listed with its result', () => {
-  // Without Beckersport and Sielanka, the newest show is 12–13.09: a REZ and a 2nd place.
-  const september = startFacts(live.filter((s) => s.date < '2026-10-01')).lastShow;
+test('example results: only the clean rounds of the top level the horse jumped clean', () => {
+  // C 130 (12.09) is a REZ, N 120 on 12.09 had 4 in phase II and 11.10 had 4: one clean N is left.
+  assert.deepEqual(startFacts(live).cleanRounds, [
+    {
+      date: '2026-07-31',
+      venue: 'Beckersport',
+      round: 'N 120 cm',
+      place: 1,
+      result: '0 / 70,78',
+      prize: '600 PLN',
+    },
+  ]);
+  // Without it the top clean level is 110, and the 13th place P 110 on 31.07 had 8 faults.
   assert.deepEqual(
-    september.rounds.map((r) => [r.round, r.place, r.result]),
+    startFacts(live.filter((s) => s.date !== '2026-07-31')).cleanRounds.map((r) => [
+      r.date,
+      r.round,
+      r.twoPhase,
+      r.result,
+    ]),
     [
-      ['C 130 cm', undefined, 'REZ'],
-      ['N 120 cm', 2, '0 / 53,07 · 4 / 37,50'],
+      ['2026-10-11', 'P 110 cm', undefined, '0 / 61,97'],
+      ['2026-10-10', 'P 110 cm', true, '0 / 51,71 · 0 / 35,30'],
     ],
   );
 });
 
-test('consecutive shows never merge, even with the same name', () => {
-  const show = (id, data, miejsce) => ({
-    ...row(data, 'H', 'N', '120', miejsce, 1),
-    id_zawodow: id,
-    zawody: { nazwa: 'Zawody Regionalne', miejsce: 'Sielanka' },
+test('example results: at most three, newest first, an older higher level beats a newer lower', () => {
+  const dates = ['2026-09-01', '2026-09-08', '2026-09-15', '2026-09-22'];
+  const n120 = dates.map((d) => row(d, 'H', 'N', '120', '1', 1));
+  assert.deepEqual(
+    startFacts(lotus(n120)).cleanRounds.map((r) => r.date),
+    ['2026-09-22', '2026-09-15', '2026-09-08'],
+  );
+  const older130 = row('2025-05-01', 'H', 'C', '130', '', 1);
+  assert.deepEqual(startFacts(lotus([...n120, older130])).cleanRounds, [
+    { date: '2025-05-01', venue: '', round: 'C 130 cm', result: '0' },
+  ]);
+  // The higher phase is the level: 120/130 outranks a clean 125.
+  assert.equal(
+    startFacts(
+      lotus([
+        row('2026-09-01', 'H', 'N', '125', '', 1),
+        row('2026-08-01', 'H', 'C', '120/130', '', 1),
+      ]),
+    ).cleanRounds[0].round,
+    'C 120/130 cm',
+  );
+});
+
+test('example results: a fault anywhere, an elimination or an unfinished round is not clean', () => {
+  const n = (...r) =>
+    startFacts(lotus([faults(row('2026-09-01', 'H', 'N', '120', '1', 1), ...r)])).cleanRounds;
+  assert.equal(n('4', '71,50'), null);
+  assert.equal(n(' ELI', ''), null);
+  assert.equal(n('', ''), null);
+  assert.equal(n('0,25', '80,10'), null);
+  assert.deepEqual(n('0,00', '80,10')[0].result, '0,00 / 80,10');
+  assert.equal(startFacts(lotus([row('2026-09-01', 'H', 'N', '120', '', 0)])).cleanRounds, null);
+  // Two phases, one column each: a fault in phase II spoils the round.
+  const phases = (a, b) => ({
+    ...row('2026-09-01', 'H', 'N', '120/120', '2', 1),
+    wyniki: JSON.stringify([
+      { Id_kolumny: '1', Wartosc: a },
+      { Id_kolumny: '2', Wartosc: b },
+    ]),
+    kolumny: JSON.stringify([
+      { Id_kolumny: '1', Runda: '1' },
+      { Id_kolumny: '2', Runda: '2' },
+    ]),
   });
-  const last = startFacts(lotus([show(2, '2026-09-20', '3'), show(1, '2026-09-13', '1')])).lastShow;
-  assert.deepEqual(last.rounds, [{ date: '2026-09-20', round: 'N 120 cm', place: 3 }]);
-  assert.equal(last.from, '2026-09-20');
+  assert.equal(startFacts(lotus([phases('0', '4')])).cleanRounds, null);
+  assert.equal(startFacts(lotus([phases('0', '0')])).cleanRounds[0].result, '0 · 0');
 });
 
 test('the result: hidden columns and empty values are left out, an unknown column is round one', () => {
@@ -122,7 +157,7 @@ test('one season reads as a sentence, with Polish plural forms', () => {
 
 test('heights: phases collapse only when equal, a class never repeats it, junk shows none', () => {
   const last = (klasa, height) =>
-    startFacts(lotus([row('2026-09-01', 'H', klasa, height, '', 1)])).lastShow.rounds[0].round;
+    startFacts(lotus([row('2026-09-01', 'H', klasa, height, '', 1)])).cleanRounds[0].round;
   assert.equal(last('N', '120/130'), 'N 120/130 cm');
   assert.equal(last('L 100', '100'), 'L 100 cm');
   assert.equal(last('N', ''), 'N');
@@ -130,17 +165,16 @@ test('heights: phases collapse only when equal, a class never repeats it, junk s
   assert.equal(last('N', null), 'N');
 });
 
-test('a missing placing is absent, and no finished round is no last show', () => {
-  assert.deepEqual(startFacts(lotus([row('2026-09-01', 'H', 'N', '120', '', 1)])).lastShow.rounds, [
-    { date: '2026-09-01', round: 'N 120 cm' },
+test('a missing placing is absent, and no clean round is no example results', () => {
+  assert.deepEqual(startFacts(lotus([row('2026-09-01', 'H', 'N', '120', '', 1)])).cleanRounds, [
+    { date: '2026-09-01', venue: '', round: 'N 120 cm', result: '0' },
   ]);
-  assert.equal(startFacts(lotus([sample[0]])).lastShow, null);
+  assert.equal(startFacts(lotus([sample[0]])).cleanRounds, null);
 });
 
 test('a row livejumping never promised throws instead of counting', () => {
   assert.throws(() => lotus([row('12.09.2026', 'H', 'N', '120', '2', 1)]));
   assert.throws(() => lotus([row('2026-09-12', 'H', 'N', '120', '2', 'yes')]));
-  assert.throws(() => lotus([{ ...row('2026-09-12', 'H', 'N', '120', '2', 1), id_zawodow: null }]));
 });
 
 test('the search term stops before the first symbol, which livejumping cannot search', () => {

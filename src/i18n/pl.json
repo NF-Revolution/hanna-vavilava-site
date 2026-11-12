@@ -154,8 +154,8 @@
       "newTab": "(livejumping.com, otwiera się w nowej karcie)"
     },
     "infoOnRequest": "Informacja na zapytanie",
-    "lastShow": {
-      "label": "Ostatnie zawody",
+    "cleanRounds": {
+      "label": "Przykładowe wyniki",
       "twoPhase": "dwufazowy",
       "place": "miejsce"
     },
@@ -653,7 +653,7 @@
       "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
       "facts.trainingLevel": "Poziom wyszkolenia",
-      "facts.lastShow": "Ostatnie zawody",
+      "facts.cleanRounds": "Przykładowe wyniki",
       "facts.starts": "Starty",
       "facts.documents": "Dokumenty",
       "suits": "Pasuje do",

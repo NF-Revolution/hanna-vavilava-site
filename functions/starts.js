@@ -85,11 +85,10 @@ export function rows(raw, name) {
       const date = iso(row.data);
       const prize = Number(row.nagroda);
       const finished = Number(row.ukonczyl);
-      const show = Number(row.id_zawodow);
       // A string, one height per phase: `"120"`, or `"120/120"` for a two-phase round.
       const phases = String(row.wysokosc_p ?? '').trim();
       const valid = /^[1-9]\d*(\/[1-9]\d*)*$/.test(phases);
-      if (!date || (finished !== 0 && finished !== 1) || !Number.isInteger(show) || show < 1)
+      if (!date || (finished !== 0 && finished !== 1))
         throw new Error(`unexpected livejumping row: ${JSON.stringify(row)}`);
       return {
         date,
@@ -98,14 +97,7 @@ export function rows(raw, name) {
         height: valid ? [...new Set(phases.split('/'))].join('/') : null,
         twoPhase: valid && phases.includes('/'),
         place: Number(row.miejsce) || null,
-        // The competition (E4.21): one id per show, shared by every round of it.
-        show,
-        showName: String(row.zawody?.nazwa ?? '')
-          .replace(/\s+/g, ' ')
-          .trim(),
         venue: String(row.zawody?.miejsce ?? '').trim(),
-        from: iso(row.data_od) ?? date,
-        to: iso(row.data_do) ?? date,
         result: result(row),
         prize: prize > 0 ? `${prize} ${row.waluta || 'PLN'}` : null,
       };
@@ -132,10 +124,11 @@ function roundName({ klasa, height }) {
  * Every row is a start — every rider, and withdrawn (`REZ`) or unfinished rounds too.
  * One season reads as a sentence, since `7 · 2026: 7` says the same number twice.
  *
- * The last show (E4.21) is the show of the latest round the horse finished, so a show of
- * only eliminations never stands in for it (owner's rule on #190); inside it every round
- * is listed, newest first, eliminations too. `null` when there is no finished round, which
- * the page shows as "on request". Language-neutral, so the page words it: an absent key
+ * The example results (E4.22, owner's rules on #194): clean rounds only, from the single
+ * highest level the horse jumped clean, newest first, at most three, from every season.
+ * The level is the height, the higher phase of `120/130`; no height ranks lowest. `null`,
+ * never `[]`, when nothing is clean: the database drops an empty array, so `[]` would read
+ * back as a change on every sync. Language-neutral, so the page words it: an absent key
  * is an absent value, as the database stores it.
  */
 export function startFacts(starts) {
@@ -159,22 +152,31 @@ export function startFacts(starts) {
 
   // A stable sort: two rounds on one day keep the API's order, newest first.
   const newest = [...starts].sort((a, b) => b.date.localeCompare(a.date));
-  const last = newest.find((s) => s.finished);
-  const lastShow = last && {
-    name: last.showName,
-    venue: last.venue,
-    from: last.from,
-    to: last.to,
-    rounds: newest
-      .filter((s) => s.show === last.show)
-      .map((s) => ({
-        date: s.date,
-        round: roundName(s),
-        ...(s.twoPhase && { twoPhase: true }),
-        ...(s.place && { place: s.place }),
-        ...(s.result && { result: s.result }),
-        ...(s.prize && { prize: s.prize }),
-      })),
-  };
-  return { starts: count, lastShow: lastShow ?? null };
+  const clean = newest.filter(isClean);
+  const top = Math.max(...clean.map(level));
+  const cleanRounds = clean
+    .filter((s) => level(s) === top)
+    .slice(0, 3)
+    .map((s) => ({
+      date: s.date,
+      venue: s.venue,
+      round: roundName(s),
+      ...(s.twoPhase && { twoPhase: true }),
+      ...(s.place && { place: s.place }),
+      result: s.result,
+      ...(s.prize && { prize: s.prize }),
+    }));
+  return { starts: count, cleanRounds: cleanRounds.length ? cleanRounds : null };
 }
+
+/*
+ * Clean: finished, and the first value of every round or phase — `Punkty`, the faults — is 0.
+ * ponytail: a points class, where 0 means no points, would read as clean; none is in the data.
+ * Check the class type (`konkurs`) if one appears.
+ */
+const isClean = (s) =>
+  s.finished &&
+  !!s.result &&
+  s.result.split(' · ').every((r) => /^0(,0+)?$/.test(r.split(' / ')[0]));
+
+const level = (s) => Math.max(...(s.height ?? '0').split('/').map(Number));

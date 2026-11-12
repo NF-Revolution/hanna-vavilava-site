@@ -315,8 +315,9 @@ export const preview = onCall({ region: 'europe-central2', secrets: [token] }, a
 
 /*
  * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
- * these two facts, the count and the last show (E4.21). No `livejumpingName`, no matching rows, or no finished round
- * leaves the fact `null`, which the page shows as "on request". A horse livejumping
+ * these two facts, the count and the example results (E4.22). No `livejumpingName` or no
+ * matching rows leaves the count `null`, which the page shows as "on request"; no clean
+ * round leaves the results `null`, which hides their row. A horse livejumping
  * fails on keeps its stored facts and does not stop the others; a missing key
  * throws for the whole run. Only a fact whose text changed is written.
  *
@@ -324,9 +325,9 @@ export const preview = onCall({ region: 'europe-central2', secrets: [token] }, a
  * change list is where Hanna sees it. A panel Save of a horse left open across the
  * Monday run writes the old facts back, and the next run puts them right.
  */
-/* One line for the panel's change list: the count's Polish text, or the show and its round count. */
+/* One line for the panel's change list: the count's Polish text, or the level and its round count. */
 const summary = (fact) =>
-  fact?.pl ?? (fact?.rounds ? `${fact.name || fact.venue} · ${fact.rounds.length}` : '');
+  fact?.pl ?? (Array.isArray(fact) ? `${fact[0].round} · ${fact.length}` : '');
 
 async function syncStarts() {
   const db = getDatabase();
@@ -340,13 +341,13 @@ async function syncStarts() {
   for (const [slug, horse] of unsold) {
     const name = horse.name ?? slug;
     try {
-      let facts = { starts: null, lastShow: null };
+      let facts = { starts: null, cleanRounds: null };
       if (horse.livejumpingName) {
         const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
         if (starts.length) facts = startFacts(starts);
       }
       const write = {};
-      for (const field of ['starts', 'lastShow']) {
+      for (const field of ['starts', 'cleanRounds']) {
         const to = facts[field];
         const from = horse.facts?.[field] ?? null;
         // Key order is the database's, not ours; absent keys are absent on both sides.
