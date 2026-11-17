@@ -150,13 +150,10 @@
     },
     "prefill": "Hello, I am writing about {name}: {url}",
     "livejumping": {
-      "link": "Results on livejumping",
       "newTab": "(livejumping.com, opens in a new tab)"
     },
-    "infoOnRequest": "Information on request",
     "cleanRounds": {
       "label": "Example results",
-      "twoPhase": "two-phase",
       "place": "place"
     },
     "rows": {
@@ -164,7 +161,6 @@
       "breeding": "Breeding",
       "trainingLevel": "Training level",
       "level": "Competition level",
-      "starts": "Starts",
       "price": "Price",
       "suits": "Who it suits",
       "location": "Location",
@@ -615,16 +611,6 @@
     "previewList": "Horses list",
     "previewReady": "The preview is not public. Publish for buyers to see the changes.",
     "previewFailed": "The preview failed. Try again.",
-    "refreshStarts": "Refresh starts",
-    "refreshStartsHint": "Pulls starts from livejumping.com for horses with a livejumping name. They reach the site on Publish.",
-    "refreshSending": "Pulling starts from livejumping…",
-    "refreshNone": "Nothing changed.",
-    "refreshChange": "{name} · {field}: {from} → {to}",
-    "refreshError": "{name}: failed ({message}). The previous value stays.",
-    "refreshFailed": "Livejumping is not answering ({message}). Nothing changed.",
-    "refreshBroken": "Refresh is not working ({message}). Nothing changed.",
-    "refreshCleared": "empty (Information on request)",
-    "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. Empty or no starts = “Information on request” on the site.",
     "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
@@ -650,11 +636,9 @@
       "status": "Status",
       "headline": "Headline",
       "description": "Description",
-      "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
       "facts.trainingLevel": "Training level",
       "facts.cleanRounds": "Example results",
-      "facts.starts": "Starts",
       "facts.documents": "Documents",
       "suits": "Suits",
       "health.vaccinations": "Vaccinations",
@@ -680,6 +664,21 @@
       "credentials": "Wrong email or password.",
       "throttled": "Too many attempts. Try again in a few minutes.",
       "generic": "Sign-in failed. Try again."
+    },
+    "rounds": {
+      "hint": "Paste the competition link from livejumping.com and copy the horse's result from it. Fill from the top; empty fields = no round, all empty = no row on the page.",
+      "slot": "Round {n}",
+      "url": "Competition link on livejumping",
+      "urlHint": "e.g. https://livejumping.com/ap/event/18762/competition/262906",
+      "date": "Date",
+      "venue": "Show venue",
+      "round": "Class",
+      "roundHint": "e.g. N 120 cm, two-phase: N 120/120 cm",
+      "place": "Place",
+      "result": "Result",
+      "resultHint": "e.g. 0 / 70,78",
+      "prize": "Prize",
+      "prizeHint": "e.g. 600 PLN, empty = none"
     }
   }
 }

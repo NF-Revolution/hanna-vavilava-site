@@ -52,36 +52,30 @@ export const horseSchema = z.strictObject({
   headline: text,
   /* One free text, Hanna's own story of the horse (E4.20). A blank line is a paragraph. */
   description: text,
-  /*
-   * The exact `s_kon` spelling on livejumping.com, e.g. `LOTUS BLUE B&C`. The starts
-   * sync (E2.12) fills `facts.starts` and `facts.cleanRounds` from it; empty is not synced.
-   */
-  livejumpingName: z.string().trim().default(''),
 
   /* The fact-table rows no field above already carries. Labels live in i18n. */
   facts: z.object({
     breeding: text,
     trainingLevel: text,
-    /* Written only by the starts sync (E2.12); `null` shows "on request" on the page. */
-    starts: text.nullable().default(null),
     /*
-     * Example results (E4.22): up to three clean rounds from the highest level the horse
-     * jumped clean, newest first. Language-neutral, worded by the page; a value livejumping
-     * had none for is absent. `null` hides the row.
+     * Example results (E4.23, decided on #196): up to three rounds Hanna picks, each typed
+     * in the panel beside its livejumping link, which the page offers as the source. Nothing
+     * syncs them: livejumping gates its API against bots. Language-neutral — `N 120 cm`,
+     * `0 / 70,78`, `600 PLN` — and worded by the page. `null` hides the row.
      */
     cleanRounds: z
       .array(
         z.object({
-          date: z.string(),
-          venue: z.string(),
-          round: z.string(),
-          // No defaults: a panel Save writes the parse back, and the sync compares it key for key.
-          twoPhase: z.boolean().optional(),
+          url: z.url({ protocol: /^https$/ }),
+          date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          venue: z.string().trim().min(1),
+          round: z.string().trim().min(1),
           place: z.number().int().positive().optional(),
-          result: z.string(),
-          prize: z.string().optional(),
+          result: z.string().trim().min(1),
+          prize: z.string().trim().optional(),
         }),
       )
+      .max(3)
       .nullable()
       .default(null),
     documents: text,

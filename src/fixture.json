@@ -33,6 +33,7 @@
         },
         "cleanRounds": [
           {
+            "url": "https://livejumping.com/ap/event/18762/competition/262906",
             "date": "2026-10-11",
             "venue": "Beckersport",
             "round": "P 110 cm",
@@ -41,10 +42,10 @@
             "prize": "350 PLN"
           },
           {
+            "url": "https://livejumping.com/ap/event/18630/competition/261537",
             "date": "2026-10-10",
             "venue": "Beckersport",
-            "round": "P 110 cm",
-            "twoPhase": true,
+            "round": "P 110/110 cm",
             "place": 4,
             "result": "0 / 51,71 · 0 / 35,30",
             "prize": "200 PLN"

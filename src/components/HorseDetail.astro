@@ -27,7 +27,7 @@ import { fill, formatDate, formatPrice, formatSize, ordinal, plural } from '../i
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
-import { directionsHref, livejumpingHref, site, stables, whatsappHref } from '../site';
+import { directionsHref, site, stables, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -51,9 +51,8 @@ const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
  * One table in two columns that share their row heights, so a tall row on one
  * side never pushes the other out of line (E4.20): filled down the left column,
  * then the right, with the sale rows last (#2, #3). Who the horse suits is a row
- * of its own, a list. A third slot links the value on: Starts to livejumping in
- * a new tab (#111), Location to directions to the stables, as the footer does
- * (#166). Every horse stands there, so Location is the stables, not a field.
+ * of its own, a list. A third slot links the value on: Location to directions
+ * to the stables, as the footer does (#166). Every horse stands there, so Location is the stables, not a field.
  */
 type Link = { href: string; text: string; newTab?: string };
 type Row = [label: string, value: string | string[], link?: Link];
@@ -62,17 +61,6 @@ const facts: Row[] = [
   [d.rows.breeding, f.breeding[locale]],
   [d.rows.trainingLevel, f.trainingLevel[locale]],
   [d.rows.level, `${horse.levelCm} cm`],
-  [
-    d.rows.starts,
-    f.starts?.[locale] ?? d.infoOnRequest,
-    horse.livejumpingName
-      ? {
-          href: livejumpingHref(horse.livejumpingName),
-          text: d.livejumping.link,
-          newTab: d.livejumping.newTab,
-        }
-      : undefined,
-  ],
   ...(horse.suits.length ? [[d.rows.suits, horse.suits.map((s) => s[locale])] as Row] : []),
   [
     d.rows.location,
@@ -84,9 +72,10 @@ const facts: Row[] = [
   [d.rows.sale, d.saleKind[horse.seller]],
 ];
 /*
- * Example results (E4.22, #194): one row across both columns under the table, so its
- * rounds stretch no paired row. Clean rounds from the top level, each with its venue,
- * since they can come from different shows. None clean, no row.
+ * Example results (E4.22, #194; by hand since E4.23, #197): one row across both columns
+ * under the table, so its rounds stretch no paired row. Each with its venue, since they
+ * can come from different shows, and its result linking to the livejumping page Hanna
+ * took it from, so a buyer can check it there. None, no row.
  */
 const cleanRounds = f.cleanRounds;
 
@@ -393,13 +382,15 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
                         {formatDate(locale, r.date)}
                         <span class="round-venue">{r.venue}</span>
                       </span>
-                      <span class="round-name">
-                        {r.twoPhase ? `${r.round} · ${d.cleanRounds.twoPhase}` : r.round}
-                      </span>
+                      <span class="round-name">{r.round}</span>
                       <span class="round-place">
                         {r.place && `${ordinal(locale, r.place)} ${d.cleanRounds.place}`}
                       </span>
-                      <span class="round-result">{r.result}</span>
+                      <a class="round-result" href={r.url} target="_blank" rel="noopener">
+                        {r.result}
+                        <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                        <span aria-hidden="true"> ↗</span>
+                      </a>
                       <span class="round-prize">{r.prize}</span>
                     </li>
                   ))}
@@ -824,6 +815,15 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
 
   .round-prize {
     text-align: right;
+  }
+
+  /* The result is the link to its source; 24px tall at least, the WCAG 2.2 AA target. */
+  .round-result {
+    justify-self: start;
+    min-height: 24px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* The five columns need about 1200px of page; narrower, each round is two lines. */

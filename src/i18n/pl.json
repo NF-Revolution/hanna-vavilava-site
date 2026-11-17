@@ -150,13 +150,10 @@
     },
     "prefill": "Dzień dobry, piszę w sprawie konia {name}: {url}",
     "livejumping": {
-      "link": "Wyniki na livejumping",
       "newTab": "(livejumping.com, otwiera się w nowej karcie)"
     },
-    "infoOnRequest": "Informacja na zapytanie",
     "cleanRounds": {
       "label": "Przykładowe wyniki",
-      "twoPhase": "dwufazowy",
       "place": "miejsce"
     },
     "rows": {
@@ -164,7 +161,6 @@
       "breeding": "Hodowla",
       "trainingLevel": "Poziom treningu",
       "level": "Poziom konkursowy",
-      "starts": "Liczba startów",
       "price": "Cena",
       "suits": "Dla kogo",
       "location": "Lokalizacja",
@@ -615,16 +611,6 @@
     "previewList": "Lista koni",
     "previewReady": "Podgląd nie jest publiczny. Żeby zmiany zobaczyli kupujący, opublikuj stronę.",
     "previewFailed": "Podgląd się nie udał. Spróbuj ponownie.",
-    "refreshStarts": "Odśwież starty",
-    "refreshStartsHint": "Pobiera starty z livejumping.com dla koni z nazwą livejumping. Na stronę trafiają po Opublikuj.",
-    "refreshSending": "Pobieram starty z livejumping…",
-    "refreshNone": "Bez zmian.",
-    "refreshChange": "{name} · {field}: {from} → {to}",
-    "refreshError": "{name}: nie udało się ({message}). Zostaje poprzednia wartość.",
-    "refreshFailed": "Livejumping nie odpowiada ({message}). Nic nie zmieniono.",
-    "refreshBroken": "Odświeżanie nie działa ({message}). Nic nie zmieniono.",
-    "refreshCleared": "puste (Informacja na zapytanie)",
-    "livejumpingHint": "Dokładnie jak na livejumping.com, np. LOTUS BLUE B&C. Puste lub brak startów = na stronie „Informacja na zapytanie”.",
     "soldConfirm": "Ten koń ma zdjęcia RTG. Następna publikacja usunie je na stałe — tego nie da się cofnąć. Zapisać jako sprzedany?",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {
@@ -650,11 +636,9 @@
       "status": "Status",
       "headline": "Nagłówek",
       "description": "Opis",
-      "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
       "facts.trainingLevel": "Poziom wyszkolenia",
       "facts.cleanRounds": "Przykładowe wyniki",
-      "facts.starts": "Starty",
       "facts.documents": "Dokumenty",
       "suits": "Pasuje do",
       "health.vaccinations": "Szczepienia",
@@ -680,6 +664,21 @@
       "credentials": "Nieprawidłowy e-mail lub hasło.",
       "throttled": "Zbyt wiele prób. Spróbuj ponownie za kilka minut.",
       "generic": "Nie udało się zalogować. Spróbuj ponownie."
+    },
+    "rounds": {
+      "hint": "Wklej link do konkursu z livejumping.com i przepisz z niego wynik konia. Wypełniaj od góry; puste pola = brak przejazdu, wszystkie puste = brak wiersza na stronie.",
+      "slot": "Przejazd {n}",
+      "url": "Link do konkursu na livejumping",
+      "urlHint": "np. https://livejumping.com/ap/event/18762/competition/262906",
+      "date": "Data",
+      "venue": "Miejsce zawodów",
+      "round": "Konkurs",
+      "roundHint": "np. N 120 cm, dwufazowy: N 120/120 cm",
+      "place": "Lokata",
+      "result": "Wynik",
+      "resultHint": "np. 0 / 70,78",
+      "prize": "Nagroda",
+      "prizeHint": "np. 600 PLN, puste = brak"
     }
   }
 }

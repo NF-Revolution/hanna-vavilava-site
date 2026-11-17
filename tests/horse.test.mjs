@@ -17,9 +17,7 @@ const cascada = {
   seller: 'company',
   headline: t('Cztery starty w 125 cm w sezonie 2026'),
   description: t('Ostrożna nad drągiem.\n\nSpokojna w stajni,\nskupiona na parkurze.'),
-  facts: Object.fromEntries(
-    ['breeding', 'trainingLevel', 'starts', 'documents'].map((k) => [k, t(k)]),
-  ),
+  facts: Object.fromEntries(['breeding', 'trainingLevel', 'documents'].map((k) => [k, t(k)])),
   suits: [t('Jeździec amator startujący w 110–120 cm')],
   health: {
     vaccinations: t('Grypa i tężec — 12.08.2026'),
@@ -139,18 +137,58 @@ test('a pair with one half filled names the blank half; two empty halves pass', 
   assert.deepEqual(halfPairs({ ...horse, headline: { pl: '', en: '' } }), []);
 });
 
-test('example results round-trip unchanged, so a panel Save is not a sync change (#194)', () => {
-  const cleanRounds = [
-    { date: '2026-10-11', venue: 'Beckersport', round: 'P 110 cm', place: 2, result: '0 / 61,97' },
-    {
-      date: '2026-10-10',
-      venue: '',
-      round: 'P 110 cm',
-      twoPhase: true,
-      result: '0 · 0',
-      prize: '200 PLN',
-    },
-  ];
-  const horse = horseSchema.parse({ ...cascada, facts: { ...cascada.facts, cleanRounds } });
-  assert.deepEqual(horse.facts.cleanRounds, cleanRounds);
+const link = 'https://livejumping.com/ap/event/18762/competition/262906';
+
+test('example results round-trip unchanged, and need a link, a date and at most three (#197)', () => {
+  const round = {
+    url: link,
+    date: '2026-10-11',
+    venue: 'Beckersport',
+    round: 'P 110 cm',
+    result: '0 / 61,97',
+  };
+  const cleanRounds = [{ ...round, place: 2, prize: '350 PLN' }, round];
+  const parse = (rounds) =>
+    horseSchema.safeParse({ ...cascada, facts: { ...cascada.facts, cleanRounds: rounds } });
+  assert.deepEqual(parse(cleanRounds).data?.facts.cleanRounds, cleanRounds);
+  assert.equal(parse([{ ...round, url: '' }]).success, false);
+  assert.equal(parse([{ ...round, url: 'javascript:alert(1)' }]).success, false);
+  assert.equal(parse([{ ...round, url: undefined }]).success, false);
+  assert.equal(parse([{ ...round, date: '11.10.2026' }]).success, false);
+  assert.equal(parse([round, round, round, round]).success, false);
+  assert.equal(horseSchema.parse(cascada).facts.cleanRounds, null);
+});
+
+test('the round slots in the panel: empty ones drop, an empty prize drops, none is null (#197)', () => {
+  const slot = (i, v) =>
+    Object.fromEntries(Object.entries(v).map(([k, x]) => [`facts.cleanRounds.${i}.${k}`, x]));
+  const empty = {
+    url: '',
+    date: '',
+    venue: '',
+    round: '',
+    place: undefined,
+    result: '',
+    prize: '',
+  };
+  const filled = {
+    ...empty,
+    url: link,
+    date: '2026-10-11',
+    venue: 'B',
+    round: 'N 120 cm',
+    result: '0',
+    prize: '',
+  };
+  const none = fromFields({ ...slot(0, empty), ...slot(1, empty), ...slot(2, empty) });
+  assert.equal(none.facts.cleanRounds, null);
+  const one = fromFields({
+    ...slot(0, empty),
+    ...slot(1, { ...filled, place: 3 }),
+    ...slot(2, empty),
+  });
+  const { prize, ...rest } = filled;
+  assert.deepEqual(one.facts.cleanRounds, [{ ...rest, place: 3 }]);
+  // Loading a stored horse names its inputs the same way.
+  assert.equal(toFields({ facts: { cleanRounds: [filled] } })['facts.cleanRounds.0.url'], link);
 });
