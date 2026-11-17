@@ -27,7 +27,7 @@ import { fill, formatDate, formatPrice, formatSize, ordinal, plural } from '../i
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
-import { directionsHref, site, stables, whatsappHref } from '../site';
+import { directionsHref, livejumpingHref, site, stables, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -75,9 +75,11 @@ const facts: Row[] = [
  * Example results (E4.22, #194; by hand since E4.23, #197): one row across both columns
  * under the table, so its rounds stretch no paired row. Each with its venue, since they
  * can come from different shows, and its result linking to the livejumping page Hanna
- * took it from, so a buyer can check it there. None, no row.
+ * took it from, so a buyer can check it there. Under them, the horse's livejumping name
+ * search (#111), which stays when there are no rounds. Neither, no row.
  */
 const cleanRounds = f.cleanRounds;
+const livejumping = horse.livejumpingName && livejumpingHref(horse.livejumpingName);
 
 /* Rows per column: the left takes the extra one. */
 const half = (n: number) => `--rows: ${Math.ceil(n / 2)}`;
@@ -370,31 +372,42 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
             </div>
           ))}
         </dl>
-        {cleanRounds && (
+        {(cleanRounds || livejumping) && (
           <dl class="table wide">
             <div>
               <dt class="lbl">{d.cleanRounds.label}</dt>
               <dd class="num">
-                <ol class="rounds">
-                  {cleanRounds.map((r) => (
-                    <li>
-                      <span class="round-date">
-                        {formatDate(locale, r.date)}
-                        <span class="round-venue">{r.venue}</span>
-                      </span>
-                      <span class="round-name">{r.round}</span>
-                      <span class="round-place">
-                        {r.place && `${ordinal(locale, r.place)} ${d.cleanRounds.place}`}
-                      </span>
-                      <a class="round-result" href={r.url} target="_blank" rel="noopener">
-                        {r.result}
-                        <span class="visually-hidden"> {d.livejumping.newTab}</span>
-                        <span aria-hidden="true"> ↗</span>
-                      </a>
-                      <span class="round-prize">{r.prize}</span>
-                    </li>
-                  ))}
-                </ol>
+                {cleanRounds && (
+                  <ol class="rounds">
+                    {cleanRounds.map((r) => (
+                      <li>
+                        <span class="round-date">
+                          {formatDate(locale, r.date)}
+                          <span class="round-venue">{r.venue}</span>
+                        </span>
+                        <span class="round-name">{r.round}</span>
+                        <span class="round-place">
+                          {r.place && `${ordinal(locale, r.place)} ${d.cleanRounds.place}`}
+                        </span>
+                        <a class="round-result" href={r.url} target="_blank" rel="noopener">
+                          {r.result}
+                          <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                          <span aria-hidden="true"> ↗</span>
+                        </a>
+                        <span class="round-prize">{r.prize}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {livejumping && (
+                  <a class="lbl fact-link" href={livejumping} target="_blank" rel="noopener">
+                    <span>
+                      {d.livejumping.link}
+                      <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                    </span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                )}
               </dd>
             </div>
           </dl>

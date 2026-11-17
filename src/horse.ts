@@ -52,6 +52,12 @@ export const horseSchema = z.strictObject({
   headline: text,
   /* One free text, Hanna's own story of the horse (E4.20). A blank line is a paragraph. */
   description: text,
+  /*
+   * The exact name on livejumping.com, e.g. `LOTUS BLUE B&C`. The page links "Results on
+   * livejumping" to its name search under the example results; empty is no link. Nothing
+   * syncs from it since E4.23 (#197).
+   */
+  livejumpingName: z.string().trim().default(''),
 
   /* The fact-table rows no field above already carries. Labels live in i18n. */
   facts: z.object({

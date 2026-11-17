@@ -157,6 +157,8 @@ test('example results round-trip unchanged, and need a link, a date and at most 
   assert.equal(parse([{ ...round, date: '11.10.2026' }]).success, false);
   assert.equal(parse([round, round, round, round]).success, false);
   assert.equal(horseSchema.parse(cascada).facts.cleanRounds, null);
+  // No livejumping name is no link under them (#197).
+  assert.equal(horseSchema.parse(cascada).livejumpingName, '');
 });
 
 test('the round slots in the panel: empty ones drop, an empty prize drops, none is null (#197)', () => {

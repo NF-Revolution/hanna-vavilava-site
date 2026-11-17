@@ -2,6 +2,16 @@
 
 Status: shipped at the pull request 2026-11-17 · #197 · decided on #196
 
+## 2026-11-17 — correction after the owner's review
+
+The first push removed the "Wyniki na livejumping ↗" name-search link with the starts row it
+sat on, and `livejumpingName` with it. The owner: "It should have stayed". Restored:
+`livejumpingName` (schema, panel field, hint now "empty = no link"), `livejumpingHref`, and the
+link under the example results. The row now shows when there are rounds or a name. Canvas v80.
+Side effect: the stored `livejumpingName` parses again, so no database cleanup is needed
+before merge. Lesson: dropping a row is not dropping what hangs off it; a visible element the
+owner did not name gets asked about, not removed.
+
 ## What was built — 2026-11-17
 
 livejumping put its API behind a Cloudflare Turnstile gate, so the starts sync only got 422s.
@@ -25,10 +35,8 @@ with its livejumping competition link, and the starts-count row goes.
 ## Outcome — 2026-11-17
 
 - Tests 67/67, `npm run ci` green. Reviewer: clear; its `javascript:` URL note fixed (https only).
-- Trap: `horseSchema` is a `strictObject`. Stored `livejumpingName` (lotus-blue, red-bull on
-  2026-11-17) fails the build parse, so it must be removed from the database before this
-  ships; the old schema defaults it, so removing it early is safe. `facts.starts` is in a
-  plain `z.object` and is stripped, but remove it too.
+- Trap: `horseSchema` is a `strictObject`; a top-level key it lost fails the build parse.
+  `facts.starts` sits in a plain `z.object` and is stripped, so removing it is tidy only.
 - Rejected: filling fields from the link with a Function (gated API, against their bot
   policy; auto mode also refused reading their bundle), parsing copied page text (fragile),
   a manual starts-count field (nobody keeps it current).

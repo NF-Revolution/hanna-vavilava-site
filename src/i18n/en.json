@@ -150,6 +150,7 @@
     },
     "prefill": "Hello, I am writing about {name}: {url}",
     "livejumping": {
+      "link": "Results on livejumping",
       "newTab": "(livejumping.com, opens in a new tab)"
     },
     "cleanRounds": {
@@ -611,6 +612,7 @@
     "previewList": "Horses list",
     "previewReady": "The preview is not public. Publish for buyers to see the changes.",
     "previewFailed": "The preview failed. Try again.",
+    "livejumpingHint": "Exactly as on livejumping.com, e.g. LOTUS BLUE B&C. The page shows a “Results on livejumping” link under the example results. Empty = no link.",
     "soldConfirm": "This horse has X-ray files. The next Publish deletes them for good — it cannot be undone. Save as sold?",
     "slugHint": "Lowercase letters, digits and hyphens. The page address — fixed once saved.",
     "sections": {
@@ -636,6 +638,7 @@
       "status": "Status",
       "headline": "Headline",
       "description": "Description",
+      "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
       "facts.trainingLevel": "Training level",
       "facts.cleanRounds": "Example results",

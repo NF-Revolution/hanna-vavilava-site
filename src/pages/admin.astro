@@ -87,6 +87,7 @@ const sections: [legend: string, fields: Field[]][] = [
   [
     a.sections.facts,
     [
+      ['livejumpingName', 'text'],
       ...Object.keys(horseSchema.shape.facts.shape)
         .filter((k) => k !== 'cleanRounds')
         .map((k): Field => [`facts.${k}`, 'pair']),
@@ -126,6 +127,7 @@ const rows = (path: string, kind: Kind) => (path === 'description' ? 8 : kind ==
 const hints: Record<string, string> = {
   price: a.priceHint,
   'xrays.count': a.xraysHint,
+  livejumpingName: a.livejumpingHint,
 };
 ---
 

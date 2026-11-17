@@ -150,6 +150,7 @@
     },
     "prefill": "Dzień dobry, piszę w sprawie konia {name}: {url}",
     "livejumping": {
+      "link": "Wyniki na livejumping",
       "newTab": "(livejumping.com, otwiera się w nowej karcie)"
     },
     "cleanRounds": {
@@ -611,6 +612,7 @@
     "previewList": "Lista koni",
     "previewReady": "Podgląd nie jest publiczny. Żeby zmiany zobaczyli kupujący, opublikuj stronę.",
     "previewFailed": "Podgląd się nie udał. Spróbuj ponownie.",
+    "livejumpingHint": "Dokładnie jak na livejumping.com, np. LOTUS BLUE B&C. Na stronie pod przykładowymi wynikami pojawi się link „Wyniki na livejumping”. Puste = bez linku.",
     "soldConfirm": "Ten koń ma zdjęcia RTG. Następna publikacja usunie je na stałe — tego nie da się cofnąć. Zapisać jako sprzedany?",
     "slugHint": "Małe litery, cyfry i myślniki. Adres strony — nie zmienia się po zapisaniu.",
     "sections": {
@@ -636,6 +638,7 @@
       "status": "Status",
       "headline": "Nagłówek",
       "description": "Opis",
+      "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
       "facts.trainingLevel": "Poziom wyszkolenia",
       "facts.cleanRounds": "Przykładowe wyniki",
