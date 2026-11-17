@@ -74,16 +74,13 @@ export function fromFields(fields: Fields): Record<string, any> {
   }
 
   /*
-   * Example results (E4.23): three fixed slots, `facts.cleanRounds.0.url`…; an all-empty
-   * slot is no round, an empty prize no prize, and no round at all hides the row.
-   * ponytail: an empty slot above a filled one shifts the error focus by one slot. The
-   * panel says to fill them top-down; renumber the paths if that ever confuses anyone.
+   * Example results (E4.23): rows `facts.cleanRounds.0.url`…, numbered by the panel. An
+   * all-empty row is no round, and no round at all hides the row on the page.
    */
   if (horse.facts?.cleanRounds) {
     const rounds = Object.values(horse.facts.cleanRounds as Record<string, Fields>).filter((r) =>
       Object.values(r).some((v) => v !== undefined && String(v).trim()),
     );
-    for (const r of rounds) if (!String(r.prize ?? '').trim()) delete r.prize;
     horse.facts.cleanRounds = rounds.length ? rounds : null;
   }
 

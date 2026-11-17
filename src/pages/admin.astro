@@ -46,18 +46,14 @@ type Kind =
 type Field = [path: string, kind: Kind, required?: boolean];
 
 /*
- * The example results' slots (E4.23): each round's livejumping link and what Hanna types
- * from that page. Three, the most the page shows; `x` is a slot's index.
+ * The example results' row (E4.23): each round's livejumping link and what Hanna types from
+ * that page. One row to start, + adds one, up to the three the page shows.
  */
-const slots = [0, 1, 2];
-const roundFields: [key: string, type: 'url' | 'date' | 'text' | 'number'][] = [
+const roundFields: [key: string, type: 'url' | 'date' | 'text'][] = [
   ['url', 'url'],
   ['date', 'date'],
-  ['venue', 'text'],
   ['round', 'text'],
-  ['place', 'number'],
   ['result', 'text'],
-  ['prize', 'text'],
 ];
 const r = a.rounds as Record<string, string>;
 
@@ -286,22 +282,10 @@ const hints: Record<string, string> = {
                     <legend>
                       {f[path]} <small>{r.hint}</small>
                     </legend>
-                    {slots.map((x) => (
-                      <fieldset class="round">
-                        <legend>{r.slot.replace('{n}', String(x + 1))}</legend>
-                        {roundFields.map(([key, type]) => (
-                          <label>
-                            {r[key]} {r[`${key}Hint`] && <small>{r[`${key}Hint`]}</small>}
-                            <input
-                              name={`${path}.${x}.${key}`}
-                              type={type}
-                              min={type === 'number' ? 1 : undefined}
-                              step={type === 'number' ? 1 : undefined}
-                            />
-                          </label>
-                        ))}
-                      </fieldset>
-                    ))}
+                    <ol id="rounds"></ol>
+                    <button type="button" id="add-round">
+                      {r.add}
+                    </button>
                   </fieldset>
                 ) : kind === 'json' ? (
                   <label>
@@ -400,6 +384,23 @@ const hints: Record<string, string> = {
           </li>
         </template>
 
+        <template id="round-row">
+          <li>
+            <fieldset>
+              <legend data-legend></legend>
+              {roundFields.map(([key, type]) => (
+                <label>
+                  {r[key]} {r[`${key}Hint`] && <small>{r[`${key}Hint`]}</small>}
+                  <input type={type} data-field={key} />
+                </label>
+              ))}
+              <button type="button" data-remove>
+                {a.remove.replace(': {name}', '')}
+              </button>
+            </fieldset>
+          </li>
+        </template>
+
         <template id="xray-row">
           <li>
             <a data-link>PDF</a>
@@ -474,6 +475,9 @@ const hints: Record<string, string> = {
   const photoRow = $<HTMLTemplateElement>('photo-row');
   const photoStatus = $('photo-status');
   const photoInput = $<HTMLInputElement>('photo-input');
+  const roundList = $('rounds');
+  const roundRow = $<HTMLTemplateElement>('round-row');
+  const addRoundButton = $<HTMLButtonElement>('add-round');
   const xrayList = $('xrays');
   const xrayRow = $<HTMLTemplateElement>('xray-row');
   const xrayStatus = $('xray-status');
@@ -700,6 +704,45 @@ const hints: Record<string, string> = {
     });
   }
 
+  /*
+   * Example results (E4.23): rows named `facts.cleanRounds.<i>.…` in display order, the shape
+   * `fromFields` reads. + stops at three, the most the page shows.
+   */
+  function numberRounds() {
+    const rows = [...roundList.children];
+    rows.forEach((li, i) => {
+      const name = admin.rounds.row.replace('{n}', String(i + 1));
+      li.querySelector('[data-legend]')!.textContent = name;
+      for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+        el.name = `facts.cleanRounds.${i}.${el.dataset.field}`;
+      }
+      li.querySelector('[data-remove]')!.setAttribute(
+        'aria-label',
+        admin.remove.replace('{name}', name),
+      );
+    });
+    addRoundButton.disabled = rows.length >= 3;
+  }
+
+  function addRound(round: Record<string, string> = {}) {
+    const li = roundRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+    for (const el of li.querySelectorAll<HTMLInputElement>('[data-field]')) {
+      el.value = round[el.dataset.field!] ?? '';
+    }
+    li.querySelector<HTMLButtonElement>('[data-remove]')!.onclick = () => {
+      li.remove();
+      numberRounds();
+      addRoundButton.focus();
+    };
+    roundList.append(li);
+    numberRounds();
+    return li;
+  }
+
+  addRoundButton.addEventListener('click', () => {
+    addRound().querySelector('input')!.focus();
+  });
+
   function addXray(file: { key: string; bytes: number }) {
     const li = xrayRow.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
     const link = li.querySelector('a')!;
@@ -787,6 +830,10 @@ const hints: Record<string, string> = {
     xrayInput.disabled = true;
     xrayList.replaceChildren();
     for (const file of storedXrays()) addXray(file);
+    // One empty row to start; an empty row is no round.
+    roundList.replaceChildren();
+    const rounds = Object.values((slug && horses[slug].facts?.cleanRounds) || {});
+    for (const round of rounds.length ? rounds : [{}]) addRound(round as Record<string, string>);
     // A build still running keeps its line: its link names the horse it was started for.
     if (!previewButton.disabled) previewStatus.textContent = '';
     slugInput.value = slug ?? '';

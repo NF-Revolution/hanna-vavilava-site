@@ -154,8 +154,7 @@
       "newTab": "(livejumping.com, otwiera się w nowej karcie)"
     },
     "cleanRounds": {
-      "label": "Przykładowe wyniki",
-      "place": "miejsce"
+      "label": "Przykładowe wyniki"
     },
     "rows": {
       "pedigree": "Pochodzenie",
@@ -669,19 +668,16 @@
       "generic": "Nie udało się zalogować. Spróbuj ponownie."
     },
     "rounds": {
-      "hint": "Wklej link do konkursu z livejumping.com i przepisz z niego wynik konia. Wypełniaj od góry; puste pola = brak przejazdu, wszystkie puste = brak wiersza na stronie.",
-      "slot": "Przejazd {n}",
+      "hint": "Wklej link do konkursu z livejumping.com i przepisz z niego wynik konia. Puste pola = brak wyniku. Najwyżej 3.",
+      "row": "Wynik {n}",
+      "add": "+ Dodaj wynik",
       "url": "Link do konkursu na livejumping",
       "urlHint": "np. https://livejumping.com/ap/event/18762/competition/262906",
       "date": "Data",
-      "venue": "Miejsce zawodów",
       "round": "Konkurs",
       "roundHint": "np. N 120 cm, dwufazowy: N 120/120 cm",
-      "place": "Lokata",
       "result": "Wynik",
-      "resultHint": "np. 0 / 70,78",
-      "prize": "Nagroda",
-      "prizeHint": "np. 600 PLN, puste = brak"
+      "resultHint": "np. 0 / 70,78"
     }
   }
 }

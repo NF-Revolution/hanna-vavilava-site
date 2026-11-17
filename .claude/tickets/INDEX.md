@@ -61,7 +61,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.19 hero scroll cue        | #176               | done — centred cue on a veil after 4 s at top, hides on scroll, canvas v67  |
 | E4.20 media-first detail     | #179               | done — video strip, one description, 5 fewer fields, canvas v68             |
 | E4.22 example results        | #194               | done — clean rounds, top height, max 3, `facts.cleanRounds`, canvas v76     |
-| E4.23 rounds by hand         | #197               | done — no sync, 3 panel slots + link, no starts row, canvas v80             |
+| E4.23 rounds by hand         | #197               | done — no sync, panel rows + link, no starts row, canvas v81                |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |
@@ -608,6 +608,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   starts-count row went with the sync. Nobody would keep a count current by hand. The
   "Wyniki na livejumping" name-search link and `livejumpingName` stay (owner, 2026-11-17),
   moved under the example results; the row shows when either is there.
+  A round is its link, date, class and result only; venue, place and prize live on the
+  linked page.
 - Preview (E2.15, #184) builds the saved database to one Hosting channel `draft`, through
   `draft.yml` and its own concurrency group. It does none of Publish's jobs: no
   `/site/updated` stamp, no sold-X-ray delete, no announcement, never live. The channel URL

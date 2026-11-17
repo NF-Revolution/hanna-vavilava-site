@@ -67,18 +67,15 @@ export const horseSchema = z.strictObject({
      * Example results (E4.23, decided on #196): up to three rounds Hanna picks, each typed
      * in the panel beside its livejumping link, which the page offers as the source. Nothing
      * syncs them: livejumping gates its API against bots. Language-neutral — `N 120 cm`,
-     * `0 / 70,78`, `600 PLN` — and worded by the page. `null` hides the row.
+     * `0 / 70,78` — and worded by the page. `null` hides the row.
      */
     cleanRounds: z
       .array(
         z.object({
           url: z.url({ protocol: /^https$/ }),
           date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-          venue: z.string().trim().min(1),
           round: z.string().trim().min(1),
-          place: z.number().int().positive().optional(),
           result: z.string().trim().min(1),
-          prize: z.string().trim().optional(),
         }),
       )
       .max(3)

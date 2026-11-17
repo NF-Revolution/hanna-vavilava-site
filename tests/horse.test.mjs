@@ -140,14 +140,8 @@ test('a pair with one half filled names the blank half; two empty halves pass', 
 const link = 'https://livejumping.com/ap/event/18762/competition/262906';
 
 test('example results round-trip unchanged, and need a link, a date and at most three (#197)', () => {
-  const round = {
-    url: link,
-    date: '2026-10-11',
-    venue: 'Beckersport',
-    round: 'P 110 cm',
-    result: '0 / 61,97',
-  };
-  const cleanRounds = [{ ...round, place: 2, prize: '350 PLN' }, round];
+  const round = { url: link, date: '2026-10-11', round: 'P 110 cm', result: '0 / 61,97' };
+  const cleanRounds = [round, { ...round, date: '2026-10-10' }];
   const parse = (rounds) =>
     horseSchema.safeParse({ ...cascada, facts: { ...cascada.facts, cleanRounds: rounds } });
   assert.deepEqual(parse(cleanRounds).data?.facts.cleanRounds, cleanRounds);
@@ -155,42 +149,20 @@ test('example results round-trip unchanged, and need a link, a date and at most 
   assert.equal(parse([{ ...round, url: 'javascript:alert(1)' }]).success, false);
   assert.equal(parse([{ ...round, url: undefined }]).success, false);
   assert.equal(parse([{ ...round, date: '11.10.2026' }]).success, false);
+  assert.equal(parse([{ ...round, result: ' ' }]).success, false);
   assert.equal(parse([round, round, round, round]).success, false);
   assert.equal(horseSchema.parse(cascada).facts.cleanRounds, null);
   // No livejumping name is no link under them (#197).
   assert.equal(horseSchema.parse(cascada).livejumpingName, '');
 });
 
-test('the round slots in the panel: empty ones drop, an empty prize drops, none is null (#197)', () => {
-  const slot = (i, v) =>
+test('the panel rows: an empty one is no round, none at all is null (#197)', () => {
+  const row = (i, v) =>
     Object.fromEntries(Object.entries(v).map(([k, x]) => [`facts.cleanRounds.${i}.${k}`, x]));
-  const empty = {
-    url: '',
-    date: '',
-    venue: '',
-    round: '',
-    place: undefined,
-    result: '',
-    prize: '',
-  };
-  const filled = {
-    ...empty,
-    url: link,
-    date: '2026-10-11',
-    venue: 'B',
-    round: 'N 120 cm',
-    result: '0',
-    prize: '',
-  };
-  const none = fromFields({ ...slot(0, empty), ...slot(1, empty), ...slot(2, empty) });
-  assert.equal(none.facts.cleanRounds, null);
-  const one = fromFields({
-    ...slot(0, empty),
-    ...slot(1, { ...filled, place: 3 }),
-    ...slot(2, empty),
-  });
-  const { prize, ...rest } = filled;
-  assert.deepEqual(one.facts.cleanRounds, [{ ...rest, place: 3 }]);
-  // Loading a stored horse names its inputs the same way.
+  const empty = { url: '', date: '', round: '', result: '' };
+  const filled = { url: link, date: '2026-10-11', round: 'N 120 cm', result: '0' };
+  assert.equal(fromFields(row(0, empty)).facts.cleanRounds, null);
+  assert.deepEqual(fromFields({ ...row(0, filled), ...row(1, empty) }).facts.cleanRounds, [filled]);
+  // Loading a stored horse names its inputs the way the panel numbers its rows.
   assert.equal(toFields({ facts: { cleanRounds: [filled] } })['facts.cleanRounds.0.url'], link);
 });

@@ -2,6 +2,15 @@
 
 Status: shipped at the pull request 2026-11-17 · #197 · decided on #196
 
+## 2026-11-17 — rounds editor reworked after the owner's review
+
+The owner did not like three fixed slots ("Przejazd 1–3"): one row, + to add more, and only
+the fields link, data, konkurs, wynik. So the panel now starts with one row; "+ Dodaj wynik"
+adds one up to three, each row has a remove button (the photo/X-ray row pattern,
+`numberRounds`/`addRound` in `admin.astro`). Venue, place and prize left the schema, the page
+and the boards: a round is `{ url, date, round, result }`, and the show is on the linked page.
+`ordinal` in `src/i18n/format.ts` lost its last caller and went. Canvas v81.
+
 ## 2026-11-17 — correction after the owner's review
 
 The first push removed the "Wyniki na livejumping ↗" name-search link with the starts row it
