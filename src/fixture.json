@@ -9,7 +9,6 @@
       "pedigree": "PLACEHOLDER × PLACEHOLDER (PLACEHOLDER)",
       "levelCm": 125,
       "price": 32000,
-      "seller": "company",
       "livejumpingName": "CASCADA",
       "headline": {
         "pl": "PLACEHOLDER",
@@ -21,14 +20,6 @@
       },
       "facts": {
         "breeding": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "trainingLevel": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "documents": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         },
@@ -47,36 +38,16 @@
           }
         ]
       },
-      "suits": [
-        {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      ],
-      "health": {
-        "vaccinations": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "knownIssues": {
+      "xrays": null,
+      "videos": [],
+      "cover": {
+        "key": "photos/red-bull/8b1f2baa.jpg",
+        "alt": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         }
       },
-      "xrays": null,
-      "videos": [],
       "photos": [
-        {
-          "key": "photos/red-bull/8b1f2baa.jpg",
-          "alt": {
-            "pl": "PLACEHOLDER",
-            "en": "PLACEHOLDER"
-          },
-          "caption": {
-            "pl": "PLACEHOLDER",
-            "en": "PLACEHOLDER"
-          }
-        },
         {
           "key": "photos/red-bull/c7856957.jpg",
           "alt": {
@@ -99,7 +70,6 @@
       "pedigree": "PLACEHOLDER × PLACEHOLDER (PLACEHOLDER)",
       "levelCm": 125,
       "price": 32000,
-      "seller": "company",
       "headline": {
         "pl": "PLACEHOLDER",
         "en": "PLACEHOLDER"
@@ -110,30 +80,6 @@
       },
       "facts": {
         "breeding": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "trainingLevel": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "documents": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      },
-      "suits": [
-        {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        }
-      ],
-      "health": {
-        "vaccinations": {
-          "pl": "PLACEHOLDER",
-          "en": "PLACEHOLDER"
-        },
-        "knownIssues": {
           "pl": "PLACEHOLDER",
           "en": "PLACEHOLDER"
         }
@@ -153,6 +99,7 @@
         ]
       },
       "videos": [],
+      "cover": null,
       "photos": [],
       "status": "sold",
       "order": 1

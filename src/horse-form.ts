@@ -12,18 +12,12 @@
  */
 type Fields = Record<string, unknown>;
 
-/* Lists of PL/EN pairs, edited as two textareas with one item per line. */
-const LINES = ['suits'];
 const JSON_PATHS = ['videos'];
 
 export function toFields(horse: object): Fields {
   const out: Fields = {};
   const walk = (value: unknown, path: string) => {
-    if (LINES.includes(path)) {
-      const items = value as { pl: string; en: string }[];
-      out[`${path}.pl`] = items.map((item) => item.pl).join('\n');
-      out[`${path}.en`] = items.map((item) => item.en).join('\n');
-    } else if (JSON_PATHS.includes(path)) {
+    if (JSON_PATHS.includes(path)) {
       out[path] = JSON.stringify(value, null, 2);
     } else if (value !== null && typeof value === 'object') {
       for (const [key, child] of Object.entries(value)) walk(child, path ? `${path}.${key}` : key);
@@ -38,11 +32,6 @@ export function toFields(horse: object): Fields {
 /* `undefined` is an empty number input: the key is left out and the schema decides. */
 export function fromFields(fields: Fields): Record<string, any> {
   const horse: Record<string, any> = {};
-  const lines = (s: unknown) =>
-    String(s ?? '')
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
 
   for (const [path, value] of Object.entries(fields)) {
     if (value === undefined) continue;
@@ -53,20 +42,11 @@ export function fromFields(fields: Fields): Record<string, any> {
     node[last] = value;
   }
 
-  for (const path of LINES) {
-    const pl = lines(fields[`${path}.pl`]);
-    const en = lines(fields[`${path}.en`]);
-    // A PL/EN count mismatch leaves an `undefined` half, and the parse names the row.
-    horse[path] = Array.from({ length: Math.max(pl.length, en.length) }, (_, i) => ({
-      pl: pl[i],
-      en: en[i],
-    }));
-  }
-
   // `photos.0.key` built an object keyed "0", "1"…; integer keys enumerate in order.
   horse.photos = Object.values(horse.photos ?? {});
-  // An empty hidden input is no phone cover.
+  // An empty hidden input is no image: no phone cover, and no cover, its alt text with it.
   horse.phoneCover ||= null;
+  if (!horse.cover?.key) horse.cover = null;
   if (horse.xrays?.files) {
     horse.xrays.files = Object.values(horse.xrays.files);
     // The label is optional, and two empty halves are no label.

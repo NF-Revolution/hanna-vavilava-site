@@ -43,9 +43,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
       <li>
         <a class="card" href={path(locale, 'horse', horse.slug)}>
           <figure class="fig">
-            {horse.photos[0] && (
+            {horse.cover && (
               <Photo
-                photo={horse.photos[0]}
+                photo={horse.cover}
                 locale={locale}
                 sizes="(max-width: 720px) 50vw, 33vw"
                 hero={i === 0}

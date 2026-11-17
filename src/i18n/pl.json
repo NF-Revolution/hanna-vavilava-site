@@ -159,20 +159,10 @@
     "rows": {
       "pedigree": "Pochodzenie",
       "breeding": "Hodowla",
-      "trainingLevel": "Poziom treningu",
       "level": "Poziom konkursowy",
       "price": "Cena",
-      "suits": "Dla kogo",
       "location": "Lokalizacja",
-      "documents": "Dokumenty",
-      "sale": "Sprzedaż",
-      "vaccinations": "Szczepienia",
-      "xrays": "Zdjęcia RTG",
-      "knownIssues": "Znane kwestie"
-    },
-    "saleKind": {
-      "company": "Sprzedaż firmowa · faktura VAT",
-      "private": "Sprzedaż prywatna · bez faktury VAT · PCC 2% po stronie kupującego"
+      "xrays": "Zdjęcia RTG"
     },
     "xrays": {
       "films": {
@@ -571,13 +561,15 @@
     "saveFailed": "Nie udało się zapisać. Spróbuj ponownie.",
     "invalid": "Popraw pola:",
     "pairHalf": "Uzupełnij obie wersje, PL i EN:",
-    "lineHint": "Jedna pozycja w wierszu, ta sama kolejność po polsku i po angielsku.",
     "priceHint": "Puste = cena na zapytanie.",
     "xraysHint": "Pusta liczba = brak badania.",
     "photoDrop": "Upuść zdjęcia tutaj albo wybierz pliki",
-    "photoHint": "Pierwsze zdjęcie to okładka. Zmniejszane do 2400 px, bez danych EXIF i lokalizacji GPS.",
+    "photoHint": "Zdjęcia do galerii — okładka ma własne pole wyżej. Zmniejszane do 2400 px, bez danych EXIF i lokalizacji GPS.",
     "guideLink": "Poradnik: zdjęcia i RTG",
     "photoNeedSlug": "Najpierw wpisz adres konia.",
+    "coverHint": "Zdjęcie poziome, cały koń w kadrze. Nagłówek strony konia, lista, siatka i podgląd linku w WhatsAppie. W galerii się nie powtarza.",
+    "coverDrop": "Wybierz okładkę",
+    "coverRemove": "Usuń okładkę",
     "phoneCoverHint": "Opcjonalne zdjęcie pionowe, cały koń w kadrze. Na telefonie zastępuje okładkę; bez niego telefon przycina okładkę.",
     "phoneCoverDrop": "Wybierz zdjęcie pionowe",
     "phoneCoverRemove": "Usuń okładkę na telefon",
@@ -618,8 +610,6 @@
       "basics": "Podstawy",
       "sale": "Sprzedaż",
       "facts": "Fakty",
-      "fit": "Dla kogo",
-      "health": "Zdrowie",
       "xrays": "RTG",
       "media": "Media"
     },
@@ -633,22 +623,18 @@
       "pedigree": "Rodowód",
       "levelCm": "Poziom (cm)",
       "price": "Cena (EUR)",
-      "seller": "Sprzedawca",
       "status": "Status",
       "headline": "Nagłówek",
       "description": "Opis",
       "livejumpingName": "Nazwa na livejumping",
       "facts.breeding": "Hodowla",
-      "facts.trainingLevel": "Poziom wyszkolenia",
       "facts.cleanRounds": "Przykładowe wyniki",
-      "facts.documents": "Dokumenty",
-      "suits": "Pasuje do",
-      "health.vaccinations": "Szczepienia",
-      "health.knownIssues": "Znane problemy",
       "xrays.count": "Liczba zdjęć",
       "xrays.takenOn": "Data badania",
       "xrays.scope": "Zakres",
       "xrays.files": "Pliki",
+      "cover": "Okładka",
+      "cover.alt": "Opis okładki dla niewidomych (wymagany)",
       "videos": "Filmy",
       "photos": "Zdjęcia",
       "phoneCover": "Okładka na telefon"
@@ -658,9 +644,7 @@
       "reserved": "Zarezerwowany",
       "sold": "Sprzedany",
       "mare": "Klacz",
-      "gelding": "Wałach",
-      "company": "Firma (faktura VAT)",
-      "private": "Osoba prywatna"
+      "gelding": "Wałach"
     },
     "errors": {
       "credentials": "Nieprawidłowy e-mail lub hasło.",

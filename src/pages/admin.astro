@@ -30,19 +30,9 @@ const a = dict.admin;
 const f = a.fields as Record<string, string>;
 const o = a.options as Record<string, string>;
 
-/* A field is text, number or date input, a PL/EN pair, PL/EN line lists, JSON, photos, the phone cover, X-ray files, or a select. */
+/* A field is text, number or date input, a PL/EN pair, JSON, photos, one image (the cover or the phone cover), X-ray files, or a select. */
 type Kind =
-  | 'text'
-  | 'number'
-  | 'date'
-  | 'pair'
-  | 'lines'
-  | 'json'
-  | 'photos'
-  | 'cover'
-  | 'xrays'
-  | 'rounds'
-  | string[];
+  'text' | 'number' | 'date' | 'pair' | 'json' | 'photos' | 'image' | 'xrays' | 'rounds' | string[];
 type Field = [path: string, kind: Kind, required?: boolean];
 
 /*
@@ -75,7 +65,6 @@ const sections: [legend: string, fields: Field[]][] = [
     a.sections.sale,
     [
       ['status', ['available', 'reserved', 'sold']],
-      ['seller', ['company', 'private']],
       ['levelCm', 'number', true],
       ['price', 'number'],
     ],
@@ -90,14 +79,6 @@ const sections: [legend: string, fields: Field[]][] = [
       ['facts.cleanRounds', 'rounds'],
     ],
   ],
-  [a.sections.fit, [['suits', 'lines']]],
-  [
-    a.sections.health,
-    [
-      ['health.vaccinations', 'pair'],
-      ['health.knownIssues', 'pair'],
-    ],
-  ],
   [
     a.sections.xrays,
     [
@@ -110,15 +91,39 @@ const sections: [legend: string, fields: Field[]][] = [
   [
     a.sections.media,
     [
-      ['videos', 'json'],
+      ['cover.key', 'image'],
+      ['cover.alt', 'pair'],
+      ['phoneCover', 'image'],
       ['photos', 'photos'],
-      ['phoneCover', 'cover'],
+      ['videos', 'json'],
     ],
   ],
 ];
 
 /* The description is Hanna's one free text (E4.20), so it gets room to write. */
-const rows = (path: string, kind: Kind) => (path === 'description' ? 8 : kind === 'lines' ? 4 : 2);
+const rows = (path: string) => (path === 'description' ? 8 : 2);
+
+/*
+ * The two single-image uploads (E4.24): the cover, landscape, and the phone cover, a
+ * portrait for the 390 hero (#149). One widget, keyed by the field it fills.
+ */
+type Image = { label: string; hint: string; drop: string; remove: string; size: number[] };
+const images: Record<string, Image> = {
+  'cover.key': {
+    label: f.cover,
+    hint: a.coverHint,
+    drop: a.coverDrop,
+    remove: a.coverRemove,
+    size: [160, 100],
+  },
+  phoneCover: {
+    label: f.phoneCover,
+    hint: a.phoneCoverHint,
+    drop: a.phoneCoverDrop,
+    remove: a.phoneCoverRemove,
+    size: [96, 171],
+  },
+};
 
 const hints: Record<string, string> = {
   price: a.priceHint,
@@ -207,18 +212,16 @@ const hints: Record<string, string> = {
             <fieldset>
               <legend>{legend}</legend>
               {fields.map(([path, kind, required]) =>
-                kind === 'pair' || kind === 'lines' ? (
+                kind === 'pair' ? (
                   <fieldset class="pair">
-                    <legend>
-                      {f[path]} {kind === 'lines' && <small>{a.lineHint}</small>}
-                    </legend>
+                    <legend>{f[path]}</legend>
                     <label>
                       PL
-                      <textarea name={`${path}.pl`} rows={rows(path, kind)}></textarea>
+                      <textarea name={`${path}.pl`} rows={rows(path)}></textarea>
                     </label>
                     <label>
                       EN
-                      <textarea name={`${path}.en`} lang="en" rows={rows(path, kind)}></textarea>
+                      <textarea name={`${path}.en`} lang="en" rows={rows(path)}></textarea>
                     </label>
                   </fieldset>
                 ) : kind === 'photos' ? (
@@ -236,21 +239,28 @@ const hints: Record<string, string> = {
                     <p id="photo-status" role="status"></p>
                     <ol id="photos"></ol>
                   </fieldset>
-                ) : kind === 'cover' ? (
-                  <fieldset>
+                ) : kind === 'image' ? (
+                  <fieldset data-image={path}>
                     <legend>
-                      {f[path]} <small>{a.phoneCoverHint}</small>
+                      {images[path].label} <small>{images[path].hint}</small>
                     </legend>
-                    <img id="cover-img" class="cover-img" alt="" width="96" height="171" hidden />
-                    <input id="cover-key" type="hidden" name={path} />
+                    <img
+                      class="image-img"
+                      alt=""
+                      width={images[path].size[0]}
+                      height={images[path].size[1]}
+                      hidden
+                      data-preview
+                    />
+                    <input type="hidden" name={path} data-key />
                     <label class="drop">
-                      {a.phoneCoverDrop}
-                      <input id="cover-input" type="file" accept="image/*" />
+                      {images[path].drop}
+                      <input type="file" accept="image/*" data-file />
                     </label>
-                    <button id="cover-remove" type="button" hidden>
-                      {a.phoneCoverRemove}
+                    <button type="button" hidden data-clear>
+                      {images[path].remove}
                     </button>
-                    <p id="cover-status" role="status"></p>
+                    <p role="status" data-status></p>
                   </fieldset>
                 ) : kind === 'xrays' ? (
                   <fieldset>
@@ -634,38 +644,46 @@ const hints: Record<string, string> = {
   photoInput.addEventListener('change', () => upload(photoInput.files));
 
   /*
-   * The phone cover (#149): one optional portrait photo, a hidden key and its
-   * preview. ponytail: a replaced or removed one stays in Storage, as photos do.
+   * The cover and the phone cover (#149, E4.24): one optional photo each, a hidden key and
+   * its preview. ponytail: a replaced or removed one stays in Storage, as photos do.
    */
-  const coverImg = $<HTMLImageElement>('cover-img');
-  const coverKey = $<HTMLInputElement>('cover-key');
-  const coverInput = $<HTMLInputElement>('cover-input');
-  const coverRemove = $<HTMLButtonElement>('cover-remove');
-  const coverStatus = $('cover-status');
-
-  function showCover(key: string) {
-    coverKey.value = key;
-    coverImg.hidden = coverRemove.hidden = !key;
-    if (key) coverImg.src = photoUrl(key);
-    else coverImg.removeAttribute('src');
-  }
-
-  coverInput.addEventListener('change', async () => {
-    const file = coverInput.files?.[0];
-    const slug = file && slugFor(coverStatus);
-    if (!file || !slug) return;
-    coverStatus.textContent = admin.photoUploading.replace('{name}', file.name);
-    try {
-      showCover(await store(file, slug));
-      coverStatus.textContent = admin.photoDone.replace('{count}', '1');
-    } catch {
-      coverStatus.textContent = admin.photoFailed.replace('{name}', file.name);
-    }
-    coverInput.value = '';
-  });
-  coverRemove.addEventListener('click', () => {
-    showCover('');
-    coverInput.focus();
+  const images = [...document.querySelectorAll<HTMLFieldSetElement>('[data-image]')].map((box) => {
+    const el = <T extends HTMLElement>(key: string) => box.querySelector<T>(`[data-${key}]`)!;
+    const [img, key, input, clear, status] = [
+      el<HTMLImageElement>('preview'),
+      el<HTMLInputElement>('key'),
+      el<HTMLInputElement>('file'),
+      el<HTMLButtonElement>('clear'),
+      el('status'),
+    ];
+    const show = (value: string) => {
+      key.value = value;
+      img.hidden = clear.hidden = !value;
+      if (value) img.src = photoUrl(value);
+      else img.removeAttribute('src');
+    };
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      const slug = file && slugFor(status);
+      if (!file || !slug) return;
+      status.textContent = admin.photoUploading.replace('{name}', file.name);
+      try {
+        show(await store(file, slug));
+        status.textContent = admin.photoDone.replace('{count}', '1');
+      } catch {
+        status.textContent = admin.photoFailed.replace('{name}', file.name);
+      }
+      input.value = '';
+    });
+    clear.addEventListener('click', () => {
+      show('');
+      input.focus();
+    });
+    /* Empties the status and shows the stored image for `path`, read from the raw horse. */
+    return (horse: Stored | undefined) => {
+      status.textContent = '';
+      show(box.dataset.image!.split('.').reduce((v: any, k) => v?.[k], horse) ?? '');
+    };
   });
   $('drop').addEventListener('dragover', (event) => event.preventDefault());
   $('drop').addEventListener('drop', (event) => {
@@ -823,8 +841,7 @@ const hints: Record<string, string> = {
     photoStatus.textContent = '';
     photoList.replaceChildren();
     for (const photo of (slug && horses[slug].photos) || []) addPhoto(photo);
-    coverStatus.textContent = '';
-    showCover((slug && horses[slug].phoneCover) || '');
+    for (const showImage of images) showImage(slug ? horses[slug] : undefined);
     uploaded = new Set();
     xrayStatus.textContent = '';
     xrayInput.disabled = true;
@@ -1203,10 +1220,9 @@ const hints: Record<string, string> = {
     object-fit: cover;
     background: var(--rule);
   }
-  .cover-img:not([hidden]) {
+  .image-img:not([hidden]) {
     display: block;
-    width: 6rem;
-    aspect-ratio: 9 / 16;
+    height: auto;
     object-fit: cover;
     background: var(--rule);
   }

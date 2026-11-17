@@ -46,9 +46,9 @@ const imageVw = [61, 61, 61, 70];
     {site.horsesListed.map((horse, i) => (
       <li class="entry">
         <figure class="fig">
-          {horse.photos[0] && (
+          {horse.cover && (
             <Photo
-              photo={horse.photos[0]}
+              photo={horse.cover}
               locale={locale}
               sizes={`(max-width: 1024px) 100vw, ${imageVw[i % 4]}vw`}
               hero={i === 0}

@@ -14,15 +14,9 @@ const cascada = {
   pedigree: 'Chacco-Blue × Larena (Cassini II)',
   levelCm: 125,
   price: 32000,
-  seller: 'company',
   headline: t('Cztery starty w 125 cm w sezonie 2026'),
   description: t('Ostrożna nad drągiem.\n\nSpokojna w stajni,\nskupiona na parkurze.'),
-  facts: Object.fromEntries(['breeding', 'trainingLevel', 'documents'].map((k) => [k, t(k)])),
-  suits: [t('Jeździec amator startujący w 110–120 cm')],
-  health: {
-    vaccinations: t('Grypa i tężec — 12.08.2026'),
-    knownIssues: t('Brak'),
-  },
+  facts: { breeding: t('breeding') },
   xrays: { count: 18, takenOn: '2026-03-04', scope: t('nogi przednie i tylne') },
   videos: [
     {
@@ -33,9 +27,10 @@ const cascada = {
       transcript: t('…'),
     },
   ],
+  cover: { key: 'photos/cascada/1a2b3c4d.jpg', alt: t('Cascada nad oxerem 125 cm') },
   photos: [
-    { key: 'photos/cascada/1a2b3c4d.jpg', alt: t('Cascada nad oxerem 125 cm'), caption: t('') },
     { key: 'photos/cascada/5e6f7a8b.jpg', alt: t('Głowa, z profilu'), caption: t('głowa') },
+    { key: 'photos/cascada/9c0d1e2f.jpg', alt: t('Sylwetka'), caption: t('') },
   ],
 };
 
@@ -49,11 +44,12 @@ test('price on request is null, never zero', () => {
 });
 
 test('a horse read back from the database, nulls and empty lists dropped, still parses', () => {
-  const { price, xrays, suits, videos, photos, ...stored } = cascada;
+  const { price, xrays, cover, videos, photos, ...stored } = cascada;
   const horse = horseSchema.parse(stored);
   assert.equal(horse.price, null);
   assert.equal(horse.xrays, null);
-  assert.deepEqual([horse.suits, horse.videos, horse.photos], [[], [], []]);
+  assert.equal(horse.cover, null);
+  assert.deepEqual([horse.videos, horse.photos], [[], []]);
 });
 
 test('an owner field fails the parse', () => {
@@ -75,6 +71,13 @@ test('the admin form round-trips a phone cover, and an empty one is none', () =>
   assert.deepEqual(horseSchema.parse(fromFields(toFields(horse))), horse);
   const fields = { ...toFields(horse), phoneCover: '' };
   assert.equal(horseSchema.parse(fromFields(fields)).phoneCover, null);
+});
+
+test('an empty cover key is no cover, alt and all; a cover without alt fails (E4.24)', () => {
+  const fields = { ...toFields(horseSchema.parse(cascada)), 'cover.key': '' };
+  assert.equal(horseSchema.parse(fromFields(fields)).cover, null);
+  const cover = { ...cascada.cover, alt: { pl: 'Cascada', en: '' } };
+  assert.equal(horseSchema.safeParse({ ...cascada, cover }).success, false);
 });
 
 test('the admin form round-trips X-ray files, and an empty label is no label', () => {
@@ -106,15 +109,14 @@ test('a blank price and a blank X-ray block are null, as the form leaves them', 
   assert.equal(horse.xrays, null);
 });
 
-test('a PL list longer than its EN twin, or broken JSON, fails the parse', () => {
+test('broken JSON fails the parse', () => {
   const fields = toFields(horseSchema.parse(cascada));
-  const uneven = { ...fields, 'suits.pl': 'jeden\ndwa', 'suits.en': 'one' };
-  assert.equal(horseSchema.safeParse(fromFields(uneven)).success, false);
   assert.equal(horseSchema.safeParse(fromFields({ ...fields, videos: '[{' })).success, false);
 });
 
-test('a horse from before E4.20, or a video without a title, fails the parse', () => {
+test('a horse from before E4.20 or E4.24, or a video without a title, fails the parse', () => {
   assert.equal(horseSchema.safeParse({ ...cascada, notFor: [] }).success, false);
+  assert.equal(horseSchema.safeParse({ ...cascada, seller: 'company' }).success, false);
   const videos = [{ ...cascada.videos[0], title: { pl: 'Film', en: '' } }];
   assert.equal(horseSchema.safeParse({ ...cascada, videos }).success, false);
 });
