@@ -8,16 +8,7 @@
 import { t, htmlLang, type Locale } from '../i18n';
 import { path, type RouteKey } from '../i18n/routes';
 import { fill } from '../i18n/format';
-import {
-  site,
-  operator,
-  stables,
-  whatsappHref,
-  telegramHref,
-  emailHref,
-  phoneHref,
-  directionsHref,
-} from '../site';
+import { site, operator, whatsappHref, telegramHref, emailHref, phoneHref } from '../site';
 
 interface Props {
   locale: Locale;
@@ -43,14 +34,8 @@ const contacts = [
       <a class="foot-wordmark" href={path(locale, 'home')}>
         {dict.brand.name}
       </a>
-      <p class="lbl foot-address">
-        {fill(dict.footer.location, { stables: stables.name, town: stables.town })}
-        <br />
-        <a class="foot-directions" href={directionsHref}>
-          {dict.footer.directions}
-          <span aria-hidden="true">→</span>
-        </a>
-      </p>
+      <!-- The city only: the stable's name or address tells a thief where the horses are (#200). -->
+      <p class="lbl foot-address">{dict.status.city}</p>
       <!-- The operator, not the seller of any one horse: the enquiry reply names that (#3, E4.24). -->
       <p class="lbl foot-address">
         {operator.name}
@@ -159,15 +144,6 @@ const contacts = [
     margin: 0;
     line-height: 1.7;
     color: var(--ink-muted);
-  }
-
-  /* Its own 44px line under the stables' name, not a 17px link inside the sentence (#166). */
-  .foot-directions {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: var(--tap);
-    color: var(--ink);
   }
 
   .foot-mail {
