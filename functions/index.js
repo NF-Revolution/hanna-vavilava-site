@@ -12,9 +12,6 @@
  *   npx firebase-tools@15 functions:secrets:set RESEND_API_KEY --project hanna-vavilava-site
  *   npx firebase-tools@15 deploy --only functions --project hanna-vavilava-site
  *
- * `startsWeekly` (E2.12) is a scheduled Function, so the first deploy of it asks to
- * enable the Cloud Scheduler API. It needs no secret of its own.
- *
  * `submitEnquiry` (E5.3) sits behind the Hosting rewrite `/api/enquiry`, and a
  * hosting deploy fails while the rewrite points at a Function that does not exist.
  * Deploy it before any hosting deploy that carries the rewrite:
@@ -98,7 +95,6 @@ import * as logger from 'firebase-functions/logger';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { isDeepStrictEqual } from 'node:util';
 import { enquiryEmail, expired, failedPath, parseEnquiry, sentPath } from './enquiry.js';
 import { telegramMessage } from './notify.js';
 import {
@@ -114,7 +110,6 @@ import {
 } from './subscribe.js';
 import { presign } from './presign.js';
 import { soldXrays } from './sold.js';
-import { apiKey, fetchStarts, startFacts } from './starts.js';
 
 initializeApp({
   databaseURL: 'https://hanna-vavilava-site-default-rtdb.europe-west1.firebasedatabase.app',
@@ -312,86 +307,6 @@ export const preview = onCall({ region: 'europe-central2', secrets: [token] }, a
   adminOnly(request);
   return { at: await dispatch('preview') };
 });
-
-/*
- * Starts from livejumping (E2.12), for every horse not sold. Only the sync writes
- * these two facts, the count and the example results (E4.22). No `livejumpingName` or no
- * matching rows leaves the count `null`, which the page shows as "on request"; no clean
- * round leaves the results `null`, which hides their row. A horse livejumping
- * fails on keeps its stored facts and does not stop the others; a missing key
- * throws for the whole run. Only a fact whose text changed is written.
- *
- * ponytail: a misspelt name reads as "no starts" and shows "on request"; the panel's
- * change list is where Hanna sees it. A panel Save of a horse left open across the
- * Monday run writes the old facts back, and the next run puts them right.
- */
-/* One line for the panel's change list: the count's Polish text, or the level and its round count. */
-const summary = (fact) =>
-  fact?.pl ?? (Array.isArray(fact) ? `${fact[0].round} · ${fact.length}` : '');
-
-async function syncStarts() {
-  const db = getDatabase();
-  const horses = (await db.ref('horses').get()).val() ?? {};
-  const unsold = Object.entries(horses).filter(([, horse]) => horse && horse.status !== 'sold');
-  const changes = [];
-  const errors = [];
-
-  // Before any write, so a missing key changes nothing.
-  const key = unsold.some(([, horse]) => horse.livejumpingName) ? await apiKey() : undefined;
-  for (const [slug, horse] of unsold) {
-    const name = horse.name ?? slug;
-    try {
-      let facts = { starts: null, cleanRounds: null };
-      if (horse.livejumpingName) {
-        const starts = await fetchStarts(key, horse.livejumpingName, horse.born);
-        if (starts.length) facts = startFacts(starts);
-      }
-      const write = {};
-      for (const field of ['starts', 'cleanRounds']) {
-        const to = facts[field];
-        const from = horse.facts?.[field] ?? null;
-        // Key order is the database's, not ours; absent keys are absent on both sides.
-        if (isDeepStrictEqual(to, from)) continue;
-        write[`horses/${slug}/facts/${field}`] = to;
-        changes.push({ name, field, from: summary(from), to: summary(to) });
-      }
-      if (Object.keys(write).length) await db.ref().update(write);
-    } catch (e) {
-      errors.push({ name, message: e.message });
-    }
-  }
-  return { changes, errors };
-}
-
-/* The panel's "Refresh starts". Hanna reads what changed, then publishes as usual. */
-export const refreshStarts = onCall(
-  { region: 'europe-central2', timeoutSeconds: 300 },
-  async (request) => {
-    adminOnly(request);
-    try {
-      return await syncStarts();
-    } catch (e) {
-      throw new HttpsError('unavailable', e.message);
-    }
-  },
-);
-
-/* Monday 06:00 in Warsaw, so the weekend's shows are live before the week's first enquiries. */
-export const startsWeekly = onSchedule(
-  {
-    schedule: '0 6 * * 1',
-    timeZone: 'Europe/Warsaw',
-    region: 'europe-central2',
-    secrets: [token, cloudflare],
-    timeoutSeconds: 300,
-  },
-  async () => {
-    const { changes, errors } = await syncStarts();
-    for (const { name, message } of errors) logger.error(`starts: ${name}: ${message}`);
-    logger.info(`starts: ${changes.length} change(s)`, { changes });
-    if (changes.length) await release();
-  },
-);
 
 /*
  * The enquiry form's endpoint (E5.3): a plain form POST, answered with a 303 to the

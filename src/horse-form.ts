@@ -73,6 +73,17 @@ export function fromFields(fields: Fields): Record<string, any> {
     for (const file of horse.xrays.files) if (!file.label?.pl && !file.label?.en) delete file.label;
   }
 
+  /*
+   * Example results (E4.23): rows `facts.cleanRounds.0.url`…, numbered by the panel. An
+   * all-empty row is no round, and no round at all hides the row on the page.
+   */
+  if (horse.facts?.cleanRounds) {
+    const rounds = Object.values(horse.facts.cleanRounds as Record<string, Fields>).filter((r) =>
+      Object.values(r).some((v) => v !== undefined && String(v).trim()),
+    );
+    horse.facts.cleanRounds = rounds.length ? rounds : null;
+  }
+
   for (const path of JSON_PATHS) {
     const keys = path.split('.');
     const last = keys.pop()!;

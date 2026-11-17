@@ -120,7 +120,7 @@ export const directionsHref = `https://www.google.com/maps/dir/?api=1&destinatio
 
 /*
  * Livejumping has no stable per-horse page (#108), so a horse links to its name search,
- * cut at the first symbol as `searchTerm` in `functions/starts.js` does: `B&C` finds nothing.
+ * cut at the first symbol: their search finds nothing for `LOTUS BLUE B&C`, all of it for `LOTUS BLUE B`.
  */
 export const livejumpingHref = (name: string): string =>
   `https://livejumping.com/ap/search/horse/${encodeURIComponent(name.split(/[^\p{L}\p{N} ]/u)[0].trim())}`;

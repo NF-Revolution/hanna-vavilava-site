@@ -23,7 +23,7 @@ import EnquiryForm from './EnquiryForm.astro';
 import NotifyForm from './NotifyForm.astro';
 import JsonLd from './JsonLd.astro';
 import { t, type Locale } from '../i18n';
-import { fill, formatDate, formatPrice, formatSize, ordinal, plural } from '../i18n/format';
+import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/format';
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
@@ -51,9 +51,8 @@ const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
  * One table in two columns that share their row heights, so a tall row on one
  * side never pushes the other out of line (E4.20): filled down the left column,
  * then the right, with the sale rows last (#2, #3). Who the horse suits is a row
- * of its own, a list. A third slot links the value on: Starts to livejumping in
- * a new tab (#111), Location to directions to the stables, as the footer does
- * (#166). Every horse stands there, so Location is the stables, not a field.
+ * of its own, a list. A third slot links the value on: Location to directions
+ * to the stables, as the footer does (#166). Every horse stands there, so Location is the stables, not a field.
  */
 type Link = { href: string; text: string; newTab?: string };
 type Row = [label: string, value: string | string[], link?: Link];
@@ -62,17 +61,6 @@ const facts: Row[] = [
   [d.rows.breeding, f.breeding[locale]],
   [d.rows.trainingLevel, f.trainingLevel[locale]],
   [d.rows.level, `${horse.levelCm} cm`],
-  [
-    d.rows.starts,
-    f.starts?.[locale] ?? d.infoOnRequest,
-    horse.livejumpingName
-      ? {
-          href: livejumpingHref(horse.livejumpingName),
-          text: d.livejumping.link,
-          newTab: d.livejumping.newTab,
-        }
-      : undefined,
-  ],
   ...(horse.suits.length ? [[d.rows.suits, horse.suits.map((s) => s[locale])] as Row] : []),
   [
     d.rows.location,
@@ -84,11 +72,14 @@ const facts: Row[] = [
   [d.rows.sale, d.saleKind[horse.seller]],
 ];
 /*
- * Example results (E4.22, #194): one row across both columns under the table, so its
- * rounds stretch no paired row. Clean rounds from the top level, each with its venue,
- * since they can come from different shows. None clean, no row.
+ * Example results (E4.22, #194; by hand since E4.23, #197): one row across both columns
+ * under the table, so its rounds stretch no paired row. Each round is its date, class and
+ * result, the result linking to the livejumping page Hanna took it from, so a buyer can
+ * check it there and see the show. Under them, the horse's livejumping name
+ * search (#111), which stays when there are no rounds. Neither, no row.
  */
 const cleanRounds = f.cleanRounds;
+const livejumping = horse.livejumpingName && livejumpingHref(horse.livejumpingName);
 
 /* Rows per column: the left takes the extra one. */
 const half = (n: number) => `--rows: ${Math.ceil(n / 2)}`;
@@ -381,29 +372,35 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
             </div>
           ))}
         </dl>
-        {cleanRounds && (
+        {(cleanRounds || livejumping) && (
           <dl class="table wide">
             <div>
               <dt class="lbl">{d.cleanRounds.label}</dt>
               <dd class="num">
-                <ol class="rounds">
-                  {cleanRounds.map((r) => (
-                    <li>
-                      <span class="round-date">
-                        {formatDate(locale, r.date)}
-                        <span class="round-venue">{r.venue}</span>
-                      </span>
-                      <span class="round-name">
-                        {r.twoPhase ? `${r.round} · ${d.cleanRounds.twoPhase}` : r.round}
-                      </span>
-                      <span class="round-place">
-                        {r.place && `${ordinal(locale, r.place)} ${d.cleanRounds.place}`}
-                      </span>
-                      <span class="round-result">{r.result}</span>
-                      <span class="round-prize">{r.prize}</span>
-                    </li>
-                  ))}
-                </ol>
+                {cleanRounds && (
+                  <ol class="rounds">
+                    {cleanRounds.map((r) => (
+                      <li>
+                        <span class="round-date">{formatDate(locale, r.date)}</span>
+                        <span class="round-name">{r.round}</span>
+                        <a class="round-result" href={r.url} target="_blank" rel="noopener">
+                          {r.result}
+                          <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                          <span aria-hidden="true"> ↗</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {livejumping && (
+                  <a class="lbl fact-link" href={livejumping} target="_blank" rel="noopener">
+                    <span>
+                      {d.livejumping.link}
+                      <span class="visually-hidden"> {d.livejumping.newTab}</span>
+                    </span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                )}
               </dd>
             </div>
           </dl>
@@ -796,21 +793,16 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     flex: 1;
   }
 
-  /* Date and venue, class, placing, result, prize: columns at 1440, two lines at 390. */
+  /* Date, class, result: columns at 1440, two lines at 390. */
   .rounds {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .round-venue {
-    display: block;
-    color: var(--ink-muted);
-  }
-
   .rounds li {
     display: grid;
-    grid-template-columns: 110px 260px 140px 1fr 120px;
+    grid-template-columns: 110px 260px 1fr;
     gap: 24px;
     padding: 8px 0;
     border-top: 1px solid var(--rule);
@@ -822,28 +814,25 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     border-top: 0;
   }
 
-  .round-prize {
-    text-align: right;
+  /* The result is the link to its source; 24px tall at least, the WCAG 2.2 AA target. */
+  .round-result {
+    justify-self: start;
+    min-height: 24px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  /* The five columns need about 1200px of page; narrower, each round is two lines. */
+  /* Narrower, the class leads and the date and result go under it, in grey. */
   @media (max-width: 1199px) {
     .rounds li {
-      grid-template-columns: auto 1fr auto;
-      grid-template-areas: 'place name prize' 'date result result';
+      grid-template-columns: auto 1fr;
+      grid-template-areas: 'name name' 'date result';
       gap: 2px 8px;
-    }
-
-    .round-place {
-      grid-area: place;
     }
 
     .round-name {
       grid-area: name;
-    }
-
-    .round-prize {
-      grid-area: prize;
     }
 
     .round-date,
