@@ -17,6 +17,9 @@ const text = z.object({ pl: z.string(), en: z.string() });
  */
 const key = z.string().regex(/^[a-z0-9][\w./-]*$/i);
 
+/* A photo's alt text, which may never be empty. */
+const alt = z.object({ pl: z.string().trim().min(1), en: z.string().trim().min(1) });
+
 /*
  * The Realtime Database stores neither `null` nor an empty array, so every
  * nullable or list field defaults: a horse read back without `xrays`, `price`
@@ -47,8 +50,6 @@ export const horseSchema = z.strictObject({
   levelCm: z.number().int().positive(),
   /* Whole EUR, the total the buyer pays. `null` is "on request" (#2). */
   price: z.number().int().positive().nullable().default(null),
-  /* Decides the VAT invoice, the price label and the sale-kind line (#3). */
-  seller: z.enum(['company', 'private']),
   headline: text,
   /* One free text, Hanna's own story of the horse (E4.20). A blank line is a paragraph. */
   description: text,
@@ -62,7 +63,6 @@ export const horseSchema = z.strictObject({
   /* The fact-table rows no field above already carries. Labels live in i18n. */
   facts: z.object({
     breeding: text,
-    trainingLevel: text,
     /*
      * Example results (E4.23, decided on #196): up to three rounds Hanna picks, each typed
      * in the panel beside its livejumping link, which the page offers as the source. Nothing
@@ -81,15 +81,8 @@ export const horseSchema = z.strictObject({
       .max(3)
       .nullable()
       .default(null),
-    documents: text,
   }),
 
-  suits: z.array(text).default([]),
-
-  health: z.object({
-    vaccinations: text,
-    knownIssues: text,
-  }),
   /* `null`: no study, the row is omitted. `files: []`: the study exists, the films are not out yet (#4). */
   xrays: z
     .object({
@@ -128,18 +121,12 @@ export const horseSchema = z.strictObject({
     )
     .default([]),
   /*
-   * The first is the cover — the detail hero and the grid card. `caption` is the
-   * short visible gallery label and may be empty; `alt` never may.
+   * Uploaded on its own (E4.24): the detail hero, the list and grid cards, the other-horses
+   * cards, the link preview card and the Product image. Never repeated in the gallery.
    */
-  photos: z
-    .array(
-      z.object({
-        key,
-        alt: z.object({ pl: z.string().trim().min(1), en: z.string().trim().min(1) }),
-        caption: text,
-      }),
-    )
-    .default([]),
+  cover: z.object({ key, alt }).nullable().default(null),
+  /* The gallery only. `caption` is the short visible label and may be empty; `alt` never may. */
+  photos: z.array(z.object({ key, alt, caption: text })).default([]),
   /*
    * A portrait shot for the 390 hero (#149), which the landscape cover cannot
    * fill without losing the head. Without one the phone crops the cover. The

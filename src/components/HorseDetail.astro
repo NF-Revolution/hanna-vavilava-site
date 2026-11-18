@@ -1,9 +1,11 @@
 ---
 /*
  * One horse (E4.4), drawn as `HorseDetail` and `MobileDetail`: hero, the
- * videos, the gallery, the description, facts, who it suits, health and the
- * other horses. Media comes first, so a buyer sees the horse move before
- * reading about it (E4.20). A section with nothing to show is left out (E4.5).
+ * gallery, the videos, the description, facts, health and the other horses.
+ * Media comes first, so a buyer sees the horse before reading about it (E4.20),
+ * photos before videos (E4.24). The hero is the horse's own cover, never a
+ * gallery photo, so it does not repeat there. A section with nothing to show is
+ * left out (E4.5).
  * The enquiry, with this horse preselected, is the page's inverted band (E5.2),
  * and at 390 too: no script could carry the horse to the enquiry page.
  *
@@ -50,26 +52,23 @@ const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
 /*
  * One table in two columns that share their row heights, so a tall row on one
  * side never pushes the other out of line (E4.20): filled down the left column,
- * then the right, with the sale rows last (#2, #3). Who the horse suits is a row
- * of its own, a list. A third slot links the value on: Location to directions
- * to the stables, as the footer does (#166). Every horse stands there, so Location is the stables, not a field.
+ * then the right, the left taking the odd row, with the price last (#2). The sale
+ * kind left the page with E4.24: the enquiry reply tells it. A third slot links
+ * the value on: Location to directions to the stables, as the footer does (#166).
+ * Every horse stands there, so Location is the stables, not a field.
  */
 type Link = { href: string; text: string; newTab?: string };
-type Row = [label: string, value: string | string[], link?: Link];
+type Row = [label: string, value: string, link?: Link];
 const facts: Row[] = [
   [d.rows.pedigree, horse.pedigree],
   [d.rows.breeding, f.breeding[locale]],
-  [d.rows.trainingLevel, f.trainingLevel[locale]],
   [d.rows.level, `${horse.levelCm} cm`],
-  ...(horse.suits.length ? [[d.rows.suits, horse.suits.map((s) => s[locale])] as Row] : []),
   [
     d.rows.location,
     `${stables.name}, ${stables.street}, ${stables.postalCode} ${stables.town}`,
     { href: directionsHref, text: dict.footer.directions },
   ],
-  [d.rows.documents, f.documents[locale]],
   [d.rows.price, price],
-  [d.rows.sale, d.saleKind[horse.seller]],
 ];
 /*
  * Example results (E4.22, #194; by hand since E4.23, #197): one row across both columns
@@ -116,7 +115,7 @@ const xrayDate = xrays && formatDate(locale, xrays.takenOn);
  *
  * ponytail: centre crop. Store a focal point per photo if a card ever cuts off a head.
  */
-const cover = horse.photos[0];
+const cover = horse.cover;
 let image;
 if (cover) {
   const src = photoUrl(cover.key);
@@ -148,7 +147,7 @@ const product = !sold &&
     name: horse.name,
     description: horse.headline[locale],
     url,
-    ...(horse.photos.length && { image: horse.photos.map((p) => photoUrl(p.key)) }),
+    ...(cover && { image: [cover, ...horse.photos].map((p) => photoUrl(p.key)) }),
     offers: {
       '@type': 'Offer',
       price: horse.price,
@@ -182,9 +181,9 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
   <JsonLd data={breadcrumb} />
   {product && <JsonLd data={product} />}
   <section class:list={['hero', { 'hero-barred': !sold }]}>
-    {horse.photos[0] && (
+    {cover && (
       <Photo
-        photo={horse.photos[0]}
+        photo={cover}
         locale={locale}
         sizes="100vw"
         hero
@@ -276,6 +275,12 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     </>
   ) : (
     <>
+      {horse.photos.length > 0 && (
+        <section class="band">
+          <h2 class="lbl head">{d.gallery}</h2>
+          <Gallery photos={horse.photos} locale={locale} />
+        </section>
+      )}
       {horse.videos.length > 0 && (
         <section class="band">
           <h2 class="lbl head">{d.videos}</h2>
@@ -322,12 +327,6 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           )}
         </section>
       )}
-      {horse.photos.length > 0 && (
-        <section class="band">
-          <h2 class="lbl head">{d.gallery}</h2>
-          <Gallery photos={horse.photos} locale={locale} />
-        </section>
-      )}
       {description.length > 0 && (
         <section class="band">
           <h2 class="lbl head">{d.description}</h2>
@@ -345,15 +344,7 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
             <div>
               <dt class="lbl">{label}</dt>
               <dd class="num">
-                {Array.isArray(value) ? (
-                  <ul class="list">
-                    {value.map((item) => (
-                      <li>{item}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  value
-                )}
+                {value}
                 {link && (
                   <a
                     class="lbl fact-link"
@@ -406,18 +397,11 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           </dl>
         )}
       </section>
-      <section class="band">
-        <h2 class="lbl head">{d.health}</h2>
-        <dl class="table" style={half(xrays ? 3 : 2)}>
-          <div>
-            <dt class="lbl">{d.rows.vaccinations}</dt>
-            <dd>{horse.health.vaccinations[locale]}</dd>
-          </div>
-          <div>
-            <dt class="lbl">{d.rows.knownIssues}</dt>
-            <dd>{horse.health.knownIssues[locale]}</dd>
-          </div>
-          {xrays && (
+      {/* Only with X-rays (E4.24): the study and the vet note, one row across both columns. */}
+      {xrays && (
+        <section class="band">
+          <h2 class="lbl head">{d.health}</h2>
+          <dl class="table wide">
             <div>
               <dt class="lbl">{d.rows.xrays}</dt>
               <dd class="num">
@@ -452,10 +436,10 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
                 )}
               </dd>
             </div>
-          )}
-        </dl>
-        <p class="copy note">{d.vetNote}</p>
-      </section>
+          </dl>
+          <p class="copy note">{d.vetNote}</p>
+        </section>
+      )}
       <section class="enquire dk" id="enquiry">
         <div class="enquire-intro">
           <div>
@@ -483,9 +467,9 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
           <li>
             <a class="card" href={path(locale, 'horse', other.slug)}>
               <figure class="thumb">
-                {other.photos[0] && (
+                {other.cover && (
                   <Photo
-                    photo={other.photos[0]}
+                    photo={other.cover}
                     locale={locale}
                     sizes="(max-width: 720px) 74px, 33vw"
                   />
@@ -845,12 +829,6 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
     .round-result {
       grid-area: result;
     }
-  }
-
-  .list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
   }
 
   .xray-pending {

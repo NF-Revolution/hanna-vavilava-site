@@ -62,6 +62,7 @@ Design: Artifact canvas `F7qeoBwkyu2Dau5p1iLg2n` ("Hanna Vavilava — sales site
 | E4.20 media-first detail     | #179               | done — video strip, one description, 5 fewer fields, canvas v68             |
 | E4.22 example results        | #194               | done — clean rounds, top height, max 3, `facts.cleanRounds`, canvas v76     |
 | E4.23 rounds by hand         | #197               | done — no sync, panel rows + link, no starts row, canvas v81                |
+| E4.24 own cover, six gone    | #199               | done — `cover` field, gallery above videos, health only with X-rays, v85    |
 | E5.1 enquiry form markup     | #40                | done — `EnquiryForm.astro`, coded select values, `+` phone                  |
 | E5.2 prefilled, search forms | #41                | done — dark form on horse page, `kind=search`, canvas v38                   |
 | E5.3 submitEnquiry endpoint  | #42                | done — `/api/enquiry` rewrite, zod, traps, 5/IP/h, deployed                 |
@@ -620,3 +621,8 @@ immutable` is object metadata set at upload rather than an edge rule, because th
   every pull request's channel. `submitEnquiry` and the notify signup treat it as the honeypot:
   the sent page, with nothing stored, mailed or messaged. They recognise a channel by `--` in
   `Origin` or `X-Forwarded-Host`. Before this, a test enquiry from a PR preview reached Hanna.
+- The sale kind left the horse page (E4.24, #199), reversing the per-horse line of E0.3 (#3).
+  `seller` is gone from the schema, so the trader-versus-private difference — VAT invoice,
+  rękojmia, the buyer's 2% PCC — is told in the enquiry reply. The same ticket dropped who the
+  horse suits, documents, training level, vaccinations and known issues, and gave the horse its
+  own `cover`, uploaded apart from the gallery, so the hero never repeats as gallery photo 01.

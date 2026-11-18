@@ -159,20 +159,10 @@
     "rows": {
       "pedigree": "Pedigree",
       "breeding": "Breeding",
-      "trainingLevel": "Training level",
       "level": "Competition level",
       "price": "Price",
-      "suits": "Who it suits",
       "location": "Location",
-      "documents": "Documents",
-      "sale": "Sale",
-      "vaccinations": "Vaccinations",
-      "xrays": "X-rays",
-      "knownIssues": "Known issues"
-    },
-    "saleKind": {
-      "company": "Company sale · VAT invoice",
-      "private": "Private sale · no VAT invoice · 2% PCC paid by the buyer"
+      "xrays": "X-rays"
     },
     "xrays": {
       "films": {
@@ -571,13 +561,15 @@
     "saveFailed": "Could not save. Try again.",
     "invalid": "Fix these fields:",
     "pairHalf": "Fill in both PL and EN:",
-    "lineHint": "One item per line, in the same order in Polish and English.",
     "priceHint": "Empty = price on request.",
     "xraysHint": "Empty count = no study.",
     "photoDrop": "Drop photos here or choose files",
-    "photoHint": "The first photo is the cover. Downscaled to 2400 px, EXIF and GPS location removed.",
+    "photoHint": "Gallery photos — the cover has its own field above. Downscaled to 2400 px, EXIF and GPS location removed.",
     "guideLink": "Guide: photos and X-rays",
     "photoNeedSlug": "Enter the horse's address first.",
+    "coverHint": "Landscape, the whole horse in frame. The horse page header, the list, the grid and the WhatsApp link preview. It does not repeat in the gallery.",
+    "coverDrop": "Choose the cover",
+    "coverRemove": "Remove the cover",
     "phoneCoverHint": "Optional portrait photo with the whole horse in frame. Replaces the cover on phones; without it, phones crop the cover.",
     "phoneCoverDrop": "Choose a portrait photo",
     "phoneCoverRemove": "Remove the phone cover",
@@ -618,8 +610,6 @@
       "basics": "Basics",
       "sale": "Sale",
       "facts": "Facts",
-      "fit": "Who it suits",
-      "health": "Health",
       "xrays": "X-rays",
       "media": "Media"
     },
@@ -633,22 +623,18 @@
       "pedigree": "Pedigree",
       "levelCm": "Level (cm)",
       "price": "Price (EUR)",
-      "seller": "Seller",
       "status": "Status",
       "headline": "Headline",
       "description": "Description",
       "livejumpingName": "Livejumping name",
       "facts.breeding": "Breeding",
-      "facts.trainingLevel": "Training level",
       "facts.cleanRounds": "Example results",
-      "facts.documents": "Documents",
-      "suits": "Suits",
-      "health.vaccinations": "Vaccinations",
-      "health.knownIssues": "Known issues",
       "xrays.count": "Number of films",
       "xrays.takenOn": "Study date",
       "xrays.scope": "Scope",
       "xrays.files": "Files",
+      "cover": "Cover",
+      "cover.alt": "Cover description for blind visitors (required)",
       "videos": "Videos",
       "photos": "Photos",
       "phoneCover": "Phone cover"
@@ -658,9 +644,7 @@
       "reserved": "Reserved",
       "sold": "Sold",
       "mare": "Mare",
-      "gelding": "Gelding",
-      "company": "Company (VAT invoice)",
-      "private": "Private seller"
+      "gelding": "Gelding"
     },
     "errors": {
       "credentials": "Wrong email or password.",
