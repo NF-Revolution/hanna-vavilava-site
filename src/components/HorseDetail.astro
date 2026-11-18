@@ -29,7 +29,7 @@ import { fill, formatDate, formatPrice, formatSize, plural } from '../i18n/forma
 import { path } from '../i18n/routes';
 import { photoUrl } from '../firebase';
 import { media } from '../media';
-import { directionsHref, livejumpingHref, site, stables, whatsappHref } from '../site';
+import { livejumpingHref, site, whatsappHref } from '../site';
 import type { Horse } from '../horse';
 
 interface Props {
@@ -53,21 +53,16 @@ const cta = whatsappHref(fill(d.prefill, { name: horse.name, url }));
  * One table in two columns that share their row heights, so a tall row on one
  * side never pushes the other out of line (E4.20): filled down the left column,
  * then the right, the left taking the odd row, with the price last (#2). The sale
- * kind left the page with E4.24: the enquiry reply tells it. A third slot links
- * the value on: Location to directions to the stables, as the footer does (#166).
- * Every horse stands there, so Location is the stables, not a field.
+ * kind left the page with E4.24: the enquiry reply tells it. Every horse stands in the
+ * same stable, so Location is the city, not a field — never the stable's name or
+ * address, which would tell a thief where the horses are (#200).
  */
-type Link = { href: string; text: string; newTab?: string };
-type Row = [label: string, value: string, link?: Link];
+type Row = [label: string, value: string];
 const facts: Row[] = [
   [d.rows.pedigree, horse.pedigree],
   [d.rows.breeding, f.breeding[locale]],
   [d.rows.level, `${horse.levelCm} cm`],
-  [
-    d.rows.location,
-    `${stables.name}, ${stables.street}, ${stables.postalCode} ${stables.town}`,
-    { href: directionsHref, text: dict.footer.directions },
-  ],
+  [d.rows.location, dict.status.city],
   [d.rows.price, price],
 ];
 /*
@@ -340,26 +335,10 @@ const others = site.horsesListed.filter((h) => h.slug !== slug).slice(0, 3);
       <section class="band">
         <h2 class="lbl head">{d.facts}</h2>
         <dl class="table" style={half(facts.length)}>
-          {facts.map(([label, value, link]) => (
+          {facts.map(([label, value]) => (
             <div>
               <dt class="lbl">{label}</dt>
-              <dd class="num">
-                {value}
-                {link && (
-                  <a
-                    class="lbl fact-link"
-                    href={link.href}
-                    target={link.newTab && '_blank'}
-                    rel={link.newTab && 'noopener'}
-                  >
-                    <span>
-                      {link.text}
-                      {link.newTab && <span class="visually-hidden"> {link.newTab}</span>}
-                    </span>
-                    <span aria-hidden="true">{link.newTab ? '↗' : '→'}</span>
-                  </a>
-                )}
-              </dd>
+              <dd class="num">{value}</dd>
             </div>
           ))}
         </dl>
